@@ -1,59 +1,82 @@
-# `Nesto`
+# Nisto
 
-Welcome to your new `Nesto` project and to the Internet Computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+A next-generation social finance platform on the Internet Computer, combining DeFi, social trading, AI-powered insights, and a developer mini-app ecosystem.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+---
 
-To learn more before you start working with `Nesto`, see the following documentation available online:
+## 🚀 Overview
+Nisto is a modern, modular, and extensible platform for managing digital assets, group vaults, payments, and more. It features a beautiful dashboard, seamless onboarding, robust recovery, and a plugin/mini-app marketplace for developers.
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Motoko Programming Language Guide](https://internetcomputer.org/docs/current/motoko/main/motoko)
-- [Motoko Language Quick Reference](https://internetcomputer.org/docs/current/motoko/main/language-manual)
+---
 
-If you want to start working on your project right away, you might want to try the following commands:
+## ✨ Key Features
 
+- **Unified Dashboard**: Clean, modern UI with stats, recent activity, and quick actions.
+- **Crypto Wallets**: Multi-currency support, deposit/withdraw, balance tracking, and address management.
+- **DeFi Tools**: Portfolio overview, asset analytics, staking, lending, yield farming, and more.
+- **Group Vaults**: Create, join, and manage group savings/investment vaults with member roles and permissions.
+- **Local Payments**: Integrate with M-Pesa, Airtel Money, and more for fiat on/off ramps.
+- **Social Games**: Participate in trading games, challenges, and leaderboards.
+- **AI Assistant**: Get personalized financial insights and recommendations.
+- **Plugin/Mini-App Marketplace**: Discover, install, and build mini-apps for trading, analytics, NFTs, and more.
+- **Account Recovery**: Multi-method recovery (email, SMS, security questions, emergency contact) with a modern, interactive setup flow.
+- **Notifications**: Real-time notifications and activity tracking.
+- **Onboarding**: Seamless, multi-step onboarding with modals for profile, wallets, and recovery.
+- **Responsive Design**: Works beautifully on desktop and mobile.
+
+---
+
+## 🛠️ Developer Guide
+
+### Getting Started
 ```bash
-cd Nesto/
-dfx help
-dfx canister --help
+git clone https://github.com/KezzyNgotho/Nisto.git
+cd Nisto
+npm install
+npm run dev  # or yarn dev
 ```
 
-## Running the project locally
+### Building & Running
+- **Frontend**: React + Vite + SCSS (in `src/Nisto_frontend`)
+- **Backend**: Motoko canisters (in `src/Nisto_backend`)
+- **Start local IC replica**: `dfx start`
+- **Deploy canisters**: `dfx deploy`
 
-If you want to test your project locally, you can use the following commands:
+### Contributing
+- Fork the repo, create a feature branch, and submit a pull request.
+- Follow the code style and add tests where possible.
 
-```bash
-# Starts the replica, running in the background
-dfx start --background
+### Creating Mini-Apps/Plugins
+- See the `src/Nisto_frontend/src/components/PluginSystem.jsx` for plugin architecture.
+- Plugins are React components with a defined API and metadata.
+- Submit your mini-app/plugin via pull request or contact the maintainers.
 
-# Deploys your canisters to the replica and generates your candid interface
-dfx deploy
-```
+---
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+## 🏆 Milestones
 
-If you have made changes to your backend canister, you can generate a new candid interface with
+- **MVP**: Unified dashboard, wallets, group vaults, onboarding, recovery, notifications.
+- **DeFi Launch**: Portfolio analytics, staking, lending, yield farming, DeFi product cards.
+- **Social Layer**: Social games, leaderboards, group challenges.
+- **Plugin Ecosystem**: Mini-app marketplace, developer APIs, plugin management UI.
+- **Mobile & Extension**: Responsive mobile UI, browser extension, push notifications.
+- **Advanced Recovery**: Multi-method, social recovery, and backup options.
+- **AI & Analytics**: AI assistant, smart alerts, risk analysis, portfolio insights.
 
-```bash
-npm run generate
-```
+---
 
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
+## 📸 Screenshots
 
-If you are making frontend changes, you can start a development server with
+> _Add screenshots/gifs of the dashboard, DeFi tools, group vaults, plugin marketplace, and onboarding modals here._
 
-```bash
-npm start
-```
+---
 
-Which will start a server at `http://localhost:8080`, proxying API requests to the replica at port 4943.
+## 📄 License
+MIT License
 
-### Note on frontend environment variables
+---
 
-If you are hosting frontend code somewhere without using DFX, you may need to make one of the following adjustments to ensure your project does not fetch the root key in production:
-
-- set`DFX_NETWORK` to `ic` if you are using Webpack
-- use your own preferred method to replace `process.env.DFX_NETWORK` in the autogenerated declarations
-  - Setting `canisters -> {asset_canister_id} -> declarations -> env_override to a string` in `dfx.json` will replace `process.env.DFX_NETWORK` with the string in the autogenerated declarations
-- Write your own `createActor` constructor
+## 📬 Contact
+- **Lead Developer:** Kezzy Ngotho ([GitHub](https://github.com/KezzyNgotho))
+- **Issues & Support:** Use the [GitHub Issues](https://github.com/KezzyNgotho/Nisto/issues) page.
+- **Contributions:** PRs welcome!
