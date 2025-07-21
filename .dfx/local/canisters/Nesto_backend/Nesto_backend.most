@@ -1,0 +1,34 @@
+// Version: 1.0.0
+actor {
+  stable var nextAIInsightId : Nat;
+  stable var nextAIMessageId : Nat;
+  stable var nextAIRecommendationId : Nat;
+  stable var nextAuditLogId : Nat;
+  stable var nextBudgetId : Nat;
+  stable var nextCryptoTransactionId : Nat;
+  stable var nextCryptoWalletId : Nat;
+  stable var nextDeFiPositionId : Nat;
+  stable var nextDefiTransactionId : Nat;
+  stable var nextEmergencyContactId : Nat;
+  stable var nextExternalConnectionId : Nat;
+  stable var nextGameId : Nat;
+  stable var nextGameParticipantId : Nat;
+  stable var nextGameRewardId : Nat;
+  stable var nextGoalId : Nat;
+  stable var nextLocalPaymentId : Nat;
+  stable var nextOTPRequestId : Nat;
+  stable var nextPaymentMethodId : Nat;
+  stable var nextPluginId : Nat;
+  stable var nextRecoveryMethodId : Nat;
+  stable var nextRecoveryRequestId : Nat;
+  stable var nextSecurityQuestionId : Nat;
+  stable var nextSessionId : Nat;
+  stable var nextTransactionId : Nat;
+  stable var nextUserId : Nat;
+  stable var nextUserPluginId : Nat;
+  stable var nextVaultId : Nat;
+  stable var nextVaultMemberId : Nat;
+  stable var nextVaultTransactionId : Nat;
+  stable var nextVerificationCodeId : Nat;
+  stable var nextWalletId : Nat
+};

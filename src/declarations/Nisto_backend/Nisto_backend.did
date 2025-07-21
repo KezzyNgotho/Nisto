@@ -1,0 +1,1155 @@
+type WalletPortfolio = 
+ record {
+   cryptoWallets: vec CryptoWallet;
+   defiPositions: vec DeFiPosition;
+   externalConnections: vec ExternalWalletConnection;
+   fiatWallets: vec Wallet;
+   lastUpdated: int;
+   totalValueKES: float64;
+   totalValueUSD: float64;
+   userId: UserId;
+ };
+type Wallet = 
+ record {
+   balance: float64;
+   createdAt: int;
+   currency: text;
+   id: text;
+   isActive: bool;
+   name: text;
+   "type": text;
+   updatedAt: int;
+   userId: UserId;
+ };
+type VaultType = 
+ variant {
+   Business;
+   Charity;
+   Custom;
+   Education;
+   Emergency;
+   Investment;
+   Savings;
+   Travel;
+ };
+type VaultTransaction = 
+ record {
+   amount: float64;
+   currency: text;
+   description: text;
+   id: text;
+   metadata: opt text;
+   status: text;
+   timestamp: int;
+   "type": text;
+   userId: UserId;
+   vaultId: text;
+ };
+type VaultMember = 
+ record {
+   contributionLimit: opt float64;
+   id: text;
+   isActive: bool;
+   joinedAt: int;
+   permissions: vec text;
+   role: text;
+   userId: UserId;
+   vaultId: text;
+   withdrawalLimit: opt float64;
+ };
+type UserPreferences = 
+ record {
+   currency: text;
+   language: text;
+   notifications: NotificationSettings;
+   privacy: PrivacySettings;
+   security: SecuritySettings;
+   theme: text;
+ };
+type UserPlugin = 
+ record {
+   config: opt text;
+   id: text;
+   installedAt: int;
+   isEnabled: bool;
+   lastUsedAt: int;
+   metadata: opt text;
+   permissions: vec PluginPermission;
+   pluginId: text;
+   userId: UserId;
+ };
+type UserId = principal;
+type User = 
+ record {
+   avatar: opt text;
+   createdAt: int;
+   displayName: text;
+   email: opt text;
+   id: UserId;
+   isActive: bool;
+   isLocked: bool;
+   lastLoginAt: opt int;
+   loginAttempts: nat;
+   preferences: UserPreferences;
+   recoverySetupCompleted: bool;
+   updatedAt: int;
+   username: text;
+ };
+type Transaction = 
+ record {
+   amount: float64;
+   category: text;
+   currency: text;
+   description: text;
+   id: text;
+   metadata: opt text;
+   status: text;
+   timestamp: int;
+   "type": text;
+   userId: UserId;
+   walletId: text;
+ };
+type SocialGame = 
+ record {
+   createdAt: int;
+   createdBy: UserId;
+   currency: text;
+   currentParticipants: nat;
+   description: text;
+   endTime: opt int;
+   entryFee: opt float64;
+   gameType: GameType;
+   id: text;
+   isPublic: bool;
+   maxParticipants: opt nat;
+   metadata: opt text;
+   name: text;
+   prizePool: float64;
+   rules: opt text;
+   startTime: int;
+   status: GameStatus;
+   updatedAt: int;
+ };
+type SecuritySettings = 
+ record {
+   deviceTracking: bool;
+   loginNotifications: bool;
+   twoFactorEnabled: bool;
+ };
+type SecurityQuestion = 
+ record {
+   answerHash: text;
+   createdAt: int;
+   id: text;
+   isActive: bool;
+   question: text;
+   userId: UserId;
+ };
+type Result_9 = 
+ variant {
+   err: text;
+   ok: DeFiPosition;
+ };
+type Result_8 = 
+ variant {
+   err: text;
+   ok: GameParticipant;
+ };
+type Result_7 = 
+ variant {
+   err: text;
+   ok: Goal;
+ };
+type Result_63 = 
+ variant {
+   err: text;
+   ok: EmergencyContact;
+ };
+type Result_62 = 
+ variant {
+   err: text;
+   ok: vec SecurityQuestion;
+ };
+type Result_61 = 
+ variant {
+   err: text;
+   ok: float64;
+ };
+type Result_60 = 
+ variant {
+   err: text;
+   ok: GameReward;
+ };
+type Result_6 = 
+ variant {
+   err: text;
+   ok: PaymentMethod;
+ };
+type Result_59 = 
+ variant {
+   err: text;
+   ok: record {
+         instructions: text;
+         userId: principal;
+       };
+ };
+type Result_58 = 
+ variant {
+   err: text;
+   ok: ExternalWalletConnection;
+ };
+type Result_57 = 
+ variant {
+   err: text;
+   ok: Budget;
+ };
+type Result_56 = 
+ variant {
+   err: text;
+   ok: CryptoTransaction;
+ };
+type Result_55 = 
+ variant {
+   err: text;
+   ok: GroupVault;
+ };
+type Result_54 = 
+ variant {
+   err: text;
+   ok: Transaction;
+ };
+type Result_53 = 
+ variant {
+   err: text;
+   ok: SocialGame;
+ };
+type Result_52 = 
+ variant {
+   err: text;
+   ok:
+    record {
+      averageConfidence: float64;
+      implementedRecommendations: nat;
+      totalInsights: nat;
+      totalMessages: nat;
+      totalRecommendations: nat;
+    };
+ };
+type Result_51 = 
+ variant {
+   err: text;
+   ok: vec AIMessage;
+ };
+type Result_50 = 
+ variant {
+   err: text;
+   ok:
+    record {
+      activeWallets: nat;
+      goalsProgress: float64;
+      monthlySpent: float64;
+      totalBalance: float64;
+    };
+ };
+type Result_5 = 
+ variant {
+   err: text;
+   ok: UserPlugin;
+ };
+type Result_49 = 
+ variant {
+   err: text;
+   ok:
+    record {
+      activeProtocols: vec text;
+      averageApy: float64;
+      totalPositions: nat;
+      totalRewards: float64;
+      totalValue: float64;
+    };
+ };
+type Result_48 = 
+ variant {
+   err: text;
+   ok:
+    record {
+      averageApy: float64;
+      totalPositions: nat;
+      totalUsers: nat;
+      totalVolume: float64;
+    };
+ };
+type Result_47 = 
+ variant {
+   err: text;
+   ok: vec record {
+             text;
+             text;
+           };
+ };
+type Result_46 = 
+ variant {
+   err: text;
+   ok: WalletPortfolio;
+ };
+type Result_45 = 
+ variant {
+   err: text;
+   ok: vec GameParticipant;
+ };
+type Result_44 = 
+ variant {
+   err: text;
+   ok:
+    record {
+      successRate: float64;
+      topProvider: opt text;
+      totalAmount: float64;
+      totalFees: float64;
+      totalPayments: nat;
+    };
+ };
+type Result_43 = 
+ variant {
+   err: text;
+   ok: vec AIInsight;
+ };
+type Result_42 = 
+ variant {
+   err: text;
+   ok: vec AIRecommendation;
+ };
+type Result_41 = 
+ variant {
+   err: text;
+   ok: vec AuditLog;
+ };
+type Result_40 = 
+ variant {
+   err: text;
+   ok: vec Budget;
+ };
+type Result_4 = 
+ variant {
+   err: text;
+   ok: User;
+ };
+type Result_39 = 
+ variant {
+   err: text;
+   ok: vec CryptoTransaction;
+ };
+type Result_38 = 
+ variant {
+   err: text;
+   ok: vec CryptoWallet;
+ };
+type Result_37 = 
+ variant {
+   err: text;
+   ok: vec DeFiPosition;
+ };
+type Result_36 = 
+ variant {
+   err: text;
+   ok: vec DeFiTransaction;
+ };
+type Result_35 = 
+ variant {
+   err: text;
+   ok: vec ExternalWalletConnection;
+ };
+type Result_34 = 
+ variant {
+   err: text;
+   ok: vec GameReward;
+ };
+type Result_33 = 
+ variant {
+   err: text;
+   ok: vec SocialGame;
+ };
+type Result_32 = 
+ variant {
+   err: text;
+   ok: vec Goal;
+ };
+type Result_31 = 
+ variant {
+   err: text;
+   ok: vec GroupVault;
+ };
+type Result_30 = 
+ variant {
+   err: text;
+   ok: vec OTPRequest;
+ };
+type Result_3 = 
+ variant {
+   err: text;
+   ok: record {
+         purpose: text;
+         recipient: text;
+         verified: bool;
+       };
+ };
+type Result_29 = 
+ variant {
+   err: text;
+   ok: vec LocalPayment;
+ };
+type Result_28 = 
+ variant {
+   err: text;
+   ok: vec PaymentMethod;
+ };
+type Result_27 = 
+ variant {
+   err: text;
+   ok: vec UserPlugin;
+ };
+type Result_26 = 
+ variant {
+   err: text;
+   ok: vec RecoveryMethod;
+ };
+type Result_25 = 
+ variant {
+   err: text;
+   ok: vec Transaction;
+ };
+type Result_24 = 
+ variant {
+   err: text;
+   ok:
+    record {
+      accountIdentifier: text;
+      allAddresses: vec text;
+      cryptoAddresses: vec record {
+                             text;
+                             text;
+                           };
+      principalId: text;
+    };
+ };
+type Result_23 = 
+ variant {
+   err: text;
+   ok: vec Wallet;
+ };
+type Result_22 = 
+ variant {
+   err: text;
+   ok:
+    record {
+      members: vec VaultMember;
+      transactions: vec VaultTransaction;
+      vault: GroupVault;
+    };
+ };
+type Result_21 = 
+ variant {
+   err: text;
+   ok: Wallet;
+ };
+type Result_20 = 
+ variant {
+   err: text;
+   ok:
+    record {
+      message: text;
+      recoveryRequestId: text;
+      securityQuestions: opt vec record {
+                                   text;
+                                   text;
+                                 };
+    };
+ };
+type Result_2 = 
+ variant {
+   err: text;
+   ok: text;
+ };
+type Result_19 = 
+ variant {
+   err: text;
+   ok: VaultMember;
+ };
+type Result_18 = 
+ variant {
+   err: text;
+   ok: AIRecommendation;
+ };
+type Result_17 = 
+ variant {
+   err: text;
+   ok: LocalPayment;
+ };
+type Result_16 = 
+ variant {
+   err: text;
+   ok: Plugin;
+ };
+type Result_15 = 
+ variant {
+   err: text;
+   ok: DeFiTransaction;
+ };
+type Result_14 = 
+ variant {
+   err: text;
+   ok: vec Plugin;
+ };
+type Result_13 = 
+ variant {
+   err: text;
+   ok: AIMessage;
+ };
+type Result_12 = 
+ variant {
+   err: text;
+   ok: record {
+         expiresIn: int;
+         message: text;
+         otpId: text;
+       };
+ };
+type Result_11 = 
+ variant {
+   err: text;
+   ok: bool;
+ };
+type Result_10 = 
+ variant {
+   err: text;
+   ok: CryptoWallet;
+ };
+type Result_1 = 
+ variant {
+   err: text;
+   ok: RecoveryMethod;
+ };
+type Result = 
+ variant {
+   err: text;
+   ok: VaultTransaction;
+ };
+type RecoveryRequest = 
+ record {
+   completedAt: opt int;
+   createdAt: int;
+   expiresAt: int;
+   id: text;
+   identifier: text;
+   metadata: opt text;
+   recoveryMethod: text;
+   recoveryToken: opt text;
+   status: text;
+   userId: opt UserId;
+   verificationCode: opt text;
+   verifiedAt: opt int;
+ };
+type RecoveryMethod = 
+ record {
+   createdAt: int;
+   id: text;
+   isActive: bool;
+   isVerified: bool;
+   metadata: opt text;
+   methodType: text;
+   userId: UserId;
+   value: text;
+   verifiedAt: opt int;
+ };
+type PrivacySettings = 
+ record {
+   allowFriendRequests: bool;
+   profileVisibility: text;
+   transactionVisibility: text;
+ };
+type PluginStatus = 
+ variant {
+   Active;
+   Deprecated;
+   Inactive;
+   Pending;
+   Suspended;
+ };
+type PluginPermission = 
+ variant {
+   ExternalAPIs;
+   Notifications;
+   ReadContacts;
+   ReadProfile;
+   ReadTransactions;
+   ReadWallets;
+   WriteContacts;
+   WriteProfile;
+   WriteTransactions;
+   WriteWallets;
+ };
+type PluginCategory = 
+ variant {
+   Custom;
+   Education;
+   Entertainment;
+   Finance;
+   Gaming;
+   Health;
+   Productivity;
+   Social;
+ };
+type Plugin = 
+ record {
+   author: text;
+   category: PluginCategory;
+   configSchema: opt text;
+   createdAt: int;
+   description: text;
+   entryPoint: text;
+   icon: opt text;
+   id: text;
+   installCount: nat;
+   isEnabled: bool;
+   isInstalled: bool;
+   metadata: opt text;
+   name: text;
+   permissions: vec PluginPermission;
+   rating: float64;
+   status: PluginStatus;
+   updatedAt: int;
+   version: text;
+ };
+type PaymentStatus = 
+ variant {
+   Cancelled;
+   Completed;
+   Failed;
+   Pending;
+   Processing;
+   Refunded;
+ };
+type PaymentProvider = 
+ variant {
+   AirtelMoney;
+   BankTransfer;
+   Card;
+   Custom;
+   Equitel;
+   Mpesa;
+   PayPal;
+ };
+type PaymentMethod = 
+ record {
+   accountName: text;
+   accountNumber: opt text;
+   createdAt: int;
+   id: text;
+   isActive: bool;
+   isDefault: bool;
+   metadata: opt text;
+   phoneNumber: opt text;
+   provider: PaymentProvider;
+   userId: UserId;
+ };
+type OTPRequest = 
+ record {
+   attempts: nat;
+   code: text;
+   createdAt: int;
+   deliveredAt: opt int;
+   expiresAt: int;
+   id: text;
+   metadata: opt text;
+   provider: text;
+   purpose: text;
+   recipient: text;
+   sentAt: opt int;
+   "service": text;
+   status: text;
+   userId: opt UserId;
+ };
+type NotificationSettings = 
+ record {
+   email: bool;
+   goals: bool;
+   push: bool;
+   security: bool;
+   social: bool;
+   transactions: bool;
+ };
+type LocalPayment = 
+ record {
+   amount: float64;
+   completedAt: opt int;
+   currency: text;
+   fee: float64;
+   id: text;
+   metadata: opt text;
+   provider: PaymentProvider;
+   recipientName: opt text;
+   recipientPhone: opt text;
+   reference: opt text;
+   status: PaymentStatus;
+   timestamp: int;
+   "type": text;
+   userId: UserId;
+ };
+type GroupVault = 
+ record {
+   createdAt: int;
+   currency: text;
+   description: opt text;
+   id: text;
+   isActive: bool;
+   isPublic: bool;
+   members: vec text;
+   metadata: opt text;
+   name: text;
+   ownerId: UserId;
+   rules: opt text;
+   targetAmount: opt float64;
+   totalBalance: float64;
+   updatedAt: int;
+   vaultType: VaultType;
+ };
+type Goal = 
+ record {
+   category: text;
+   createdAt: int;
+   currency: text;
+   currentAmount: float64;
+   description: text;
+   id: text;
+   isAchieved: bool;
+   isActive: bool;
+   targetAmount: float64;
+   targetDate: opt int;
+   title: text;
+   updatedAt: int;
+   userId: UserId;
+ };
+type GameType = 
+ variant {
+   Challenge;
+   Custom;
+   Lottery;
+   Prediction;
+   Quiz;
+   Tournament;
+   Trading;
+ };
+type GameStatus = 
+ variant {
+   Active;
+   Cancelled;
+   Completed;
+   Paused;
+ };
+type GameReward = 
+ record {
+   amount: float64;
+   claimedAt: opt int;
+   currency: opt text;
+   description: text;
+   expiresAt: opt int;
+   gameId: text;
+   id: text;
+   metadata: opt text;
+   "type": text;
+   userId: UserId;
+ };
+type GameParticipant = 
+ record {
+   gameId: text;
+   id: text;
+   isActive: bool;
+   joinedAt: int;
+   metadata: opt text;
+   rank: opt nat;
+   score: float64;
+   userId: UserId;
+ };
+type ExternalWalletConnection = 
+ record {
+   address: opt text;
+   connectedAt: int;
+   id: text;
+   isActive: bool;
+   lastUsedAt: int;
+   permissions: vec text;
+   principalId: opt text;
+   userId: UserId;
+   walletType: text;
+ };
+type EmergencyContact = 
+ record {
+   createdAt: int;
+   email: text;
+   id: text;
+   isVerified: bool;
+   name: text;
+   relationship: text;
+   userId: UserId;
+   verifiedAt: opt int;
+ };
+type DeFiTransaction = 
+ record {
+   amountA: float64;
+   amountB: opt float64;
+   fee: float64;
+   id: text;
+   metadata: opt text;
+   protocol: DeFiProtocol;
+   status: text;
+   timestamp: int;
+   tokenA: text;
+   tokenB: opt text;
+   txHash: opt text;
+   "type": text;
+   userId: UserId;
+ };
+type DeFiProtocol = 
+ variant {
+   Custom;
+   ICDex;
+   ICPSwap;
+   InfinitySwap;
+   Neutrinite;
+   Sonic;
+ };
+type DeFiProductType = 
+ variant {
+   Borrowing;
+   Custom;
+   Governance;
+   Lending;
+   Liquidity;
+   Staking;
+   Swap;
+   YieldFarming;
+ };
+type DeFiPosition = 
+ record {
+   amount: float64;
+   apy: float64;
+   createdAt: int;
+   id: text;
+   isActive: bool;
+   metadata: opt text;
+   productType: DeFiProductType;
+   protocol: DeFiProtocol;
+   rewards: float64;
+   tokenA: text;
+   tokenB: opt text;
+   updatedAt: int;
+   userId: UserId;
+ };
+type CryptoWalletType = 
+ variant {
+   ALPACALB;
+   BOOM;
+   CAT;
+   CHAT;
+   CKPEPE;
+   CLOWN;
+   CYCLES;
+   DAMONIC;
+   DKUMA;
+   DOGMI;
+   DRAGGINZ;
+   DSCVR;
+   ELNA;
+   FIAT;
+   FOMO;
+   GHOST;
+   GLDT;
+   ICP;
+   KINIC;
+   MEME;
+   MOD;
+   MOTOKO;
+   NANAS;
+   NICP;
+   NTN;
+   OPENCHAT;
+   PANDA;
+   PARTY;
+   SEERS;
+   SHRIMP;
+   SNEED;
+   SNS1;
+   SONIC;
+   TRAX;
+   WUMBO;
+   YUGE;
+   ckBTC;
+   ckETH;
+ };
+type CryptoWallet = 
+ record {
+   address: opt text;
+   balance: float64;
+   createdAt: int;
+   currency: text;
+   externalWalletType: opt text;
+   id: text;
+   isActive: bool;
+   isExternal: bool;
+   lastSyncAt: opt int;
+   metadata: opt text;
+   name: text;
+   updatedAt: int;
+   userId: UserId;
+   walletType: CryptoWalletType;
+ };
+type CryptoTransaction = 
+ record {
+   amount: float64;
+   blockHeight: opt nat;
+   currency: text;
+   fee: float64;
+   fromAddress: opt text;
+   id: text;
+   metadata: opt text;
+   status: text;
+   timestamp: int;
+   toAddress: opt text;
+   txHash: opt text;
+   "type": text;
+   userId: UserId;
+   walletId: text;
+ };
+type Budget = 
+ record {
+   amount: float64;
+   category: text;
+   endDate: int;
+   id: text;
+   isActive: bool;
+   name: text;
+   period: text;
+   spent: float64;
+   startDate: int;
+   userId: UserId;
+ };
+type AuditLog = 
+ record {
+   action: text;
+   details: text;
+   id: text;
+   ipAddress: opt text;
+   success: bool;
+   timestamp: int;
+   userAgent: opt text;
+   userId: opt UserId;
+ };
+type AIRecommendation = 
+ record {
+   category: text;
+   createdAt: int;
+   description: text;
+   estimatedImpact: float64;
+   id: text;
+   isImplemented: bool;
+   metadata: opt text;
+   priority: text;
+   title: text;
+   userId: UserId;
+ };
+type AIMessageType = 
+ variant {
+   Assistant;
+   Error;
+   System;
+   User;
+ };
+type AIMessage = 
+ record {
+   content: text;
+   id: text;
+   metadata: opt text;
+   timestamp: int;
+   "type": AIMessageType;
+   userId: UserId;
+ };
+type AIInsight = 
+ record {
+   actionable: bool;
+   confidence: float64;
+   createdAt: int;
+   description: text;
+   id: text;
+   metadata: opt text;
+   title: text;
+   "type": text;
+   userId: UserId;
+ };
+service : {
+  addEmergencyContact: (name: text, email: text, relationship: text) ->
+   (Result_63);
+  addPaymentMethod: (provider: text, accountNumber: opt text, phoneNumber:
+   opt text, accountName: text, isDefault: bool) -> (Result_6);
+  addRecoveryMethod: (methodType: text, value: text, metadata: opt text) ->
+   (Result_1);
+  addSecurityQuestions: (questions: vec record {
+                                          text;
+                                          text;
+                                        }) -> (Result_62);
+  awardGameReward: (gameId: text, userId: UserId, rewardType: text, amount:
+   float64, currency: opt text, description: text) -> (Result_60);
+  calculateDefiRewards: (positionId: text) -> (Result_61);
+  cancelPayment: (paymentId: text) -> (Result_17);
+  claimGameReward: (rewardId: text) -> (Result_60);
+  closeDefiPosition: (positionId: text) -> (Result_9);
+  completeRecovery: (recoveryToken: text, newDeviceInfo: opt text) ->
+   (Result_59);
+  completeRecoverySetup: () -> (Result_4);
+  connectExternalWallet: (walletType: text, principalId: opt text, address:
+   opt text, permissions: vec text) -> (Result_58);
+  createBudget: (name: text, category: text, amount: float64, period: 
+   text, startDate: int, endDate: int) -> (Result_57);
+  createCryptoTransaction: (walletId: text, "type": text, amount: float64,
+   toAddress: opt text, fromAddress: opt text, txHash: opt text, fee:
+   float64) -> (Result_56);
+  createCryptoWallet: (name: text, walletType: text, isExternal: bool,
+   externalWalletType: opt text, address: opt text) -> (Result_10);
+  createDeFiPosition: (protocol: text, positionType: text, tokenA: text,
+   tokenB: opt text, amount: float64, apy: float64) -> (Result_9);
+  createDefiPosition: (protocol: text, productType: text, tokenA: text,
+   tokenB: opt text, amount: float64, apy: float64) -> (Result_9);
+  createGoal: (title: text, description: text, targetAmount: float64,
+   currency: text, targetDate: opt int, category: text) -> (Result_7);
+  createGroupVault: (name: text, description: opt text, vaultType: text,
+   currency: text, targetAmount: opt float64, isPublic: bool, rules:
+   opt text) -> (Result_55);
+  createPlugin: (name: text, description: text, version: text, category:
+   text, permissions: vec text, icon: opt text, entryPoint: text,
+   configSchema: opt text) -> (Result_16);
+  createSocialGame: (name: text, description: text, gameType: text,
+   startTime: int, endTime: opt int, maxParticipants: opt nat, entryFee:
+   opt float64, prizePool: float64, currency: text, rules: opt text,
+   isPublic: bool) -> (Result_53);
+  createTransaction: (walletId: text, "type": text, amount: float64,
+   category: text, description: text) -> (Result_54);
+  createUser: (username: text, displayName: text, email: opt text) ->
+   (Result_4);
+  createWallet: (name: text, "type": text, currency: text) -> (Result_21);
+  depositToVault: (vaultId: text, amount: float64, description: opt text) ->
+   (Result);
+  endGame: (gameId: text) -> (Result_53);
+  generateAIInsights: () -> (Result_43);
+  generateAIRecommendations: () -> (Result_42);
+  generateDepositAddress: (walletType: text) -> (Result_2);
+  getAIAnalytics: () -> (Result_52);
+  getAIConversationHistory: () -> (Result_51);
+  getAvailableGames: () -> (Result_33);
+  getAvailablePlugins: () -> (Result_14);
+  getDashboardStats: () -> (Result_50) query;
+  getDefiAnalytics: () -> (Result_49);
+  getDefiPositionsByProductType: (productType: text) -> (Result_37);
+  getDefiPositionsByProtocol: (protocol: text) -> (Result_37);
+  getDefiProtocolStats: (protocol: text) -> (Result_48);
+  getDefiTransactionsByProtocol: (protocol: text) -> (Result_36);
+  getDepositAddress: (walletType: text) -> (Result_2);
+  getDepositAddresses: () -> (Result_47);
+  getFullWalletPortfolio: () -> (Result_46);
+  getGameLeaderboard: (gameId: text) -> (Result_45);
+  getGamesByType: (gameType: text) -> (Result_33);
+  getPaymentStats: () -> (Result_44);
+  getPaymentsByProvider: (provider: text) -> (Result_29);
+  getPluginsByCategory: (category: text) -> (Result_14);
+  getPrincipalId: () -> (text) query;
+  getRecoveryRequestStatus: (requestId: text) -> (opt RecoveryRequest) query;
+  getSystemStats: () ->
+   (record {
+      totalCryptoTransactions: nat;
+      totalCryptoWallets: nat;
+      totalDeFiPositions: nat;
+      totalExternalConnections: nat;
+      totalOTPRequests: nat;
+      totalRecoveryMethods: nat;
+      totalRecoveryRequests: nat;
+      totalTransactions: nat;
+      totalUsers: nat;
+      totalWallets: nat;
+    }) query;
+  getUser: () -> (Result_4) query;
+  getUserAIInsights: () -> (Result_43);
+  getUserAIRecommendations: () -> (Result_42);
+  getUserAuditLogs: () -> (Result_41);
+  getUserBudgets: () -> (Result_40) query;
+  getUserByEmail: (email: text) -> (opt UserId) query;
+  getUserByPhone: (phone: text) -> (opt UserId) query;
+  getUserCryptoTransactions: () -> (Result_39);
+  getUserCryptoWallets: () -> (Result_38) query;
+  getUserDeFiPositions: () -> (Result_37);
+  getUserDefiPositions: () -> (Result_37);
+  getUserDefiTransactions: () -> (Result_36);
+  getUserExternalConnections: () -> (Result_35);
+  getUserGameRewards: () -> (Result_34);
+  getUserGames: () -> (Result_33);
+  getUserGoals: () -> (Result_32) query;
+  getUserGroupVaults: () -> (Result_31);
+  getUserOTPRequests: () -> (Result_30);
+  getUserPaymentHistory: () -> (Result_29);
+  getUserPaymentMethods: () -> (Result_28);
+  getUserPlugins: () -> (Result_27);
+  getUserRecoveryMethods: () -> (Result_26) query;
+  getUserTransactions: () -> (Result_25) query;
+  getUserWalletAddresses: () -> (Result_24);
+  getUserWallets: () -> (Result_23) query;
+  getVaultDetails: (vaultId: text) -> (Result_22);
+  getWallet: (walletId: text) -> (Result_21);
+  getWalletByAddress: (address: text) -> (opt text) query;
+  greet: (name: text) -> (text) query;
+  initiateLocalPayment: (provider: text, "type": text, amount: float64,
+   currency: text, recipientPhone: opt text, recipientName: opt text,
+   reference: opt text) -> (Result_17);
+  initiateRecovery: (identifier: text, recoveryMethod: text) -> (Result_20);
+  installPlugin: (pluginId: text, config: opt text) -> (Result_5);
+  inviteToVault: (vaultId: text, userId: UserId, role: text) -> (Result_19);
+  joinGame: (gameId: text) -> (Result_8);
+  joinVault: (vaultId: text) -> (Result_19);
+  linkRecoveredAccount: (recoveryToken: text, newPrincipalId: principal) ->
+   (Result_4);
+  loginOrCreateUser: () -> (Result_4);
+  markRecommendationImplemented: (recommendationId: text) -> (Result_18);
+  processPayment: (paymentId: text) -> (Result_17);
+  ratePlugin: (pluginId: text, rating: float64) -> (Result_16);
+  recordDefiTransaction: (protocol: text, "type": text, tokenA: text, tokenB:
+   opt text, amountA: float64, amountB: opt float64, fee: float64, txHash:
+   opt text) -> (Result_15);
+  regenerateWalletAddress: (walletId: text) -> (Result_2);
+  removePaymentMethod: (methodId: text) -> (Result_11);
+  searchPlugins: (searchQuery: text) -> (Result_14);
+  sendAIMessage: (content: text) -> (Result_13);
+  sendOTP: (recipient: text, "service": text, provider: text, purpose:
+   text) -> (Result_12);
+  sendVerificationCode: (identifier: text, codeType: text) -> (Result_2);
+  togglePlugin: (pluginId: text, enabled: bool) -> (Result_5);
+  uninstallPlugin: (pluginId: text) -> (Result_11);
+  updateCryptoWalletBalance: (walletId: text, newBalance: float64) ->
+   (Result_10);
+  updateDefiPosition: (positionId: text, amount: float64, apy: float64,
+   rewards: float64) -> (Result_9);
+  updateGameScore: (gameId: text, score: float64) -> (Result_8);
+  updateGoalProgress: (goalId: text, amount: float64) -> (Result_7);
+  updatePaymentMethod: (methodId: text, accountNumber: opt text, phoneNumber:
+   opt text, accountName: text, isDefault: bool) -> (Result_6);
+  updatePluginConfig: (pluginId: text, config: text) -> (Result_5);
+  updateUser: (displayName: opt text, avatar: opt text) -> (Result_4);
+  userExists: () -> (bool);
+  validateAddress: (address: text, walletType: text) -> (bool) query;
+  verifyCode: (identifier: text, code: text, codeType: text) -> (Result_2);
+  verifyOTP: (otpId: text, code: text) -> (Result_3);
+  verifyRecovery: (recoveryRequestId: text, verificationCode: opt text,
+   securityAnswers: opt vec record {
+                              text;
+                              text;
+                            }) -> (Result_2);
+  verifyRecoveryMethod: (recoveryMethodId: text, otpId: text, otpCode:
+   text) -> (Result_1);
+  withdrawFromVault: (vaultId: text, amount: float64, description:
+   opt text) -> (Result);
+}

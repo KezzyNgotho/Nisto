@@ -1,0 +1,23 @@
+// Main global styles entry
+@import './App.scss';
+
+// Import AOS (Animate On Scroll) styles
+@import 'aos/dist/aos.css';
+
+// Theme variables (override or extend as needed)
+:root {
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--dashboard-bg);
+  color: var(--neutral-800);
+  transition: background var(--transition), color var(--transition);
+}
+
+// AOS animation utility (optional, for custom tweaks)
+[data-aos] {
+  transition-property: opacity, transform;
+} 
