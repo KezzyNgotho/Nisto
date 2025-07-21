@@ -42,20 +42,60 @@ export default function RecoverySetup({ onClose, initialSetup }) {
       { key: 'security_qa', label: 'Security Questions', icon: <FiKey /> },
       { key: 'emergency_contact', label: 'Emergency Contact', icon: <FiUserCheck /> },
     ];
+    const [inputs, setInputs] = useState({
+      email: '',
+      phone: '',
+      security_qa: [{ question: '', answer: '' }],
+      emergency_contact: { name: '', email: '', relationship: '' },
+    });
+    const [submitting, setSubmitting] = useState(false);
     const toggleMethod = (key) => {
       setSelectedMethods((prev) =>
         prev.includes(key) ? prev.filter((m) => m !== key) : [...prev, key]
       );
       setError('');
     };
-    const handleSetup = () => {
-      if (selectedMethods.length === 0) {
-        setError('Please select at least one recovery method');
+    const handleInput = (key, value) => {
+      setInputs((prev) => ({ ...prev, [key]: value }));
+    };
+    const handleSecurityQA = (idx, field, value) => {
+      setInputs((prev) => ({
+        ...prev,
+        security_qa: prev.security_qa.map((q, i) => i === idx ? { ...q, [field]: value } : q)
+      }));
+    };
+    const addSecurityQA = () => {
+      setInputs((prev) => ({ ...prev, security_qa: [...prev.security_qa, { question: '', answer: '' }] }));
+    };
+    const handleECInput = (field, value) => {
+      setInputs((prev) => ({ ...prev, emergency_contact: { ...prev.emergency_contact, [field]: value } }));
+    };
+    // Validation
+    const allValid = selectedMethods.length > 0 && selectedMethods.every((m) => {
+      if (m === 'email') return inputs.email && /@/.test(inputs.email);
+      if (m === 'phone') return inputs.phone && inputs.phone.length >= 8;
+      if (m === 'security_qa') return inputs.security_qa.every(q => q.question && q.answer);
+      if (m === 'emergency_contact') return inputs.emergency_contact.name && /@/.test(inputs.emergency_contact.email) && inputs.emergency_contact.relationship;
+      return false;
+    });
+    const handleSetup = async () => {
+      if (!allValid) {
+        setError('Please fill all required fields for selected methods');
         return;
       }
-      // Proceed to next step or save
-      showToast({ message: 'Recovery setup started (demo)', type: 'success', icon: <FiCheck /> });
-      if (onClose) onClose();
+      setSubmitting(true);
+      try {
+        if (selectedMethods.includes('email')) await addRecoveryMethod('email', inputs.email);
+        if (selectedMethods.includes('phone')) await addRecoveryMethod('phone', inputs.phone);
+        if (selectedMethods.includes('security_qa')) await addSecurityQuestions(inputs.security_qa.map(q => [q.question, q.answer]));
+        if (selectedMethods.includes('emergency_contact')) await addRecoveryMethod('emergency_contact', JSON.stringify(inputs.emergency_contact));
+        showToast({ message: 'Recovery setup complete', type: 'success', icon: <FiCheck /> });
+        if (onClose) onClose();
+      } catch (err) {
+        setError('Failed to set up recovery. Please try again.');
+      } finally {
+        setSubmitting(false);
+      }
     };
     return (
       <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.18)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -97,6 +137,86 @@ export default function RecoverySetup({ onClose, initialSetup }) {
                 </button>
               ))}
             </div>
+            {/* Dynamic input fields for selected methods */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {selectedMethods.includes('email') && (
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={inputs.email}
+                  onChange={e => handleInput('email', e.target.value)}
+                  required
+                  className="dashboard-card"
+                  style={{ padding: '0.8rem 1rem', fontSize: 15, border: '1.2px solid var(--primary-100)', borderRadius: 8 }}
+                />
+              )}
+              {selectedMethods.includes('phone') && (
+                <input
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  value={inputs.phone}
+                  onChange={e => handleInput('phone', e.target.value)}
+                  required
+                  className="dashboard-card"
+                  style={{ padding: '0.8rem 1rem', fontSize: 15, border: '1.2px solid var(--primary-100)', borderRadius: 8 }}
+                />
+              )}
+              {selectedMethods.includes('security_qa') && (
+                <div className="dashboard-card" style={{ padding: '1rem', borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ fontWeight: 600, color: 'var(--primary-700)', marginBottom: 4 }}>Security Questions</div>
+                  {inputs.security_qa.map((q, idx) => (
+                    <div key={idx} style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        type="text"
+                        placeholder="Question"
+                        value={q.question}
+                        onChange={e => handleSecurityQA(idx, 'question', e.target.value)}
+                        required
+                        style={{ flex: 2, padding: '0.6rem', borderRadius: 6, border: '1px solid var(--primary-100)' }}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Answer"
+                        value={q.answer}
+                        onChange={e => handleSecurityQA(idx, 'answer', e.target.value)}
+                        required
+                        style={{ flex: 2, padding: '0.6rem', borderRadius: 6, border: '1px solid var(--primary-100)' }}
+                      />
+                    </div>
+                  ))}
+                  <button type="button" className="btn btn-secondary" style={{ marginTop: 6, alignSelf: 'flex-start' }} onClick={addSecurityQA}><FiPlus /> Add Question</button>
+                </div>
+              )}
+              {selectedMethods.includes('emergency_contact') && (
+                <div className="dashboard-card" style={{ padding: '1rem', borderRadius: 8, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <div style={{ fontWeight: 600, color: 'var(--primary-700)', marginBottom: 4 }}>Emergency Contact</div>
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    value={inputs.emergency_contact.name}
+                    onChange={e => handleECInput('name', e.target.value)}
+                    required
+                    style={{ padding: '0.6rem', borderRadius: 6, border: '1px solid var(--primary-100)' }}
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email"
+                    value={inputs.emergency_contact.email}
+                    onChange={e => handleECInput('email', e.target.value)}
+                    required
+                    style={{ padding: '0.6rem', borderRadius: 6, border: '1px solid var(--primary-100)' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Relationship"
+                    value={inputs.emergency_contact.relationship}
+                    onChange={e => handleECInput('relationship', e.target.value)}
+                    required
+                    style={{ padding: '0.6rem', borderRadius: 6, border: '1px solid var(--primary-100)' }}
+                  />
+                </div>
+              )}
+            </div>
             <div style={{ background: '#eaf6ff', color: '#1976d2', borderRadius: 8, padding: '0.9rem 1.1rem', fontSize: 15, display: 'flex', alignItems: 'center', gap: 10 }}>
               <FiInfo style={{ fontSize: 18 }} /> <b>Tip:</b> Email and SMS are the most reliable recovery options. Choose at least one method to secure your account.
             </div>
@@ -104,8 +224,8 @@ export default function RecoverySetup({ onClose, initialSetup }) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, background: 'var(--neutral-50)', borderTop: '1.5px solid var(--neutral-100)', padding: '1.1rem 2rem', marginTop: 24 }}>
             <button className="btn btn-secondary" onClick={onClose}>Skip for now</button>
-            <button className="btn btn-primary" style={{ opacity: selectedMethods.length === 0 ? 0.6 : 1 }} disabled={selectedMethods.length === 0} onClick={handleSetup}>
-              <FiCheck style={{ marginRight: 6 }} /> Setup Recovery
+            <button className="btn btn-primary" style={{ opacity: allValid && !submitting ? 1 : 0.6 }} disabled={!allValid || submitting} onClick={handleSetup}>
+              <FiCheck style={{ marginRight: 6 }} /> {submitting ? 'Setting Up...' : 'Setup Recovery'}
             </button>
           </div>
         </div>
