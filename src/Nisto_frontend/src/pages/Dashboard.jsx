@@ -218,6 +218,7 @@ function Dashboard() {
           {/* Main dashboard tabs */}
           {activeTab === 'overview' && (
             <section className="dashboard-section">
+              {/* Stat Cards */}
               <div className="dashboard-cards">
                 <div className="dashboard-card">
                   <div className="stat-number">{formatBalance(userStats.totalBalance)}</div>
@@ -225,21 +226,37 @@ function Dashboard() {
                 </div>
                 <div className="dashboard-card">
                   <div className="stat-number">{userStats.walletCount}</div>
-                  <div className="stat-label">Wallets</div>
+                  <div className="stat-label">Crypto Wallets</div>
                 </div>
                 <div className="dashboard-card">
                   <div className="stat-number">{userStats.recoveryMethodsCount}</div>
                   <div className="stat-label">Recovery Methods</div>
                 </div>
                 <div className="dashboard-card">
-                  <div className="stat-number">3</div>
-                  <div className="stat-label">Recent Activities</div>
+                  <div className="stat-number">+12%</div>
+                  <div className="stat-label">This Month</div>
                 </div>
-                <div className="dashboard-card">
-                  <div className="stat-number">{notifications.length}</div>
-                  <div className="stat-label">Notifications</div>
+              </div>
+              {/* Recent Activity */}
+              <div className="dashboard-section" style={{ marginTop: 0, marginBottom: '1.5rem', padding: '1.2rem 1.5rem' }}>
+                <h3 style={{ fontSize: '1.08rem', color: 'var(--primary-700)', marginBottom: 12 }}>Recent Activity</h3>
+                <div className="recent-activity-list" style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {userStats.recentActivity.map((item, idx) => (
+                    <div key={idx} className="recent-activity-item" style={{ display: 'flex', alignItems: 'center', gap: 16, background: 'var(--neutral-50)', borderRadius: 8, padding: '0.7rem 1rem', boxShadow: 'var(--shadow-sm)' }}>
+                      <span style={{ fontSize: 20, color: 'var(--primary-600)' }}>{item.icon && React.createElement(item.icon)}</span>
+                      <span style={{ flex: 1, color: 'var(--neutral-700)', fontWeight: 500 }}>{item.text}</span>
+                      <span style={{ color: 'var(--neutral-400)', fontSize: 13 }}>{item.time}</span>
+                    </div>
+                  ))}
                 </div>
-                {/* Add more stat cards here as needed */}
+              </div>
+              {/* Quick Actions */}
+              <div className="dashboard-section" style={{ marginTop: 0, padding: '1.2rem 1.5rem' }}>
+                <h3 style={{ fontSize: '1.08rem', color: 'var(--primary-700)', marginBottom: 12 }}>Quick Actions</h3>
+                <div style={{ display: 'flex', gap: 16 }}>
+                  <button className="btn btn-primary" style={{ minWidth: 120 }} onClick={()=>setActiveTab('wallets')}>+ Add Wallet</button>
+                  <button className="btn btn-secondary" style={{ minWidth: 120 }} onClick={()=>setActiveTab('recovery')}>Add Recovery</button>
+                </div>
               </div>
             </section>
           )}
