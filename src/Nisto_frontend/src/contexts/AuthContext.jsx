@@ -170,6 +170,23 @@ export function AuthProvider({ children }) {
     return backend.deleteGroupVault(vaultId);
   }, [backend]);
 
+  // Vault Action Proposals
+  const proposeVaultAction = useCallback(async (vaultId, actionType, targetId = null, newRole = null) => {
+    return backend.proposeVaultAction(vaultId, actionType, targetId, newRole);
+  }, [backend]);
+
+  const voteVaultAction = useCallback(async (proposalId, approve) => {
+    return backend.voteVaultAction(proposalId, approve);
+  }, [backend]);
+
+  const appealVaultAction = useCallback(async (proposalId, reason) => {
+    return backend.appealVaultAction(proposalId, reason);
+  }, [backend]);
+
+  const getVaultProposals = useCallback(async (vaultId) => {
+    return backend.getVaultProposals(vaultId);
+  }, [backend]);
+
   // Provide all values and functions needed by consumers
   const value = {
     user,
@@ -200,6 +217,10 @@ export function AuthProvider({ children }) {
     depositToVault,
     withdrawFromVault,
     deleteGroupVault,
+    proposeVaultAction,
+    voteVaultAction,
+    appealVaultAction,
+    getVaultProposals,
   };
 
   return (

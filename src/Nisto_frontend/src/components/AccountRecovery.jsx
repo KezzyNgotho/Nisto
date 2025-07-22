@@ -113,7 +113,7 @@ export default function AccountRecovery({ isOpen, onClose, onRecoveryComplete })
           {step === 2 && (
             <form onSubmit={handleVerify} className="recovery-form">
               <label>Enter the verification code sent to your {method}:</label>
-              <input
+                  <input
                 type="text"
                 placeholder="Verification code"
                 value={verificationCode}
@@ -162,4 +162,4 @@ export default function AccountRecovery({ isOpen, onClose, onRecoveryComplete })
       </div>
     </div>
   );
-} 
+}

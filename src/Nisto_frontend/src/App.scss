@@ -3900,7 +3900,7 @@ body {
 .dashboard-content {
   flex: 1;
   margin-top: 72px;
-  padding: 2rem 2.5rem;
+  padding: 2rem 0.5rem 2rem 0.5rem; /* Reduce left and right padding */
   overflow-y: auto;
   box-sizing: border-box;
   width: 100%;
@@ -5829,4 +5829,108 @@ body {
     padding: 1.2rem 1rem 1rem 1rem;
     min-width: 0;
   }
+}
+
+// Vaults UX polish
+.btn-action {
+  transition: background 0.18s, box-shadow 0.18s, color 0.18s;
+  outline: none;
+  position: relative;
+}
+.btn-action:hover, .btn-action:focus {
+  background: var(--primary-50);
+  color: var(--primary-700);
+  box-shadow: 0 2px 8px 0 rgba(59,130,246,0.10);
+  z-index: 2;
+}
+
+.vault-card-hover {
+  transition: box-shadow 0.18s, transform 0.18s;
+}
+.vault-card-hover:hover {
+  box-shadow: 0 8px 24px 0 rgba(59,130,246,0.13), var(--shadow-md);
+  transform: translateY(-2px) scale(1.01);
+  z-index: 3;
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-left: 8px;
+  background: var(--neutral-100);
+  color: var(--primary-600);
+}
+.status-chip.status-active { color: var(--success-700); background: var(--success-100); }
+.status-chip.status-closed { color: var(--error-700); background: var(--error-100); }
+.status-chip.status-pending { color: var(--warning-700); background: var(--warning-100); }
+
+.card-divider {
+  border: none;
+  border-top: 1px solid var(--neutral-200);
+  margin: 12px 0;
+}
+
+// Modal transitions
+.modal-fade {
+  animation: fadeIn 0.22s cubic-bezier(.4,0,.2,1);
+}
+.modal-scale {
+  animation: scaleIn 0.22s cubic-bezier(.4,0,.2,1);
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes scaleIn {
+  from { transform: scale(0.97); }
+  to { transform: scale(1); }
+}
+
+// Simple modal design
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 41, 59, 0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-form {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 8px 32px 0 rgba(59,130,246,0.13);
+  padding: 2rem 2rem 1.5rem 2rem;
+  min-width: 320px;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  position: relative;
+}
+.modal-form h3 {
+  font-size: 1.1rem;
+  color: var(--primary-700);
+  margin: 0 0 10px 0;
+  font-weight: 800;
+}
+.modal-form input, .modal-form select {
+  width: 100%;
+  margin-top: 4px;
+  padding: 0.6em;
+  border-radius: 8px;
+  border: 1.5px solid var(--primary-100);
+  font-size: 15px;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
 }

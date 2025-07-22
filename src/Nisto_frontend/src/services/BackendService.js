@@ -623,6 +623,9 @@ class BackendService {
 
   // Group Vaults
   async getUserGroupVaults() {
+    if (!this.isAuthenticated) {
+      throw new Error('User is not authenticated. Please log in.');
+    }
     try {
       await this.ensureActor();
       const result = await this.actor.getUserGroupVaults();
@@ -816,6 +819,72 @@ class BackendService {
     } catch (error) {
       console.error('Delete group vault failed:', error);
       throw error;
+    }
+  }
+
+  // Vault Action Proposals (Voting, Appeals, etc.)
+  async proposeVaultAction(vaultId, actionType, targetId = null, newRole = null) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.proposeVaultAction(
+        vaultId,
+        actionType,
+        targetId ? [targetId] : [],
+        newRole ? [newRole] : []
+      );
+      if (result.ok) {
+        return result.ok;
+      } else {
+        throw new Error(result.err);
+      }
+    } catch (error) {
+      console.error('Propose vault action failed:', error);
+      throw error;
+    }
+  }
+
+  async voteVaultAction(proposalId, approve) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.voteVaultAction(proposalId, approve);
+      if (result.ok) {
+        return result.ok;
+      } else {
+        throw new Error(result.err);
+      }
+    } catch (error) {
+      console.error('Vote vault action failed:', error);
+      throw error;
+    }
+  }
+
+  async appealVaultAction(proposalId, reason) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.appealVaultAction(proposalId, reason);
+      if (result.ok) {
+        return result.ok;
+      } else {
+        throw new Error(result.err);
+      }
+    } catch (error) {
+      console.error('Appeal vault action failed:', error);
+      throw error;
+    }
+  }
+
+  async getVaultProposals(vaultId) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.getVaultProposals(vaultId);
+      if (result.ok) {
+        return result.ok;
+      } else {
+        throw new Error(result.err);
+      }
+    } catch (error) {
+      console.error('Get vault proposals failed:', error);
+      return [];
     }
   }
 }

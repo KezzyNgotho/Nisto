@@ -190,33 +190,33 @@ function Dashboard() {
       {/* Main Area */}
       <div className="dashboard-main">
         {/* Top Bar/Header */}
-        <header className="dashboard-header">
+      <header className="dashboard-header">
           <div className="dashboard-header-left">
             <div className="header-page-indicator">🏦</div>
           </div>
           <div className="dashboard-header-right">
-            <div className="dashboard-user-info">
-              <div className="user-avatar">
-                <FiUser />
-              </div>
-              <div className="user-details">
+          <div className="dashboard-user-info">
+            <div className="user-avatar">
+              <FiUser />
+            </div>
+            <div className="user-details">
                 <span className="user-name">{user?.displayName || 'User'}</span>
                 <span className="user-principal">{principal ? `${principal.slice(0, 12)}...` : 'Loading...'}</span>
               </div>
             </div>
             <button className="notification-btn-header" onClick={()=>setShowNotifications(!showNotifications)}>
-              <FiBell />
+                <FiBell />
               {unreadCount > 0 && <span className="notification-badge-header">{unreadCount}</span>}
             </button>
             <button className="logout-btn-header" onClick={handleLogout}><FiLogOut /></button>
-          </div>
-        </header>
+        </div>
+      </header>
         {/* Main Content */}
         <main className="dashboard-content">
           {showNotifications && <NotificationCenter />}
           <ToastNotification />
           {/* Main dashboard tabs */}
-          {activeTab === 'overview' && (
+        {activeTab === 'overview' && (
             <section className="dashboard-section">
               {/* Stat Cards */}
               <div className="dashboard-cards">
@@ -246,7 +246,7 @@ function Dashboard() {
                       <span style={{ fontSize: 20, color: 'var(--primary-600)' }}>{item.icon && React.createElement(item.icon)}</span>
                       <span style={{ flex: 1, color: 'var(--neutral-700)', fontWeight: 500 }}>{item.text}</span>
                       <span style={{ color: 'var(--neutral-400)', fontSize: 13 }}>{item.time}</span>
-                    </div>
+                </div>
                   ))}
                 </div>
               </div>

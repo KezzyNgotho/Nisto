@@ -77,9 +77,7 @@ MIT License
 ---
 
 ## 📬 Contact
-- **Lead Developer:** Kezzy Ngotho ([GitHub](https://github.com/KezzyNgotho))
-
-- **Co-Developer:** Alex Rotich ([GitHub](https://github.com/Alex-KR-dev))
-
+- **Lead Developer:** Ian Alex ([GitHub](https://github.com/Alex-KR-dev))
+ **Lead Developer:** dev Wangari ([GitHub](https://github.com/KezzyNgotho))
 - **Issues & Support:** Use the [GitHub Issues](https://github.com/KezzyNgotho/Nisto/issues) page.
 - **Contributions:** PRs welcome!

@@ -46,7 +46,7 @@ function CryptoWallets() {
   ];
 
   const externalWalletTypes = [
-    'Plug', 'Stoic', 'Bitfinity', 'NFID', 'MetaMask', 'Trust Wallet', 'Coinbase Wallet'
+    'Plug', 'Stoic', 'Bitfinity', 'NFID', 'Trust Wallet', 'Coinbase Wallet'
   ];
 
   useEffect(() => {
