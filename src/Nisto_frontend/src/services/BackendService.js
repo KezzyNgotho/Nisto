@@ -20,7 +20,7 @@ const getCanisterId = () => {
   
   // In local development, use the environment variable from .env file
   // This is automatically set by dfx when running locally
-  return import.meta.env.VITE_CANISTER_ID_NISTO_BACKEND || 'uxrrr-q7777-77774-qaaaq-cai';
+  return import.meta.env.VITE_CANISTER_ID_NISTO_BACKEND || 'vizcg-th777-77774-qaaea-cai';
 };
 
 // Get Internet Identity canister ID
@@ -29,9 +29,8 @@ const getInternetIdentityCanisterId = () => {
     // In production, use the mainnet Internet Identity
     return 'rdmx6-jaaaa-aaaaa-aaadq-cai';
   }
-  
   // In local development, use the local Internet Identity canister
-  return import.meta.env.VITE_CANISTER_ID_INTERNET_IDENTITY || 'uzt4z-lp777-77774-qaabq-cai';
+  return 'vg3po-ix777-77774-qaafa-cai';
 };
 
 const CANISTER_ID = getCanisterId();
