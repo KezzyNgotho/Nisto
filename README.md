@@ -20,7 +20,7 @@
 
 ---
 
-## 🌟 Why Nisto Will Win
+## 🌟 Why Nisto
 
 Nisto isn't just another DeFi platform—it's a **revolutionary social finance ecosystem** that combines the power of decentralized finance with the connectivity of social networks. Built on the Internet Computer, Nisto offers unprecedented scalability, security, and user experience.
 
