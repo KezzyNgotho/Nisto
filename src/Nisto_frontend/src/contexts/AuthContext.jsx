@@ -122,7 +122,33 @@ export function AuthProvider({ children }) {
 
   // Group Vaults
   const getUserGroupVaults = useCallback(async () => {
-    return backend.getUserGroupVaults();
+    try {
+      const result = await backend.getUserGroupVaults();
+      if (result.ok) {
+        return result.ok;
+      } else {
+        console.error('Failed to get user group vaults:', result.err);
+        return [];
+      }
+    } catch (error) {
+      console.error('Failed to get user group vaults:', error);
+      return [];
+    }
+  }, [backend]);
+
+  const getPublicVaults = useCallback(async () => {
+    try {
+      const result = await backend.getPublicVaults();
+      if (result.ok) {
+        return result.ok;
+      } else {
+        console.error('Failed to get public vaults:', result.err);
+        return [];
+      }
+    } catch (error) {
+      console.error('Failed to get public vaults:', error);
+      return [];
+    }
   }, [backend]);
 
   const createGroupVault = useCallback(async (name, description, vaultType, currency, targetAmount, isPublic, rules) => {
@@ -206,6 +232,7 @@ export function AuthProvider({ children }) {
     linkRecoveredAccount,
     updateCryptoWalletBalance,
     getUserGroupVaults,
+    getPublicVaults,
     createGroupVault,
     joinGroupVault,
     getVaultDetails,

@@ -32,6 +32,7 @@ function PluginSystem() {
   const [showPluginModal, setShowPluginModal] = useState(false);
   const [selectedPlugin, setSelectedPlugin] = useState(null);
   const [isInstalling, setIsInstalling] = useState(false);
+  const [isUninstalling, setIsUninstalling] = useState(false);
 
   const categories = [
     { id: 'all', name: 'All', icon: '📦' },
@@ -43,7 +44,7 @@ function PluginSystem() {
   ];
 
   useEffect(() => {
-    // Load available plugins
+    // Load available plugins (mocked)
     setPlugins([
       {
         id: 1,
@@ -59,7 +60,12 @@ function PluginSystem() {
         tags: ['budgeting', 'expenses', 'ai', 'analytics'],
         features: ['AI-powered insights', 'Multi-currency support', 'Export reports'],
         status: 'available',
-        icon: '📊'
+        icon: '📊',
+        screenshots: [],
+        reviews: [
+          { user: 'Alice', rating: 5, comment: 'Super useful for my monthly budget!' },
+          { user: 'Bob', rating: 4, comment: 'Great insights, easy to use.' }
+        ]
       },
       {
         id: 2,
@@ -75,7 +81,11 @@ function PluginSystem() {
         tags: ['crypto', 'portfolio', 'trading', 'defi'],
         features: ['Real-time prices', 'Portfolio tracking', 'DeFi integration'],
         status: 'available',
-        icon: '₿'
+        icon: '₿',
+        screenshots: [],
+        reviews: [
+          { user: 'Eve', rating: 5, comment: 'Love the real-time updates!' }
+        ]
       },
       {
         id: 3,
@@ -91,79 +101,46 @@ function PluginSystem() {
         tags: ['savings', 'social', 'challenges', 'gamification'],
         features: ['Group challenges', 'Progress tracking', 'Rewards system'],
         status: 'available',
-        icon: '🎯'
+        icon: '🎯',
+        screenshots: [],
+        reviews: [
+          { user: 'Charlie', rating: 5, comment: 'Fun way to save with friends!' }
+        ]
       },
       {
         id: 4,
         name: 'Bill Reminder',
         description: 'Never miss a bill payment with smart reminders',
         category: 'utilities',
-        author: 'ReminderPro',
-        version: '1.1.2',
+        author: 'UtilitySoft',
+        version: '1.0.0',
         rating: 4.7,
-        downloads: 18760,
+        downloads: 12000,
         size: '1.2 MB',
         price: 0,
-        tags: ['bills', 'reminders', 'automation'],
-        features: ['Smart reminders', 'Payment tracking', 'Auto-categorization'],
+        tags: ['bills', 'reminders', 'utilities'],
+        features: ['Smart reminders', 'Recurring bills', 'Calendar sync'],
         status: 'available',
-        icon: '📅'
-      },
-      {
-        id: 5,
-        name: 'Investment Simulator',
-        description: 'Practice investing with virtual money',
-        category: 'finance',
-        author: 'InvestSim',
-        version: '1.3.0',
-        rating: 4.5,
-        downloads: 12340,
-        size: '4.2 MB',
-        price: 0,
-        tags: ['investing', 'simulation', 'education'],
-        features: ['Virtual trading', 'Market data', 'Learning modules'],
-        status: 'available',
-        icon: '📈'
-      },
-      {
-        id: 6,
-        name: 'Expense Splitter',
-        description: 'Split expenses with friends and family easily',
-        category: 'social',
-        author: 'SplitWise',
-        version: '1.0.8',
-        rating: 4.8,
-        downloads: 9870,
-        size: '2.7 MB',
-        price: 0,
-        tags: ['expenses', 'splitting', 'social'],
-        features: ['Group expenses', 'Payment tracking', 'Settlement'],
-        status: 'available',
-        icon: '✂️'
+        icon: '⏰',
+        screenshots: [],
+        reviews: []
       }
     ]);
-
-    // Load installed plugins
-    setInstalledPlugins([
-      {
-        id: 1,
-        name: 'Budget Tracker Pro',
-        version: '1.2.0',
-        status: 'active',
-        lastUsed: new Date(Date.now() - 86400000),
-        icon: '📊'
-      },
-      {
-        id: 3,
-        name: 'Social Savings Challenge',
-        version: '1.0.5',
-        status: 'active',
-        lastUsed: new Date(Date.now() - 172800000),
-        icon: '🎯'
-      }
-    ]);
+    // Mock: user has installed plugin 2
+    setInstalledPlugins([2]);
   }, []);
 
+  // Filtered plugins for marketplace
+  const filteredPlugins = plugins.filter(p => {
+    const matchesCategory = selectedCategory === 'all' || p.category === selectedCategory;
+    const matchesSearch = p.name.toLowerCase().includes(searchQuery.toLowerCase()) || p.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  // Plugins user has installed
+  const userInstalledPlugins = plugins.filter(p => installedPlugins.includes(p.id));
+
+  // Handlers
   const handlePluginSelect = (plugin) => {
     setSelectedPlugin(plugin);
     setShowPluginModal(true);
@@ -171,334 +148,118 @@ function PluginSystem() {
 
   const handleInstallPlugin = async (plugin) => {
     setIsInstalling(true);
-    
-    try {
-      // Simulate installation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Add to installed plugins
-      const installedPlugin = {
-        id: plugin.id,
-        name: plugin.name,
-        version: plugin.version,
-        status: 'active',
-        lastUsed: new Date(),
-        icon: plugin.icon
-      };
-      
-      setInstalledPlugins(prev => [...prev, installedPlugin]);
-      setShowPluginModal(false);
-      setSelectedPlugin(null);
-      
-      alert(`${plugin.name} installed successfully!`);
-    } catch (error) {
-      console.error('Installation failed:', error);
-      alert('Installation failed. Please try again.');
-    } finally {
+    setTimeout(() => {
+      setInstalledPlugins(prev => [...prev, plugin.id]);
       setIsInstalling(false);
-    }
+    }, 1000);
   };
 
   const handleUninstallPlugin = async (plugin) => {
-    if (confirm(`Are you sure you want to uninstall ${plugin.name}?`)) {
-      setInstalledPlugins(prev => prev.filter(p => p.id !== plugin.id));
-      alert(`${plugin.name} uninstalled successfully!`);
-    }
+    setIsUninstalling(true);
+    setTimeout(() => {
+      setInstalledPlugins(prev => prev.filter(id => id !== plugin.id));
+      setIsUninstalling(false);
+      setShowPluginModal(false);
+    }, 1000);
   };
 
-  const filteredPlugins = plugins.filter(plugin => {
-    const matchesSearch = plugin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         plugin.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || plugin.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'active': return 'text-green-500';
-      case 'inactive': return 'text-gray-500';
-      case 'updating': return 'text-yellow-500';
-      default: return 'text-gray-500';
-    }
-  };
-
+  // UI
   return (
-    <div className="plugin-system">
-      <div className="plugin-header">
-        <div className="plugin-header-content">
-          <div className="plugin-icon">
-            <FiGrid />
-          </div>
-          <div className="plugin-info">
-            <h2>Plugin Marketplace</h2>
-            <p>Discover and install powerful mini-apps to enhance your Nisto experience</p>
-          </div>
+    <div className="plugin-marketplace-root" style={{ width: '100%', padding: 0, margin: 0, position: 'relative' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 24, marginBottom: 24, borderBottom: '1px solid var(--neutral-100)', padding: '0 2rem 1.2rem 2rem', background: 'white', position: 'sticky', top: 0, zIndex: 2 }}>
+        <h2 style={{ fontWeight: 700, fontSize: 28, margin: 0, color: 'var(--primary-700)', letterSpacing: '-1px' }}>Plug-in Marketplace</h2>
+        <div style={{ flex: 1 }} />
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className={`tab-btn${activeTab==='marketplace'?' active':''}`} onClick={()=>setActiveTab('marketplace')} style={{ padding: '0.6rem 1.4rem', borderRadius: 8, border: 'none', background: activeTab==='marketplace' ? 'var(--primary-600)' : 'var(--neutral-100)', color: activeTab==='marketplace' ? 'white' : 'var(--neutral-600)', fontWeight: 600, fontSize: 16, transition: 'all 0.18s', boxShadow: activeTab==='marketplace' ? '0 2px 8px 0 rgba(59,130,246,0.10)' : 'none', cursor: 'pointer' }}>Marketplace</button>
+          <button className={`tab-btn${activeTab==='installed'?' active':''}`} onClick={()=>setActiveTab('installed')} style={{ padding: '0.6rem 1.4rem', borderRadius: 8, border: 'none', background: activeTab==='installed' ? 'var(--primary-600)' : 'var(--neutral-100)', color: activeTab==='installed' ? 'white' : 'var(--neutral-600)', fontWeight: 600, fontSize: 16, transition: 'all 0.18s', boxShadow: activeTab==='installed' ? '0 2px 8px 0 rgba(59,130,246,0.10)' : 'none', cursor: 'pointer' }}>Installed</button>
         </div>
       </div>
-
-      {/* Navigation Tabs */}
-      <div className="plugin-nav">
-        <button 
-          className={`nav-tab ${activeTab === 'marketplace' ? 'active' : ''}`}
-          onClick={() => setActiveTab('marketplace')}
+      {/* Search and filter */}
+      <div style={{ display: 'flex', gap: 16, marginBottom: 24, flexWrap: 'wrap', padding: '0 2rem' }}>
+        <input
+          type="text"
+          placeholder="Search plugins..."
+          value={searchQuery}
+          onChange={e => setSearchQuery(e.target.value)}
+          style={{ flex: 1, minWidth: 220, padding: '0.7rem 1.2rem', borderRadius: 8, border: '1px solid var(--neutral-200)', fontSize: 16, background: 'var(--neutral-50)', boxShadow: '0 1px 2px 0 rgba(0,0,0,0.03)' }}
+        />
+        <select
+          value={selectedCategory}
+          onChange={e => setSelectedCategory(e.target.value)}
+          style={{ padding: '0.7rem 1.2rem', borderRadius: 8, border: '1px solid var(--neutral-200)', fontSize: 16, background: 'var(--neutral-50)', boxShadow: '0 1px 2px 0 rgba(0,0,0,0.03)' }}
         >
-          <FiPackage />
-          <span>Marketplace</span>
-        </button>
-        <button 
-          className={`nav-tab ${activeTab === 'installed' ? 'active' : ''}`}
-          onClick={() => setActiveTab('installed')}
-        >
-          <FiDownload />
-          <span>Installed</span>
-        </button>
+          {categories.map(cat => (
+            <option key={cat.id} value={cat.id}>{cat.icon} {cat.name}</option>
+          ))}
+        </select>
       </div>
-
-      <div className="plugin-content">
-        {/* Marketplace Tab */}
-        {activeTab === 'marketplace' && (
-          <div className="marketplace-section">
-            {/* Search and Filters */}
-            <div className="marketplace-controls">
-              <div className="search-box">
-                <FiSearch />
-                <input
-                  type="text"
-                  placeholder="Search plugins..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              
-              <div className="category-filter">
-                <FiFilter />
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                >
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {category.icon} {category.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Plugins Grid */}
-            <div className="plugins-grid">
-              {filteredPlugins.map((plugin) => (
-                <div key={plugin.id} className="plugin-card">
-                  <div className="plugin-header">
-                    <div className="plugin-icon">
-                      <span className="plugin-emoji">{plugin.icon}</span>
-                    </div>
-                    <div className="plugin-info">
-                      <h4>{plugin.name}</h4>
-                      <p>{plugin.description}</p>
-                      <div className="plugin-meta">
-                        <span className="author">by {plugin.author}</span>
-                        <span className="version">v{plugin.version}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="plugin-stats">
-                    <div className="stat-item">
-                      <FiStar className="text-yellow-500" />
-                      <span>{plugin.rating}</span>
-                    </div>
-                    <div className="stat-item">
-                      <FiDownload />
-                      <span>{plugin.downloads.toLocaleString()}</span>
-                    </div>
-                    <div className="stat-item">
-                      <FiPackage />
-                      <span>{plugin.size}</span>
-                    </div>
-                  </div>
-
-                  <div className="plugin-tags">
-                    {plugin.tags.slice(0, 3).map((tag, index) => (
-                      <span key={index} className="tag">{tag}</span>
-                    ))}
-                  </div>
-
-                  <div className="plugin-actions">
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => handlePluginSelect(plugin)}
-                    >
-                      <FiInfo />
-                      Details
-                    </button>
-                    <button className="btn btn-secondary">
-                      <FiHeart />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+      {/* Plugin grid/list */}
+      <div className="plugin-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: 24, padding: '0 2rem 2rem 2rem' }}>
+        {(activeTab === 'marketplace' ? filteredPlugins : userInstalledPlugins).length === 0 ? (
+          <div style={{ gridColumn: '1/-1', textAlign: 'center', color: 'var(--neutral-400)', fontSize: 18, padding: '3rem 0' }}>
+            No plugins found.
           </div>
-        )}
-
-        {/* Installed Tab */}
-        {activeTab === 'installed' && (
-          <div className="installed-section">
-            <h3>Installed Plugins</h3>
-            <div className="installed-plugins">
-              {installedPlugins.map((plugin) => (
-                <div key={plugin.id} className="installed-plugin-card">
-                  <div className="plugin-info">
-                    <div className="plugin-icon">
-                      <span className="plugin-emoji">{plugin.icon}</span>
-                    </div>
-                    <div className="plugin-details">
-                      <h4>{plugin.name}</h4>
-                      <p>Version {plugin.version}</p>
-                      <span className="last-used">
-                        Last used: {plugin.lastUsed.toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="plugin-status">
-                    <span className={`status ${getStatusColor(plugin.status)}`}>
-                      {plugin.status}
-                    </span>
-                  </div>
-
-                  <div className="plugin-actions">
-                    <button className="btn btn-secondary btn-sm">
-                      <FiPlay />
-                    </button>
-                    <button className="btn btn-secondary btn-sm">
-                      <FiSettings />
-                    </button>
-                    <button 
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleUninstallPlugin(plugin)}
-                    >
-                      <FiTrash2 />
-                    </button>
-                  </div>
-                </div>
-              ))}
-
-              {installedPlugins.length === 0 && (
-                <div className="no-plugins">
-                  <FiPackage className="no-plugins-icon" />
-                  <h4>No plugins installed</h4>
-                  <p>Browse the marketplace to discover and install plugins</p>
-                  <button 
-                    className="btn btn-primary"
-                    onClick={() => setActiveTab('marketplace')}
-                  >
-                    Browse Marketplace
-                  </button>
-                </div>
+        ) : (
+          (activeTab === 'marketplace' ? filteredPlugins : userInstalledPlugins).map(plugin => (
+            <div key={plugin.id} className="plugin-card" style={{ background: 'white', borderRadius: 14, boxShadow: '0 2px 8px rgba(0,0,0,0.07)', padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', position: 'relative', minHeight: 220, transition: 'box-shadow 0.2s, transform 0.18s', cursor: 'pointer', border: '1px solid var(--neutral-100)' }}
+              onClick={()=>handlePluginSelect(plugin)}
+              onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-4px) scale(1.03)'}
+              onMouseLeave={e => e.currentTarget.style.transform = 'none'}
+            >
+              <div style={{ fontSize: 36, marginBottom: 12 }}>{plugin.icon}</div>
+              <div style={{ fontWeight: 700, fontSize: 18, marginBottom: 4 }}>{plugin.name}</div>
+              <div style={{ color: 'var(--neutral-500)', fontSize: 15, marginBottom: 8 }}>{plugin.description}</div>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                <span style={{ background: 'var(--neutral-100)', borderRadius: 6, padding: '2px 8px', fontSize: 13 }}>{plugin.category}</span>
+                <span style={{ color: '#f5b50a', fontWeight: 600, fontSize: 13 }}>★ {plugin.rating}</span>
+              </div>
+              <div style={{ fontSize: 13, color: 'var(--neutral-400)' }}>{plugin.downloads.toLocaleString()} installs</div>
+              {installedPlugins.includes(plugin.id) && (
+                <div style={{ position: 'absolute', top: 18, right: 18, background: 'var(--primary-100)', color: 'var(--primary-700)', borderRadius: 8, padding: '2px 10px', fontSize: 13, fontWeight: 600 }}>Installed</div>
               )}
             </div>
-          </div>
+          ))
         )}
       </div>
-
-      {/* Plugin Details Modal */}
+      {/* Plugin details modal */}
       {showPluginModal && selectedPlugin && (
-        <div className="modal-overlay">
-          <div className="modal large">
-            <div className="modal-header">
-              <div className="modal-title">
-                <span className="plugin-emoji">{selectedPlugin.icon}</span>
-                <h3>{selectedPlugin.name}</h3>
-              </div>
-              <button 
-                className="btn btn-icon"
-                onClick={() => setShowPluginModal(false)}
-              >
-                ×
-              </button>
+        <div className="plugin-modal-overlay" style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.18)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeIn 0.2s' }} onClick={()=>setShowPluginModal(false)}>
+          <div className="plugin-modal" style={{ background: 'white', borderRadius: 16, boxShadow: '0 4px 32px rgba(0,0,0,0.18)', padding: 36, minWidth: 340, maxWidth: 420, width: '100%', position: 'relative', animation: 'slideUp 0.22s' }} onClick={e=>e.stopPropagation()}>
+            <button onClick={()=>setShowPluginModal(false)} style={{ position: 'absolute', top: 18, right: 18, background: 'none', border: 'none', fontSize: 22, color: 'var(--neutral-400)', cursor: 'pointer' }}><FiX /></button>
+            <div style={{ fontSize: 48, marginBottom: 12 }}>{selectedPlugin.icon}</div>
+            <div style={{ fontWeight: 700, fontSize: 22, marginBottom: 6 }}>{selectedPlugin.name}</div>
+            <div style={{ color: 'var(--neutral-500)', fontSize: 15, marginBottom: 10 }}>{selectedPlugin.description}</div>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+              <span style={{ background: 'var(--neutral-100)', borderRadius: 6, padding: '2px 8px', fontSize: 13 }}>{selectedPlugin.category}</span>
+              <span style={{ color: '#f5b50a', fontWeight: 600, fontSize: 13 }}>★ {selectedPlugin.rating}</span>
+              <span style={{ fontSize: 13, color: 'var(--neutral-400)' }}>{selectedPlugin.downloads.toLocaleString()} installs</span>
             </div>
-            
-            <div className="modal-content">
-              <div className="plugin-details">
-                <div className="plugin-description">
-                  <p>{selectedPlugin.description}</p>
-                </div>
-
-                <div className="plugin-stats-detail">
-                  <div className="stat-item">
-                    <span>Author:</span>
-                    <span>{selectedPlugin.author}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span>Version:</span>
-                    <span>{selectedPlugin.version}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span>Size:</span>
-                    <span>{selectedPlugin.size}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span>Downloads:</span>
-                    <span>{selectedPlugin.downloads.toLocaleString()}</span>
-                  </div>
-                  <div className="stat-item">
-                    <span>Rating:</span>
-                    <span>
-                      <FiStar className="text-yellow-500" />
-                      {selectedPlugin.rating}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="plugin-features">
-                  <h4>Features</h4>
-                  <ul>
-                    {selectedPlugin.features.map((feature, index) => (
-                      <li key={index}>
-                        <FiCheck className="text-green-500" />
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="plugin-tags-detail">
-                  <h4>Tags</h4>
-                  <div className="tags-list">
-                    {selectedPlugin.tags.map((tag, index) => (
-                      <span key={index} className="tag">{tag}</span>
-                    ))}
-                  </div>
-                </div>
-              </div>
+            <div style={{ fontSize: 13, color: 'var(--neutral-400)', marginBottom: 8 }}>By {selectedPlugin.author} • v{selectedPlugin.version} • {selectedPlugin.size}</div>
+            <div style={{ marginBottom: 12 }}>
+              {selectedPlugin.features && selectedPlugin.features.map((f, i) => (
+                <span key={i} style={{ background: 'var(--primary-50)', color: 'var(--primary-700)', borderRadius: 6, padding: '2px 8px', fontSize: 13, marginRight: 6 }}>{f}</span>
+              ))}
             </div>
-
-            <div className="modal-actions">
-              <button 
-                className="btn btn-secondary"
-                onClick={() => setShowPluginModal(false)}
-              >
-                Cancel
-              </button>
-              <button 
-                className="btn btn-primary"
-                onClick={() => handleInstallPlugin(selectedPlugin)}
-                disabled={isInstalling}
-              >
-                {isInstalling ? (
-                  <>
-                    <FiDownload className="spinning" />
-                    Installing...
-                  </>
-                ) : (
-                  <>
-                    <FiDownload />
-                    Install Plugin
-                  </>
-                )}
-              </button>
+            {/* Install/Uninstall button */}
+            {installedPlugins.includes(selectedPlugin.id) ? (
+              <button className="btn btn-danger" style={{ width: '100%', marginBottom: 10, fontWeight: 600, fontSize: 16, borderRadius: 8, transition: 'all 0.18s' }} onClick={()=>handleUninstallPlugin(selectedPlugin)} disabled={isUninstalling}>{isUninstalling ? 'Uninstalling...' : 'Uninstall'}</button>
+            ) : (
+              <button className="btn btn-primary" style={{ width: '100%', marginBottom: 10, fontWeight: 600, fontSize: 16, borderRadius: 8, transition: 'all 0.18s' }} onClick={()=>handleInstallPlugin(selectedPlugin)} disabled={isInstalling}>{isInstalling ? 'Installing...' : 'Install'}</button>
+            )}
+            {/* Reviews */}
+            <div style={{ marginTop: 18 }}>
+              <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 6 }}>Reviews</div>
+              {selectedPlugin.reviews && selectedPlugin.reviews.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {selectedPlugin.reviews.map((r, i) => (
+                    <div key={i} style={{ background: 'var(--neutral-100)', borderRadius: 6, padding: '6px 10px', fontSize: 14 }}>
+                      <span style={{ fontWeight: 600 }}>{r.user}</span>: <span style={{ color: '#f5b50a' }}>★ {r.rating}</span> <span style={{ color: 'var(--neutral-600)' }}>{r.comment}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ color: 'var(--neutral-400)', fontSize: 14 }}>No reviews yet.</div>
+              )}
             </div>
           </div>
         </div>

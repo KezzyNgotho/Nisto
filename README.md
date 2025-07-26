@@ -62,36 +62,129 @@ Nisto isn't just another DeFi platform—it's a **revolutionary social finance e
 
 ### **Prerequisites**
 - Node.js 18+ 
-- DFX (Internet Computer SDK)
+- DFX (Internet Computer SDK) - [Install DFX](https://internetcomputer.org/docs/current/developer-docs/setup/install/)
 - Git
 
 ### **Quick Start**
+
+#### **1. Clone and Setup**
 ```bash
 # Clone the repository
 git clone https://github.com/KezzyNgotho/Nisto.git
-cd Nisto
+cd Nesto
 
-# Install dependencies
+# Install root dependencies
 npm install
 
+# Install frontend dependencies
+cd src/Nisto_frontend
+npm install
+cd ../..
+```
+
+#### **2. Start Local Development Environment**
+```bash
 # Start local Internet Computer replica
 dfx start --background
 
-# Deploy canisters
-dfx deploy
-
-# Start the frontend
-cd src/Nisto_frontend
-npm start
+# Wait for the replica to be ready (check with dfx ping)
+dfx ping
 ```
 
-### **Production Deployment**
+#### **3. Deploy Canisters**
 ```bash
-# Deploy to mainnet
-dfx deploy --network ic
+# Deploy all canisters (Internet Identity, Backend, Frontend)
+dfx deploy
+
+# Or deploy individually:
+dfx deploy internet_identity
+dfx deploy Nisto_backend
+dfx deploy Nisto_frontend
+```
+
+#### **4. Build and Deploy Frontend**
+```bash
+# Build the frontend
+cd src/Nisto_frontend
+npm run build
+
+# Deploy the updated frontend
+cd ../..
+dfx deploy Nisto_frontend
+```
+
+#### **5. Access Your Application**
+```bash
+# Get the frontend URL
+dfx canister id Nisto_frontend
+
+# Open in browser: http://localhost:4943/?canisterId=<FRONTEND_CANISTER_ID>
+```
+
+---
+
+## 📋 **Current Canister IDs**
+
+### **Local Development Environment**
+```bash
+# Internet Identity Canister
+internet_identity: uzt4z-lp777-77774-qaabq-cai
+
+# Backend Canister  
+Nisto_backend: uxrrr-q7777-77774-qaaaq-cai
+
+# Frontend Canister
+Nisto_frontend: u6s2n-gx777-77774-qaaba-cai
+```
+
+### **Environment Variables**
+The following environment variables are automatically set in `.env`:
+```bash
+CANISTER_ID_INTERNET_IDENTITY=uzt4z-lp777-77774-qaabq-cai
+CANISTER_ID_NISTO_BACKEND=uxrrr-q7777-77774-qaaaq-cai
+CANISTER_ID_NISTO_FRONTEND=u6s2n-gx777-77774-qaaba-cai
+```
+
+---
+
+## 🔧 **Development Workflow**
+
+### **Backend Development (Motoko)**
+```bash
+# Edit backend code
+code src/Nisto_backend/main.mo
+
+# Deploy backend changes
+dfx deploy Nisto_backend
+
+# Check backend status
+dfx canister status Nisto_backend
+
+# View backend logs
+dfx canister call Nisto_backend greet '("World")'
+```
+
+### **Frontend Development (React)**
+```bash
+# Start development server
+cd src/Nisto_frontend
+npm start
 
 # Build for production
 npm run build
+
+# Deploy frontend changes
+cd ../..
+dfx deploy Nisto_frontend
+```
+
+### **Internet Identity Setup**
+```bash
+# Check Internet Identity status
+dfx canister status internet_identity
+
+# Access Internet Identity interface
+# http://localhost:4943/?canisterId=uzt4z-lp777-77774-qaabq-cai
 ```
 
 ---
@@ -116,7 +209,7 @@ graph TB
 </div>
 
 ### **Tech Stack**
-- **Frontend**: React 18, TypeScript, Vite, SCSS
+- **Frontend**: React 18, JavaScript, Vite, SCSS
 - **Backend**: Motoko (Internet Computer)
 - **Authentication**: Internet Identity
 - **Styling**: Modern CSS with animations
@@ -199,389 +292,198 @@ graph TB
 - **Security Settings**: Two-factor authentication and privacy controls
 - **Session Management**: Automatic session handling and refresh
 
-#### **💳 Crypto Wallets Module**
-- **Wallet Dashboard**: Multi-wallet overview and management
-- **Transaction History**: Detailed transaction logs with filtering
-- **Address Management**: Add, edit, and label wallet addresses
-- **Balance Display**: Real-time balance updates with currency conversion
-- **Security Features**: Wallet security settings and backup options
+#### **💰 Wallet Management Module**
+- **Wallet Overview**: Multi-currency wallet dashboard
+- **Transaction History**: Complete transaction tracking
+- **Address Management**: Generate and manage wallet addresses
+- **Portfolio Analytics**: Performance charts and metrics
 
 #### **🏦 DeFi Tools Module**
-- **Portfolio Overview**: Asset allocation and performance charts
-- **Yield Farming Interface**: Manage yield farming positions
-- **Lending Dashboard**: Borrow and lend with real-time rates
-- **Staking Interface**: Stake tokens and track rewards
-- **Analytics Tools**: Advanced portfolio analytics and insights
+- **Protocol Integration**: Connect to DeFi protocols
+- **Position Management**: Monitor and manage DeFi positions
+- **Yield Farming**: Automated yield optimization
+- **Risk Assessment**: Portfolio risk analysis
 
-#### **👥 Group Vaults Module**
-- **Vault Creation**: Step-by-step vault setup wizard
-- **Member Management**: Add, remove, and manage vault members
-- **Transaction Approval**: Multi-signature transaction interface
-- **Vault Analytics**: Performance metrics and member activity
-- **Public Vaults**: Discover and join public vaults
-
-#### **🎮 Social Games Module**
-- **Game Lobby**: Browse and join available games
-- **Trading Interface**: In-game trading with real-time updates
-- **Leaderboards**: Global and local player rankings
-- **Reward Display**: Token rewards and achievement tracking
-- **Game History**: Personal game performance and statistics
-
-#### **🤖 AI Financial Assistant Module**
-- **Chat Interface**: Natural language interaction with AI
-- **Insight Display**: Personalized financial insights and recommendations
-- **Risk Analysis**: Portfolio risk assessment and alerts
-- **Market Updates**: Real-time market news and analysis
-- **Learning Preferences**: Customize AI recommendations
-
-#### **💳 Local Payment Methods Module**
-- **Payment Interface**: User-friendly payment forms
-- **Provider Selection**: Choose from available payment providers
-- **Transaction Tracking**: Real-time payment status updates
-- **History Management**: Complete payment history and receipts
-- **Settings Configuration**: Payment preferences and limits
-
-#### **🔌 Plugin System Module**
-- **Marketplace Interface**: Browse and discover plugins
-- **Installation Management**: Install, update, and remove plugins
-- **Plugin Configuration**: Configure plugin settings and permissions
-- **Developer Tools**: Plugin development and testing tools
-- **Review System**: Rate and review plugins
-
-#### **🔔 Notification System Module**
-- **Real-time Notifications**: WebSocket-based live notifications
-- **Notification Center**: Centralized notification management
-- **Toast Notifications**: Non-intrusive status updates
-- **Email Integration**: Email notification delivery
-- **Push Notifications**: Mobile push notification support
-
-### **Service Layer**
-
-#### **🌐 Backend Service**
-- **API Integration**: Complete backend API integration
-- **Data Management**: User data and state management
-- **Error Handling**: Comprehensive error handling and recovery
-- **Caching**: Intelligent data caching for performance
-- **WebSocket Support**: Real-time communication
-
-#### **💼 Wallet Service**
-- **Wallet Operations**: Create, import, and manage wallets
-- **Transaction Processing**: Send and receive transactions
-- **Balance Tracking**: Real-time balance updates
-- **Address Management**: Generate and manage addresses
-- **Security Features**: Wallet encryption and backup
-
-#### **📡 WebSocket Service**
-- **Real-time Updates**: Live data updates and notifications
-- **Connection Management**: Automatic reconnection and error handling
-- **Event Handling**: Structured event processing
-- **Performance Optimization**: Efficient data transmission
-- **Security**: Secure WebSocket communication
-
-### **Context Management**
-
-#### **🔐 Authentication Context**
-- **User State**: Global user authentication state
-- **Session Management**: Automatic session handling
-- **Recovery Methods**: Recovery method management
-- **Crypto Wallets**: Wallet state and operations
-- **Security Features**: Security settings and preferences
-
-#### **🔔 Notification Context**
-- **Global Notifications**: Application-wide notification state
-- **Real-time Updates**: Live notification updates
-- **User Preferences**: Notification preferences and settings
-- **History Management**: Notification history and cleanup
-- **Integration**: Seamless integration with all modules
-
----
-
-## 📊 **Module Architecture & Features**
-
-### 🏗️ **Backend Modules (Motoko)**
-
-#### **🔐 Authentication & Security Module**
-- **User Management**: Complete user lifecycle with preferences and settings
-- **Recovery System**: Multi-method account recovery (email, phone, security questions, emergency contacts)
-- **Session Management**: Secure login sessions with device tracking
-- **Audit Logging**: Comprehensive security audit trails
-- **Two-Factor Authentication**: Enhanced security with 2FA support
-
-#### **💰 Wallet & Transaction Module**
-- **Multi-Currency Wallets**: Support for Bitcoin, Ethereum, Internet Computer, and more
-- **External Wallet Integration**: Connect existing wallets (MetaMask, WalletConnect)
-- **Transaction Management**: Complete transaction lifecycle with status tracking
-- **Portfolio Analytics**: Real-time balance tracking and performance metrics
-- **Address Management**: Unlimited wallet addresses with labeling
-
-#### **🏦 DeFi Integration Module**
-- **Protocol Support**: Integration with major DeFi protocols
-- **Yield Farming**: Automated yield optimization strategies
-- **Lending & Borrowing**: Collateralized lending with competitive rates
-- **Staking Rewards**: Passive income through staking mechanisms
-- **Position Tracking**: Real-time DeFi position monitoring
-
-#### **👥 Group Vaults Module**
-- **Vault Creation**: Customizable vault types (savings, investment, emergency)
-- **Member Management**: Role-based access control (owner, admin, member)
-- **Transaction Approval**: Multi-signature transaction workflows
-- **Contribution Tracking**: Automated contribution and withdrawal tracking
-- **Vault Analytics**: Performance metrics and member activity
-
-#### **🎮 Social Gaming Module**
-- **Trading Challenges**: Competitive trading competitions
-- **Game Types**: Various game modes (daily, weekly, tournament)
-- **Participant Management**: Player registration and tracking
-- **Reward System**: Token rewards and leaderboard rankings
-- **Game History**: Complete game and participant history
-
-#### **🤖 AI Assistant Module**
-- **Message Types**: Support for text, voice, and structured data
-- **Insight Generation**: Personalized financial insights and analysis
-- **Recommendation Engine**: AI-powered investment recommendations
-- **Risk Assessment**: Portfolio risk analysis and alerts
-- **Learning System**: Continuous improvement from user interactions
-
-#### **💳 Local Payment Module**
-- **Payment Providers**: Integration with M-Pesa, Airtel Money, and more
-- **Transaction Processing**: Complete payment lifecycle management
-- **Status Tracking**: Real-time payment status updates
-- **Fee Management**: Transparent fee structure and calculations
-- **Compliance**: Regulatory compliance and reporting
+#### **👥 Social Features Module**
+- **Group Vaults**: Collaborative savings and investment
+- **Trading Games**: Competitive trading challenges
+- **Leaderboards**: Global and local rankings
+- **Social Feed**: Community interactions and updates
 
 #### **🔌 Plugin Marketplace Module**
-- **Plugin Management**: Complete plugin lifecycle (create, install, update, remove)
-- **Category System**: Organized plugin categories (trading, analytics, gaming)
-- **Permission System**: Granular permission controls
-- **User Plugin States**: Individual user plugin configurations
-- **Review System**: Plugin ratings and user reviews
-
-### 🎨 **Frontend Modules (React)**
-
-#### **📊 Dashboard Module**
-- **Overview Tab**: Real-time portfolio summary and quick actions
-- **Activity Feed**: Recent transactions and social interactions
-- **Statistics Display**: User stats and performance metrics
-- **Notification Center**: Real-time notifications and alerts
-- **Responsive Design**: Mobile-first responsive layout
-
-#### **🔐 Authentication Module**
-- **Login Modal**: Internet Identity integration
-- **Recovery Setup**: Multi-step recovery method configuration
-- **Security Settings**: Two-factor authentication and privacy controls
-- **Session Management**: Automatic session handling and refresh
-
-#### **💳 Crypto Wallets Module**
-- **Wallet Dashboard**: Multi-wallet overview and management
-- **Transaction History**: Detailed transaction logs with filtering
-- **Address Management**: Add, edit, and label wallet addresses
-- **Balance Display**: Real-time balance updates with currency conversion
-- **Security Features**: Wallet security settings and backup options
-
-#### **🏦 DeFi Tools Module**
-- **Portfolio Overview**: Asset allocation and performance charts
-- **Yield Farming Interface**: Manage yield farming positions
-- **Lending Dashboard**: Borrow and lend with real-time rates
-- **Staking Interface**: Stake tokens and track rewards
-- **Analytics Tools**: Advanced portfolio analytics and insights
-
-#### **👥 Group Vaults Module**
-- **Vault Creation**: Step-by-step vault setup wizard
-- **Member Management**: Add, remove, and manage vault members
-- **Transaction Approval**: Multi-signature transaction interface
-- **Vault Analytics**: Performance metrics and member activity
-- **Public Vaults**: Discover and join public vaults
-
-#### **🎮 Social Games Module**
-- **Game Lobby**: Browse and join available games
-- **Trading Interface**: In-game trading with real-time updates
-- **Leaderboards**: Global and local player rankings
-- **Reward Display**: Token rewards and achievement tracking
-- **Game History**: Personal game performance and statistics
-
-#### **🤖 AI Financial Assistant Module**
-- **Chat Interface**: Natural language interaction with AI
-- **Insight Display**: Personalized financial insights and recommendations
-- **Risk Analysis**: Portfolio risk assessment and alerts
-- **Market Updates**: Real-time market news and analysis
-- **Learning Preferences**: Customize AI recommendations
-
-#### **💳 Local Payment Methods Module**
-- **Payment Interface**: User-friendly payment forms
-- **Provider Selection**: Choose from available payment providers
-- **Transaction Tracking**: Real-time payment status updates
-- **History Management**: Complete payment history and receipts
-- **Settings Configuration**: Payment preferences and limits
-
-#### **🔌 Plugin System Module**
-- **Marketplace Interface**: Browse and discover plugins
-- **Installation Management**: Install, update, and remove plugins
-- **Plugin Configuration**: Configure plugin settings and permissions
-- **Developer Tools**: Plugin development and testing tools
-- **Review System**: Rate and review plugins
-
-#### **🔔 Notification System Module**
-- **Real-time Notifications**: WebSocket-based live notifications
-- **Notification Center**: Centralized notification management
-- **Toast Notifications**: Non-intrusive status updates
-- **Email Integration**: Email notification delivery
-- **Push Notifications**: Mobile push notification support
-
-### 🔧 **Service Layer**
-
-#### **🌐 Backend Service**
-- **API Integration**: Complete backend API integration
-- **Data Management**: User data and state management
-- **Error Handling**: Comprehensive error handling and recovery
-- **Caching**: Intelligent data caching for performance
-- **WebSocket Support**: Real-time communication
-
-#### **💼 Wallet Service**
-- **Wallet Operations**: Create, import, and manage wallets
-- **Transaction Processing**: Send and receive transactions
-- **Balance Tracking**: Real-time balance updates
-- **Address Management**: Generate and manage addresses
-- **Security Features**: Wallet encryption and backup
-
-#### **📡 WebSocket Service**
-- **Real-time Updates**: Live data updates and notifications
-- **Connection Management**: Automatic reconnection and error handling
-- **Event Handling**: Structured event processing
-- **Performance Optimization**: Efficient data transmission
-- **Security**: Secure WebSocket communication
-
-### 🎯 **Context Management**
-
-#### **🔐 Authentication Context**
-- **User State**: Global user authentication state
-- **Session Management**: Automatic session handling
-- **Recovery Methods**: Recovery method management
-- **Crypto Wallets**: Wallet state and operations
-- **Security Features**: Security settings and preferences
-
-#### **🔔 Notification Context**
-- **Global Notifications**: Application-wide notification state
-- **Real-time Updates**: Live notification updates
-- **User Preferences**: Notification preferences and settings
-- **History Management**: Notification history and cleanup
-- **Integration**: Seamless integration with all modules
+- **Plugin Discovery**: Browse and search plugins
+- **Installation Management**: Install and configure plugins
+- **User Reviews**: Rate and review plugins
+- **Developer Tools**: Plugin development resources
 
 ---
 
-## 🎮 **Plugin Ecosystem**
+## 🚀 **Production Deployment**
 
-Nisto's plugin system allows developers to extend the platform's functionality:
+### **Deploy to Mainnet**
+```bash
+# Switch to mainnet
+dfx deploy --network ic
 
-### **Available Plugins**
-- **Trading Bots**: Automated trading strategies
-- **Analytics Tools**: Advanced portfolio analysis
-- **NFT Marketplace**: Digital asset trading
-- **Gaming Integration**: Play-to-earn games
+# Set production environment variables
+export DFX_NETWORK=ic
 
-### **Building Plugins**
-```javascript
-// Example plugin structure
-const NistoPlugin = {
-  name: "My Trading Bot",
-  version: "1.0.0",
-  description: "Automated trading strategy",
-  author: "Your Name",
-  category: "Trading",
-  
-  // Plugin API
-  initialize: () => { /* Setup */ },
-  execute: (data) => { /* Main logic */ },
-  cleanup: () => { /* Cleanup */ }
-};
+# Deploy canisters to mainnet
+dfx deploy internet_identity --network ic
+dfx deploy Nisto_backend --network ic
+dfx deploy Nisto_frontend --network ic
+```
+
+### **Environment Configuration**
+```bash
+# Production environment variables
+DFX_NETWORK=ic
+CANISTER_ID_INTERNET_IDENTITY=rdmx6-jaaaa-aaaaa-aaadq-cai  # Mainnet Internet Identity
 ```
 
 ---
 
-## 📈 **Roadmap**
+## 🔧 **Troubleshooting**
 
-### **Phase 1: Foundation** ✅
-- [x] Core wallet functionality
-- [x] Basic DeFi integration
-- [x] User authentication
-- [x] Responsive UI
+### **Common Issues**
 
-### **Phase 2: Social Layer** 🚧
-- [ ] Social trading features
-- [ ] Group vaults
-- [ ] Leaderboards
-- [ ] Community features
+#### **1. DFX Not Found**
+```bash
+# Install DFX
+sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
+```
 
-### **Phase 3: AI & Analytics** 📅
-- [ ] AI-powered insights
-- [ ] Advanced analytics
-- [ ] Risk management
-- [ ] Smart recommendations
+#### **2. Canister Deployment Fails**
+```bash
+# Check replica status
+dfx ping
 
-### **Phase 4: Ecosystem** 📅
-- [ ] Plugin marketplace
-- [ ] Developer APIs
-- [ ] Mobile app
-- [ ] Browser extension
+# Restart replica
+dfx stop
+dfx start --background
 
-### **Phase 5: Global Expansion** 📅
-- [ ] Multi-language support
-- [ ] Local payment integrations
-- [ ] Regulatory compliance
-- [ ] Enterprise features
+# Clean and redeploy
+dfx canister delete --all
+dfx deploy
+```
+
+#### **3. Frontend Build Issues**
+```bash
+# Clear node modules and reinstall
+cd src/Nisto_frontend
+rm -rf node_modules package-lock.json
+npm install
+
+# Rebuild
+npm run build
+```
+
+#### **4. Internet Identity Issues**
+```bash
+# Check Internet Identity status
+dfx canister status internet_identity
+
+# Redeploy Internet Identity
+dfx deploy internet_identity
+```
+
+### **Useful Commands**
+```bash
+# Check all canister statuses
+dfx canister status --all
+
+# View canister logs
+dfx canister call Nisto_backend greet '("Hello")'
+
+# Get canister IDs
+dfx canister id internet_identity
+dfx canister id Nisto_backend
+dfx canister id Nisto_frontend
+
+# Check replica health
+dfx ping
+
+# View replica logs
+dfx logs
+```
+
+---
+
+## 📚 **API Documentation**
+
+### **Backend API Endpoints**
+
+#### **Authentication**
+- `loginOrCreateUser()` - Login or create new user
+- `getUser()` - Get current user data
+- `updateUser(displayName, avatar)` - Update user profile
+
+#### **Recovery System**
+- `addRecoveryMethod(methodType, value, metadata)` - Add recovery method
+- `getUserRecoveryMethods()` - Get user recovery methods
+- `initiateRecovery(identifier, recoveryMethod)` - Start recovery process
+- `verifyRecovery(recoveryRequestId, verificationCode, securityAnswers)` - Verify recovery
+
+#### **Wallet Management**
+- `createCryptoWallet(name, currency, isExternal, externalWalletType, metadata)` - Create wallet
+- `getUserCryptoWallets()` - Get user wallets
+- `updateCryptoWalletBalance(walletId, newBalance)` - Update wallet balance
+
+#### **Group Vaults**
+- `createVault(name, description, vaultType, currency, isPublic, targetAmount, rules, metadata)` - Create vault
+- `getUserVaults()` - Get user vaults
+- `depositToVault(vaultId, amount, description)` - Deposit to vault
+- `withdrawFromVault(vaultId, amount, description)` - Withdraw from vault
+
+#### **DeFi Integration**
+- `createDeFiPosition(productType, protocol, amount, currency, strategy, metadata)` - Create DeFi position
+- `getUserDeFiPositions()` - Get user DeFi positions
+- `updateDeFiPosition(positionId, newAmount, newStrategy)` - Update position
+
+#### **Local Payments**
+- `initiateLocalPayment(provider, type, amount, currency, recipientPhone, recipientName, reference)` - Start payment
+- `getUserPaymentHistory()` - Get payment history
+- `addPaymentMethod(provider, accountNumber, phoneNumber, accountName, isDefault)` - Add payment method
+
+#### **AI Assistant**
+- `sendAIMessage(messageType, content, metadata)` - Send AI message
+- `getAIConversationHistory()` - Get conversation history
+- `generateAIInsights()` - Generate insights
+- `getAIRecommendations()` - Get recommendations
+
+#### **Plugin System**
+- `installPlugin(pluginId)` - Install plugin
+- `getUserPlugins()` - Get user plugins
+- `updatePluginSettings(pluginId, settings)` - Update plugin settings
 
 ---
 
 ## 🤝 **Contributing**
 
-We welcome contributions from developers, designers, and financial experts!
+### **Development Setup**
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes
+4. Test thoroughly
+5. Commit your changes: `git commit -m 'Add amazing feature'`
+6. Push to the branch: `git push origin feature/amazing-feature`
+7. Open a Pull Request
 
-### **How to Contribute**
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/AmazingFeature`)
-3. **Commit** your changes (`git commit -m 'Add AmazingFeature'`)
-4. **Push** to the branch (`git push origin feature/AmazingFeature`)
-5. **Open** a Pull Request
-
-### **Development Guidelines**
-- Follow TypeScript best practices
+### **Code Style**
+- Follow Motoko best practices for backend code
+- Use modern React patterns for frontend code
 - Write comprehensive tests
-- Update documentation
-- Follow the existing code style
+- Document all public APIs
 
----
+### **Testing**
+```bash
+# Run backend tests
+dfx canister call Nisto_backend test
 
-## 📊 **Project Statistics**
-
-<div align="center">
-
-![GitHub language count](https://img.shields.io/github/languages/count/KezzyNgotho/Nisto)
-![GitHub top language](https://img.shields.io/github/languages/top/KezzyNgotho/Nisto)
-![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/KezzyNgotho/Nisto)
-![GitHub repo size](https://img.shields.io/github/repo-size/KezzyNgotho/Nisto)
-
-</div>
-
----
-
-## 🏆 **Team**
-
-<div align="center">
-
-| Role | Developer | GitHub |
-|------|-----------|--------|
-| **Lead Developer** | Ian Alex | [@Alex-KR-dev](https://github.com/Alex-KR-dev) |
-| **Lead Developer** | dev Wangari | [@KezzyNgotho](https://github.com/KezzyNgotho) |
-
-</div>
-
----
-
-## 📞 **Support & Community**
-
-- **📧 Email**: [Contact via GitHub](https://github.com/KezzyNgotho/Nisto/issues)
-- **🐛 Bug Reports**: [GitHub Issues](https://github.com/KezzyNgotho/Nisto/issues)
-- **💡 Feature Requests**: [GitHub Discussions](https://github.com/KezzyNgotho/Nisto/discussions)
-- **📖 Documentation**: [Wiki](https://github.com/KezzyNgotho/Nisto/wiki)
+# Run frontend tests
+cd src/Nisto_frontend
+npm test
+```
 
 ---
 
@@ -591,12 +493,30 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+## 🙏 **Acknowledgments**
+
+- **Internet Computer Foundation** for the revolutionary blockchain platform
+- **DFINITY** for the Motoko programming language
+- **React Team** for the amazing frontend framework
+- **Open Source Community** for inspiration and support
+
+---
+
+## 📞 **Support**
+
+- **Documentation**: [Wiki](https://github.com/KezzyNgotho/Nisto/wiki)
+- **Issues**: [GitHub Issues](https://github.com/KezzyNgotho/Nisto/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/KezzyNgotho/Nisto/discussions)
+- **Email**: support@nisto.com
+
+---
+
 <div align="center">
 
-**🌟 Star this repository if you believe in the future of social finance! 🌟**
+**Built with ❤️ by the Nisto Team**
 
-*Built with ❤️ on the Internet Computer*
-
-[![Deploy to Internet Computer](https://img.shields.io/badge/Deploy%20to-Internet%20Computer-blue?style=for-the-badge&logo=internet-explorer)](https://internetcomputer.org/)
+[![Twitter](https://img.shields.io/twitter/follow/nisto_defi?style=social)](https://twitter.com/nisto_defi)
+[![Discord](https://img.shields.io/discord/1234567890?style=flat&logo=discord)](https://discord.gg/nisto)
+[![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat&logo=telegram&logoColor=white)](https://t.me/nisto_defi)
 
 </div>

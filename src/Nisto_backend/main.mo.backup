@@ -15,6 +15,9 @@ import Random "mo:base/Random";
 import Blob "mo:base/Blob";
 import Buffer "mo:base/Buffer";
 import Char "mo:base/Char";
+//import VaultCreate "modules/vault_create";
+import Nat "mo:base/Nat";
+import PluginMarketplace "modules/PluginMarketplace";
 
 actor Nisto {
   
@@ -80,6 +83,37 @@ actor Nisto {
     createdAt: Int;
     verifiedAt: ?Int;
     metadata: ?Text; // Additional data (encrypted)
+  };
+
+  // ===== VAULT TYPES =====
+  
+  public type VaultType = {
+    #Savings;
+    #Investment;
+    #Emergency;
+    #Travel;
+    #Education;
+    #Business;
+    #Charity;
+    #Custom;
+  };
+
+  public type Vault = {
+    id: Text;
+    name: Text;
+    description: Text;
+    owner: Principal;
+    members: [Principal];
+    createdAt: Int;
+    updatedAt: Int;
+    isPublic: Bool;
+    vaultType: VaultType;
+    currency: Text;
+    balance: Float;
+    targetAmount: ?Float;
+    rules: ?Text;
+    status: Text;
+    metadata: ?Text;
   };
   
   public type SecurityQuestion = {
@@ -335,6 +369,45 @@ actor Nisto {
     deliveredAt: ?Int;
     metadata: ?Text;
   };
+  // ========== PLUGIN MARKETPLACE STATE ==========
+stable var nextPluginId : Nat = 1;
+stable var plugins : [PluginMarketplace.Plugin] = [];
+stable var userPlugins : [PluginMarketplace.UserPluginEntry] = [];
+
+let admin : Principal = Principal.fromText("2vxsx-fae"); // Anonymous principal for development
+
+  // ========== PLUGIN MARKETPLACE HELPERS ==========
+  private func contains<T>(array: [T], item: T, equal: (T, T) -> Bool): Bool {
+    Array.find<T>(array, func(x: T): Bool { equal(x, item) }) != null
+  };
+
+  private func findIndex<T>(array: [T], predicate: (T) -> Bool): ?Nat {
+    var index: Nat = 0;
+    for (item in array.vals()) {
+      if (predicate(item)) {
+        return ?index;
+      };
+      index += 1;
+    };
+    null
+  };
+
+  private func natEqual(a: Nat, b: Nat): Bool {
+    a == b
+  };
+
+  private func getUserState(p : Principal) : PluginMarketplace.UserPluginState {
+    let userKey = Principal.toText(p);
+    switch (userPluginStates.get(userKey)) {
+      case null { { installed = [] } };
+      case (?state) { state };
+    }
+  }
+
+  private func setUserState(p : Principal, state : PluginMarketplace.UserPluginState) {
+    let userKey = Principal.toText(p);
+    userPluginStates.put(userKey, state);
+  }
   
   // ============ STATE VARIABLES ============
   
@@ -350,9 +423,6 @@ actor Nisto {
   private stable var nextRecoveryRequestId: Nat = 0;
   private stable var nextSessionId: Nat = 0;
   private stable var nextAuditLogId: Nat = 0;
-  
-  // Admin principal
-  private let admin: Principal = Principal.fromText("2vxsx-fae"); // Anonymous principal for development
   
   // Crypto wallet counters
   private stable var nextCryptoWalletId: Nat = 0;
@@ -406,29 +476,31 @@ actor Nisto {
   private stable var nextOTPRequestId: Nat = 0;
   
   // ===== GROUP VAULTS STORAGE =====
-  private var groupVaults = HashMap.HashMap<Text, GroupVault>(50, Text.equal, Text.hash);
-  private var vaultMembers = HashMap.HashMap<Text, VaultMember>(100, Text.equal, Text.hash);
-  private var vaultTransactions = HashMap.HashMap<Text, VaultTransaction>(200, Text.equal, Text.hash);
+  private var vaults = HashMap.HashMap<Text, Vault>(100, Text.equal, Text.hash);
   private stable var nextVaultId: Nat = 0;
+  
+  // Group vault storage
+  private var groupVaults = HashMap.HashMap<Text, GroupVault>(100, Text.equal, Text.hash);
+  private var vaultMembers = HashMap.HashMap<Text, VaultMember>(200, Text.equal, Text.hash);
+  private var vaultTransactions = HashMap.HashMap<Text, VaultTransaction>(500, Text.equal, Text.hash);
   private stable var nextVaultMemberId: Nat = 0;
   private stable var nextVaultTransactionId: Nat = 0;
   
-  // Vault indexes
+  // Group vault indexes
   private var userVaults = HashMap.HashMap<UserId, [Text]>(10, Principal.equal, Principal.hash);
   private var vaultMemberIndex = HashMap.HashMap<Text, [Text]>(50, Text.equal, Text.hash); // vaultId -> memberIds
   private var vaultTransactionIndex = HashMap.HashMap<Text, [Text]>(50, Text.equal, Text.hash); // vaultId -> transactionIds
   
   // ===== PLUGIN SYSTEM STORAGE =====
-  // ===== PLUGIN SYSTEM STORAGE =====
   private var pluginStore = HashMap.HashMap<Text, Plugin>(100, Text.equal, Text.hash);
   private var userPluginStore = HashMap.HashMap<Text, UserPlugin>(200, Text.equal, Text.hash);
+  private var userPluginStates = HashMap.HashMap<Text, PluginMarketplace.UserPluginState>(200, Text.equal, Text.hash);
   private stable var nextPluginId: Nat = 0;
   private stable var nextUserPluginId: Nat = 0;
   
   // Plugin indexes
   private var userPluginIndex = HashMap.HashMap<UserId, [Text]>(10, Principal.equal, Principal.hash);
   private var pluginCategoryIndex = HashMap.HashMap<Text, [Text]>(10, Text.equal, Text.hash); // category -> pluginIds
-  
   
   // ===== SOCIAL GAMES STORAGE =====
   private var socialGames = HashMap.HashMap<Text, SocialGame>(50, Text.equal, Text.hash);
@@ -474,8 +546,6 @@ actor Nisto {
   private var userLocalPayments = HashMap.HashMap<UserId, [Text]>(10, Principal.equal, Principal.hash);
   private var userPaymentMethods = HashMap.HashMap<UserId, [Text]>(10, Principal.equal, Principal.hash);
   private var providerPaymentIndex = HashMap.HashMap<Text, [Text]>(10, Text.equal, Text.hash); // provider -> paymentIds
-
-  
   
   // ============ HELPER FUNCTIONS ============
   
@@ -506,6 +576,19 @@ actor Nisto {
     // Simple hash for demo - in production use proper crypto
     let combined = password # "nesto_salt_2024";
     Nat32.toText(Text.hash(combined));
+  };
+  
+  private func textToVaultType(vaultType: Text): VaultType {
+    switch (vaultType) {
+      case ("Savings") { #Savings };
+      case ("Investment") { #Investment };
+      case ("Emergency") { #Emergency };
+      case ("Travel") { #Travel };
+      case ("Education") { #Education };
+      case ("Business") { #Business };
+      case ("Charity") { #Charity };
+      case (_) { #Custom };
+    };
   };
   
   private func isCodeExpired(expiresAt: Int): Bool {
@@ -539,82 +622,25 @@ actor Nisto {
   };
 
   // ============ TYPE CONVERSION HELPERS ============
-  
-  // Vault type conversions
-  private func vaultTypeToText(vaultType: VaultType): Text {
-    switch (vaultType) {
-      case (#Savings) { "Savings" };
-      case (#Investment) { "Investment" };
-      case (#Emergency) { "Emergency" };
-      case (#Travel) { "Travel" };
-      case (#Education) { "Education" };
-      case (#Business) { "Business" };
-      case (#Charity) { "Charity" };
-      case (#Custom) { "Custom" };
-    };
-  };
-  
-  private func textToVaultType(text: Text): VaultType {
-    switch (text) {
-      case ("Savings") { #Savings };
-      case ("Investment") { #Investment };
-      case ("Emergency") { #Emergency };
-      case ("Travel") { #Travel };
-      case ("Education") { #Education };
-      case ("Business") { #Business };
-      case ("Charity") { #Charity };
-      case (_) { #Custom };
-    };
-  };
+  // ========== PLUGIN MARKETPLACE HELPERS ==========
+private func getUserState(p : Principal) : PluginMarketplace.UserPluginState {
+  let found = userPlugins.find((x) => x.user == p);
+  if (  found == null) { return { installed = [] }; };
+  return found!.state;
+}
+
+private func setUserState(p : Principal, state : PluginMarketplace.UserPluginState) {
+  let idx = userPlugins.indexWhere((x) => x.user == p);
+  if (idx == null) {
+    let newEntry : PluginMarketplace.UserPluginEntry = { user = p; state = state };
+    userPlugins := Array.append<PluginMarketplace.UserPluginEntry>(userPlugins, [newEntry]);
+  } else {
+    userPlugins[idx!] := { user = p; state = state };
+  }
+}
+
   
   // Plugin category conversions
- // ========== PLUGIN SYSTEM HELPER FUNCTIONS ==========
-  
-  private func addToUserPluginIndex(userId: UserId, pluginId: Text) {
-    switch (userPluginIndex.get(userId)) {
-      case null {
-        userPluginIndex.put(userId, [pluginId]);
-      };
-      case (?existingPlugins) {
-        let updatedPlugins = Array.append<Text>(existingPlugins, [pluginId]);
-        userPluginIndex.put(userId, updatedPlugins);
-      };
-    };
-  };
-  
-  private func removeFromUserPluginIndex(userId: UserId, pluginId: Text) {
-    switch (userPluginIndex.get(userId)) {
-      case null { return; };
-      case (?existingPlugins) {
-        let filteredPlugins = Array.filter<Text>(existingPlugins, func(pid: Text): Bool { pid != pluginId });
-        userPluginIndex.put(userId, filteredPlugins);
-      };
-    };
-  };
-  
-  private func addToPluginCategoryIndex(category: Text, pluginId: Text) {
-    switch (pluginCategoryIndex.get(category)) {
-      case null {
-        pluginCategoryIndex.put(category, [pluginId]);
-      };
-      case (?existingPlugins) {
-        let updatedPlugins = Array.append<Text>(existingPlugins, [pluginId]);
-        pluginCategoryIndex.put(category, updatedPlugins);
-      };
-    };
-  };
-  
-  private func removeFromPluginCategoryIndex(category: Text, pluginId: Text) {
-    switch (pluginCategoryIndex.get(category)) {
-      case null { return; };
-      case (?existingPlugins) {
-        let filteredPlugins = Array.filter<Text>(existingPlugins, func(pid: Text): Bool { pid != pluginId });
-        pluginCategoryIndex.put(category, filteredPlugins);
-      };
-    };
-  };
-
-  // Plugin category conversion
   private func pluginCategoryToText(category: PluginCategory): Text {
     switch (category) {
       case (#Finance) { "Finance" };
@@ -627,7 +653,41 @@ actor Nisto {
       case (#Custom) { "Custom" };
     };
   };
-
+  
+  private func textToPluginCategory(text: Text): PluginCategory {
+    switch (text) {
+      case ("Finance") { #Finance };
+      case ("Social") { #Social };
+      case ("Gaming") { #Gaming };
+      case ("Productivity") { #Productivity };
+      case ("Entertainment") { #Entertainment };
+      case ("Education") { #Education };
+      case ("Health") { #Health };
+      case (_) { #Custom };
+    };
+  };
+  
+  // Plugin status conversions
+  private func pluginStatusToText(status: PluginStatus): Text {
+    switch (status) {
+      case (#Active) { "Active" };
+      case (#Inactive) { "Inactive" };
+      case (#Pending) { "Pending" };
+      case (#Suspended) { "Suspended" };
+      case (#Deprecated) { "Deprecated" };
+    };
+  };
+  
+  private func textToPluginStatus(text: Text): PluginStatus {
+    switch (text) {
+      case ("Active") { #Active };
+      case ("Inactive") { #Inactive };
+      case ("Pending") { #Pending };
+      case ("Suspended") { #Suspended };
+      case ("Deprecated") { #Deprecated };
+      case (_) { #Inactive };
+    };
+  };
   
   // Game type conversions
   private func gameTypeToText(gameType: GameType): Text {
@@ -1024,24 +1084,13 @@ actor Nisto {
       };
       // Fill remaining with zeros
       let remaining = 32 - Array.size(hashBytes);
-      if (remaining > 0) {
-        let endIndex = remaining - 1;
-        for (i in Iter.range(0, endIndex)) {
-          buffer.add(0);
-        };
+      for (i in Iter.range(0, remaining - 1)) {
+        buffer.add(0);
       };
       Buffer.toArray(buffer);
     } else if (Array.size(hashBytes) > 32) {
-      // Truncate to 32 bytes by taking first 32 elements
-      let buffer = Buffer.Buffer<Nat8>(32);
-      var count = 0;
-      for (byte in hashBytes.vals()) {
-        if (count < 32) {
-          buffer.add(byte);
-          count += 1;
-        };
-      };
-      Buffer.toArray(buffer);
+      // Truncate to 32 bytes
+      Array.subArray<Nat8>(hashBytes, 0, 32);
     } else {
       hashBytes;
     };
@@ -3382,10 +3431,9 @@ actor Nisto {
     
     // Ensure it's always 6 digits
     let codeText = Int.toText(code);
-    let codeSize = codeText.size();
-    if (codeSize < 6) {
+    if (codeText.size() < 6) {
       // Pad with leading zeros
-      let padding = 6 - codeSize;
+      let padding = 6 - codeText.size();
       var paddedCode = "";
       var i = 0;
       while (i < padding) {
@@ -3393,18 +3441,6 @@ actor Nisto {
         i += 1;
       };
       paddedCode # codeText;
-    } else if (codeSize > 6) {
-      // Truncate to 6 digits by taking last 6 characters
-      let chars = Text.toIter(codeText);
-      var result = "";
-      var count = 0;
-      for (char in chars) {
-        if (count >= codeSize - 6) {
-          result := result # Text.fromChar(char);
-        };
-        count += 1;
-      };
-      result;
     } else {
       codeText;
     };
@@ -3459,17 +3495,6 @@ actor Nisto {
   };
 
   // ===== GROUP VAULTS TYPES =====
-  
-  public type VaultType = {
-    #Savings;
-    #Investment;
-    #Emergency;
-    #Travel;
-    #Education;
-    #Business;
-    #Charity;
-    #Custom;
-  };
 
   public type VaultMember = {
     id: Text;
@@ -3514,7 +3539,7 @@ actor Nisto {
     metadata: ?Text;
   };
 
-   // ===== PLUGIN SYSTEM TYPES =====
+  // ===== PLUGIN SYSTEM TYPES =====
   
   public type PluginCategory = {
     #Finance;
@@ -3580,7 +3605,6 @@ actor Nisto {
     permissions: [PluginPermission];
     metadata: ?Text;
   };
-
 
   // ===== SOCIAL GAMES TYPES =====
   
@@ -3928,6 +3952,24 @@ actor Nisto {
     };
   };
   
+  // Get public vaults
+  public shared(msg) func getPublicVaults(): async Result.Result<[GroupVault], Text> {
+    let caller = msg.caller;
+    
+    let publicVaults = Array.mapFilter<(Text, GroupVault), GroupVault>(
+      groupVaults.entries() |> Iter.toArray(_),
+      func((id, vault)) {
+        if (vault.isPublic and vault.isActive) {
+          ?vault;
+        } else {
+          null;
+        };
+      }
+    );
+    
+    #ok(publicVaults);
+  };
+
   // Join a public vault
   public shared(msg) func joinVault(vaultId: Text): async Result.Result<VaultMember, Text> {
     let caller = msg.caller;
@@ -3982,7 +4024,7 @@ actor Nisto {
       };
     };
   };
-  
+   
   // Deposit to vault
   public shared(msg) func depositToVault(
     vaultId: Text,
@@ -4239,45 +4281,553 @@ actor Nisto {
     };
   };
 
-  // ============ PLUGIN SYSTEM MANAGEMENT ============
-  
-  // ========== PLUGIN SYSTEM PUBLIC FUNCTIONS ==========
-  
-  public shared(msg) func addPlugin(plugin: Plugin): async Result.Result<Plugin, Text> {
-    if (msg.caller != admin) {
-      return #err("Only admin can add plugins");
+  // Change member role in vault
+  public shared(msg) func changeMemberRole(
+    vaultId: Text,
+    memberId: Text,
+    newRole: Text
+  ): async Result.Result<VaultMember, Text> {
+    let caller = msg.caller;
+    
+    // Check if caller is owner or admin
+    let userMemberIds = Option.get(vaultMemberIndex.get(vaultId), []);
+    let callerMember = Array.find<Text>(userMemberIds, func(memberId) {
+      switch (vaultMembers.get(memberId)) {
+        case (?member) { 
+          member.userId == caller and member.isActive and 
+          (member.role == "owner" or member.role == "admin")
+        };
+        case null { false };
+      };
+    });
+    
+    switch (callerMember) {
+      case null { return #err("Not authorized to change member roles"); };
+      case (?callerMemberId) {
+        // Check if target member exists and is in this vault
+        switch (vaultMembers.get(memberId)) {
+          case null { return #err("Member not found"); };
+          case (?member) {
+            if (member.vaultId != vaultId) {
+              return #err("Member is not in this vault");
+            };
+            
+            // Prevent changing owner role
+            if (member.role == "owner") {
+              return #err("Cannot change owner role");
+            };
+            
+            // Prevent non-owners from changing admin roles
+            switch (vaultMembers.get(callerMemberId)) {
+              case (?callerMember) {
+                if (callerMember.role != "owner" and member.role == "admin") {
+                  return #err("Only owner can change admin roles");
+                };
+              };
+              case null { return #err("Caller member not found"); };
+            };
+            
+            let now = getCurrentTime();
+            let updatedMember: VaultMember = {
+              id = member.id;
+              vaultId = member.vaultId;
+              userId = member.userId;
+              role = newRole;
+              joinedAt = member.joinedAt;
+              contributionLimit = member.contributionLimit;
+              withdrawalLimit = member.withdrawalLimit;
+              isActive = member.isActive;
+              permissions = if (newRole == "admin") {
+                ["deposit", "withdraw", "invite"];
+              } else {
+                ["deposit", "withdraw"];
+              };
+            };
+            
+            vaultMembers.put(memberId, updatedMember);
+            
+            await logAuditEvent(?caller, "VAULT_ROLE_CHANGED", "Changed member role to: " # newRole, true);
+            return #ok(updatedMember);
+          };
+        };
+      };
     };
-    
-    let pluginId = generateId("plugin", nextPluginId);
-    nextPluginId += 1;
-    
-    let newPlugin: Plugin = {
-      id = pluginId;
-      name = plugin.name;
-      description = plugin.description;
-      version = plugin.version;
-      author = plugin.author;
-      category = plugin.category;
-      status = plugin.status;
-      permissions = plugin.permissions;
-      icon = plugin.icon;
-      entryPoint = plugin.entryPoint;
-      configSchema = plugin.configSchema;
-      isEnabled = plugin.isEnabled;
-      isInstalled = plugin.isInstalled;
-      installCount = 0;
-      rating = 0.0;
-      createdAt = getCurrentTime();
-      updatedAt = getCurrentTime();
-      metadata = plugin.metadata;
-    };
-    
-    pluginStore.put(pluginId, newPlugin);
-    addToPluginCategoryIndex(pluginCategoryToText(plugin.category), pluginId);
-    
-    #ok(newPlugin)
   };
 
+  // Remove member from vault
+  public shared(msg) func removeMember(
+    vaultId: Text,
+    memberId: Text
+  ): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    
+    // Check if caller is owner or admin
+    let userMemberIds = Option.get(vaultMemberIndex.get(vaultId), []);
+    let callerMember = Array.find<Text>(userMemberIds, func(memberId) {
+      switch (vaultMembers.get(memberId)) {
+        case (?member) { 
+          member.userId == caller and member.isActive and 
+          (member.role == "owner" or member.role == "admin")
+        };
+        case null { false };
+      };
+    });
+    
+    switch (callerMember) {
+      case null { return #err("Not authorized to remove members"); };
+      case (?callerMemberId) {
+        // Check if target member exists and is in this vault
+        switch (vaultMembers.get(memberId)) {
+          case null { return #err("Member not found"); };
+          case (?member) {
+            if (member.vaultId != vaultId) {
+              return #err("Member is not in this vault");
+            };
+            
+            // Prevent removing owner
+            if (member.role == "owner") {
+              return #err("Cannot remove vault owner");
+            };
+            
+            // Prevent non-owners from removing admins
+            switch (vaultMembers.get(callerMemberId)) {
+              case (?callerMember) {
+                if (callerMember.role != "owner" and member.role == "admin") {
+                  return #err("Only owner can remove admins");
+                };
+              };
+              case null { return #err("Caller member not found"); };
+            };
+            
+            // Remove member from vault
+            vaultMembers.delete(memberId);
+            
+            // Update vault member index
+            let currentVaultMembers = Option.get(vaultMemberIndex.get(vaultId), []);
+            let updatedVaultMembers = Array.filter<Text>(currentVaultMembers, func(id) { id != memberId });
+            vaultMemberIndex.put(vaultId, updatedVaultMembers);
+            
+            // Update user vaults index
+            let currentUserVaults = Option.get(userVaults.get(member.userId), []);
+            let updatedUserVaults = Array.filter<Text>(currentUserVaults, func(id) { id != vaultId });
+            userVaults.put(member.userId, updatedUserVaults);
+            
+            await logAuditEvent(?caller, "VAULT_MEMBER_REMOVED", "Removed member from vault", true);
+            return #ok(true);
+          };
+        };
+      };
+    };
+  };
+
+  // ============ PLUGIN SYSTEM MANAGEMENT ============
+  
+  // Create a new plugin (for developers)
+  public shared(msg) func createPlugin(
+    name: Text,
+    description: Text,
+    version: Text,
+    category: Text,
+    permissions: [Text],
+    icon: ?Text,
+    entryPoint: Text,
+    configSchema: ?Text
+  ): async Result.Result<Plugin, Text> {
+    let caller = msg.caller;
+    
+    // Check if user exists
+    switch (users.get(caller)) {
+      case null { return #err("User not found"); };
+      case (?user) {
+        let pluginId = generateId("plugin", nextPluginId);
+        nextPluginId += 1;
+        
+        let now = getCurrentTime();
+        let categoryEnum = textToPluginCategory(category);
+        
+        // Convert permission strings to enum
+        let permissionEnums = Array.map<Text, PluginPermission>(permissions, func(perm) {
+          switch (perm) {
+            case ("ReadWallets") { #ReadWallets };
+            case ("WriteWallets") { #WriteWallets };
+            case ("ReadTransactions") { #ReadTransactions };
+            case ("WriteTransactions") { #WriteTransactions };
+            case ("ReadProfile") { #ReadProfile };
+            case ("WriteProfile") { #WriteProfile };
+            case ("ReadContacts") { #ReadContacts };
+            case ("WriteContacts") { #WriteContacts };
+            case ("Notifications") { #Notifications };
+            case ("ExternalAPIs") { #ExternalAPIs };
+            case (_) { #ReadWallets };
+          };
+        });
+        
+        let newPlugin: Plugin = {
+          id = pluginId;
+          name = name;
+          description = description;
+          version = version;
+          author = user.displayName;
+          category = categoryEnum;
+          status = #Pending;
+          permissions = permissionEnums;
+          icon = icon;
+          entryPoint = entryPoint;
+          configSchema = configSchema;
+          isEnabled = false;
+          isInstalled = false;
+          installCount = 0;
+          rating = 0.0;
+          createdAt = now;
+          updatedAt = now;
+          metadata = null;
+        };
+        
+        plugins.put(pluginId, newPlugin);
+        
+        // Update category index
+        let categoryKey = pluginCategoryToText(categoryEnum);
+        let currentCategoryPlugins = Option.get(pluginCategoryIndex.get(categoryKey), []);
+        pluginCategoryIndex.put(categoryKey, Array.append(currentCategoryPlugins, [pluginId]));
+        
+        await logAuditEvent(?caller, "PLUGIN_CREATED", "Plugin created: " # name, true);
+        return #ok(newPlugin);
+      };
+    };
+  };
+  
+  // Get all available plugins
+  public shared(msg) func getAvailablePlugins(): async Result.Result<[Plugin], Text> {
+    let caller = msg.caller;
+    
+    let pluginsArray = Array.mapFilter<(Text, Plugin), Plugin>(
+      plugins.entries() |> Iter.toArray(_),
+      func((id, plugin)) { ?plugin }
+    );
+    
+    #ok(pluginsArray);
+  };
+  
+  // Get plugins by category
+  public shared(msg) func getPluginsByCategory(category: Text): async Result.Result<[Plugin], Text> {
+    let caller = msg.caller;
+    
+    let categoryEnum = textToPluginCategory(category);
+    let categoryKey = pluginCategoryToText(categoryEnum);
+    
+    switch (pluginCategoryIndex.get(categoryKey)) {
+      case null { #ok([]) };
+      case (?pluginIds) {
+        let pluginsArray = Array.mapFilter<Text, Plugin>(pluginIds, func(id) {
+          plugins.get(id);
+        });
+        #ok(pluginsArray);
+      };
+    };
+  };
+  
+  // Get user's installed plugins
+  public shared(msg) func getUserPlugins(): async Result.Result<[UserPlugin], Text> {
+    let caller = msg.caller;
+    
+    switch (userPluginIndex.get(caller)) {
+      case null { #ok([]) };
+      case (?userPluginIds) {
+        let userPluginsArray = Array.mapFilter<Text, UserPlugin>(userPluginIds, func(id) {
+          userPlugins.get(id);
+        });
+        #ok(userPluginsArray);
+      };
+    };
+  };
+  
+  // Install a plugin
+  public shared(msg) func installPlugin(
+    pluginId: Text,
+    config: ?Text
+  ): async Result.Result<UserPlugin, Text> {
+    let caller = msg.caller;
+    
+    // Check if plugin exists and is active
+    switch (plugins.get(pluginId)) {
+      case null { return #err("Plugin not found"); };
+      case (?plugin) {
+        if (plugin.status != #Active) {
+          return #err("Plugin is not available for installation");
+        };
+        
+        // Check if already installed
+        let userPluginIds = Option.get(userPluginIndex.get(caller), []);
+        let isAlreadyInstalled = Option.isSome(Array.find<Text>(userPluginIds, func(userPluginId) {
+          switch (userPlugins.get(userPluginId)) {
+            case (?userPlugin) { userPlugin.pluginId == pluginId };
+            case null { false };
+          };
+        }));
+        
+        if (isAlreadyInstalled) {
+          return #err("Plugin is already installed");
+        };
+        
+        let userPluginId = generateId("user_plugin", nextUserPluginId);
+        nextUserPluginId += 1;
+        
+        let now = getCurrentTime();
+        let newUserPlugin: UserPlugin = {
+          id = userPluginId;
+          userId = caller;
+          pluginId = pluginId;
+          isEnabled = true;
+          config = config;
+          installedAt = now;
+          lastUsedAt = now;
+          permissions = plugin.permissions;
+          metadata = null;
+        };
+        
+        userPlugins.put(userPluginId, newUserPlugin);
+        
+        // Update indexes
+        let currentUserPlugins = Option.get(userPluginIndex.get(caller), []);
+        userPluginIndex.put(caller, Array.append(currentUserPlugins, [userPluginId]));
+        
+        // Update plugin install count
+        let updatedPlugin: Plugin = {
+          id = plugin.id;
+          name = plugin.name;
+          description = plugin.description;
+          version = plugin.version;
+          author = plugin.author;
+          category = plugin.category;
+          status = plugin.status;
+          permissions = plugin.permissions;
+          icon = plugin.icon;
+          entryPoint = plugin.entryPoint;
+          configSchema = plugin.configSchema;
+          isEnabled = plugin.isEnabled;
+          isInstalled = plugin.isInstalled;
+          installCount = plugin.installCount + 1;
+          rating = plugin.rating;
+          createdAt = plugin.createdAt;
+          updatedAt = now;
+          metadata = plugin.metadata;
+        };
+        
+        plugins.put(pluginId, updatedPlugin);
+        
+        await logAuditEvent(?caller, "PLUGIN_INSTALLED", "Installed plugin: " # plugin.name, true);
+        return #ok(newUserPlugin);
+      };
+    };
+  };
+  
+  // Uninstall a plugin
+  public shared(msg) func uninstallPlugin(pluginId: Text): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    
+    // Find user's plugin installation
+    let userPluginIds = Option.get(userPluginIndex.get(caller), []);
+    let userPluginId = Array.find<Text>(userPluginIds, func(id) {
+      switch (userPlugins.get(id)) {
+        case (?userPlugin) { userPlugin.pluginId == pluginId };
+        case null { false };
+      };
+    });
+    
+    switch (userPluginId) {
+      case null { return #err("Plugin not installed"); };
+      case (?id) {
+        // Remove user plugin
+        userPlugins.delete(id);
+        
+        // Update user plugin index
+        let updatedUserPlugins = Array.filter<Text>(userPluginIds, func(pluginId) {
+          pluginId != id;
+        });
+        userPluginIndex.put(caller, updatedUserPlugins);
+        
+        // Update plugin install count
+        switch (plugins.get(pluginId)) {
+          case null {};
+          case (?plugin) {
+            let updatedPlugin: Plugin = {
+              id = plugin.id;
+              name = plugin.name;
+              description = plugin.description;
+              version = plugin.version;
+              author = plugin.author;
+              category = plugin.category;
+              status = plugin.status;
+              permissions = plugin.permissions;
+              icon = plugin.icon;
+              entryPoint = plugin.entryPoint;
+              configSchema = plugin.configSchema;
+              isEnabled = plugin.isEnabled;
+              isInstalled = plugin.isInstalled;
+              installCount = if (plugin.installCount > 0) { plugin.installCount - 1 } else { 0 };
+              rating = plugin.rating;
+              createdAt = plugin.createdAt;
+              updatedAt = getCurrentTime();
+              metadata = plugin.metadata;
+            };
+            plugins.put(pluginId, updatedPlugin);
+          };
+        };
+        
+        await logAuditEvent(?caller, "PLUGIN_UNINSTALLED", "Uninstalled plugin", true);
+        return #ok(true);
+      };
+    };
+  };
+  
+  // Enable/disable a plugin
+  public shared(msg) func togglePlugin(pluginId: Text, enabled: Bool): async Result.Result<UserPlugin, Text> {
+    let caller = msg.caller;
+    
+    // Find user's plugin installation
+    let userPluginIds = Option.get(userPluginIndex.get(caller), []);
+    let userPluginId = Array.find<Text>(userPluginIds, func(id) {
+      switch (userPlugins.get(id)) {
+        case (?userPlugin) { userPlugin.pluginId == pluginId };
+        case null { false };
+      };
+    });
+    
+    switch (userPluginId) {
+      case null { return #err("Plugin not installed"); };
+      case (?id) {
+        switch (userPlugins.get(id)) {
+          case null { return #err("User plugin not found"); };
+          case (?userPlugin) {
+            let updatedUserPlugin: UserPlugin = {
+              id = userPlugin.id;
+              userId = userPlugin.userId;
+              pluginId = userPlugin.pluginId;
+              isEnabled = enabled;
+              config = userPlugin.config;
+              installedAt = userPlugin.installedAt;
+              lastUsedAt = getCurrentTime();
+              permissions = userPlugin.permissions;
+              metadata = userPlugin.metadata;
+            };
+            
+            userPlugins.put(id, updatedUserPlugin);
+            
+            await logAuditEvent(?caller, "PLUGIN_TOGGLED", "Plugin " # (if enabled { "enabled" } else { "disabled" }), true);
+            return #ok(updatedUserPlugin);
+          };
+        };
+      };
+    };
+  };
+  
+  // Update plugin configuration
+  public shared(msg) func updatePluginConfig(
+    pluginId: Text,
+    config: Text
+  ): async Result.Result<UserPlugin, Text> {
+    let caller = msg.caller;
+    
+    // Find user's plugin installation
+    let userPluginIds = Option.get(userPluginIndex.get(caller), []);
+    let userPluginId = Array.find<Text>(userPluginIds, func(id) {
+      switch (userPlugins.get(id)) {
+        case (?userPlugin) { userPlugin.pluginId == pluginId };
+        case null { false };
+      };
+    });
+    
+    switch (userPluginId) {
+      case null { return #err("Plugin not installed"); };
+      case (?id) {
+        switch (userPlugins.get(id)) {
+          case null { return #err("User plugin not found"); };
+          case (?userPlugin) {
+            let updatedUserPlugin: UserPlugin = {
+              id = userPlugin.id;
+              userId = userPlugin.userId;
+              pluginId = userPlugin.pluginId;
+              isEnabled = userPlugin.isEnabled;
+              config = ?config;
+              installedAt = userPlugin.installedAt;
+              lastUsedAt = getCurrentTime();
+              permissions = userPlugin.permissions;
+              metadata = userPlugin.metadata;
+            };
+            
+            userPlugins.put(id, updatedUserPlugin);
+            
+            await logAuditEvent(?caller, "PLUGIN_CONFIG_UPDATED", "Updated plugin configuration", true);
+            return #ok(updatedUserPlugin);
+          };
+        };
+      };
+    };
+  };
+  
+  // Rate a plugin
+  public shared(msg) func ratePlugin(
+    pluginId: Text,
+    rating: Float
+  ): async Result.Result<Plugin, Text> {
+    let caller = msg.caller;
+    
+    // Validate rating
+    if (rating < 0.0 or rating > 5.0) {
+      return #err("Rating must be between 0 and 5");
+    };
+    
+    // Check if plugin exists
+    switch (plugins.get(pluginId)) {
+      case null { return #err("Plugin not found"); };
+      case (?plugin) {
+        // Simple rating update (in production, you'd want more sophisticated rating logic)
+        let updatedPlugin: Plugin = {
+          id = plugin.id;
+          name = plugin.name;
+          description = plugin.description;
+          version = plugin.version;
+          author = plugin.author;
+          category = plugin.category;
+          status = plugin.status;
+          permissions = plugin.permissions;
+          icon = plugin.icon;
+          entryPoint = plugin.entryPoint;
+          configSchema = plugin.configSchema;
+          isEnabled = plugin.isEnabled;
+          isInstalled = plugin.isInstalled;
+          installCount = plugin.installCount;
+          rating = rating;
+          createdAt = plugin.createdAt;
+          updatedAt = getCurrentTime();
+          metadata = plugin.metadata;
+        };
+        
+        plugins.put(pluginId, updatedPlugin);
+        
+        await logAuditEvent(?caller, "PLUGIN_RATED", "Rated plugin: " # Float.toText(rating), true);
+        return #ok(updatedPlugin);
+      };
+    };
+  };
+  
+  // Search plugins
+  public shared(msg) func searchPlugins(searchQuery: Text): async Result.Result<[Plugin], Text> {
+    let caller = msg.caller;
+    
+    let allPlugins = Array.mapFilter<(Text, Plugin), Plugin>(
+      plugins.entries() |> Iter.toArray(_),
+      func((id, plugin)) { ?plugin }
+    );
+    
+    let filteredPlugins = Array.filter<Plugin>(allPlugins, func(plugin) {
+      Text.contains(plugin.name, #text(searchQuery)) or
+      Text.contains(plugin.description, #text(searchQuery)) or
+      Text.contains(plugin.author, #text(searchQuery))
+    });
+    
+    #ok(filteredPlugins);
+  };
 
   // ============ SOCIAL GAMES MANAGEMENT ============
   
@@ -5987,4 +6537,144 @@ actor Nisto {
     let randomValue = Int.abs(Time.now()) % 100;
     randomValue < 95; // 95% success rate
   };
+
+   /* public shared(msg) func createVault(
+    name: Text,
+    description: Text,
+    vaultType: Text,
+    currency: Text,
+    isPublic: Bool,
+    targetAmount: ?Float,
+    rules: ?Text,
+    metadata: ?Text
+  ): async { #ok: Vault; #err: Text } {
+    if (name == "" or currency == "") {
+      return #err("Vault name and currency cannot be empty");
+    };
+    let id = "vault_" # Nat.toText(nextVaultId);
+    nextVaultId += 1;
+    let now = Time.now();
+    let vault: Vault = {
+      id = id;
+      name = name;
+      description = description;
+      owner = msg.caller;
+      members = [msg.caller];
+      createdAt = now;
+      updatedAt = now;
+      isPublic = isPublic;
+      vaultType = vaultType;
+      currency = currency;
+      balance = 0.0;
+      targetAmount = targetAmount;
+      rules = rules;
+      status = "active";
+      metadata = metadata;
+    };
+    vaults.put(id, vault);
+    #ok(vault)
+  };
+
+   public query(msg) func getUserVaults(): async [Vault] {
+    let caller = msg.caller;
+    var result : [Vault] = [];
+    for ((_, v) in vaults.entries()) {
+      if (Array.find<Principal>(v.members, func(m) { m == caller }) != null) {
+        result := Array.append(result, [v]);
+      }
+    };
+    result
+  } */
+
+  // ========== PLUGIN MARKETPLACE PUBLIC FUNCTIONS ==========
+
+  public shared(msg) func addPlugin(plugin : PluginMarketplace.Plugin) : async Result.Result<PluginMarketplace.Plugin, Text> {
+  if (msg.caller != admin) return #err("Only admin can add plugins");
+  let newPlugin : PluginMarketplace.Plugin = {
+    id = nextPluginId;
+    name = plugin.name;
+    description = plugin.description;
+    category = plugin.category;
+    author = plugin.author;
+    version = plugin.version;
+    rating = plugin.rating;
+    downloads = 0;
+    size = plugin.size;
+    price = plugin.price;
+    tags = plugin.tags;
+    features = plugin.features;
+    status = plugin.status;
+    icon = plugin.icon;
+    screenshots = plugin.screenshots;
+    reviews = [];
+    createdAt = Time.now();
+    updatedAt = Time.now();
+  };
+  plugins := Array.append<PluginMarketplace.Plugin>(plugins, [newPlugin]);
+  nextPluginId += 1;
+  #ok(newPlugin)
 };
+
+public shared(msg) func listPlugins() : async [PluginMarketplace.Plugin] {
+  plugins
+};
+
+public shared(msg) func getPlugin(id : Nat) : async ?PluginMarketplace.Plugin {
+  plugins.find((p) => p.id == id)
+};
+
+public shared(msg) func installPlugin(pluginId : Nat) : async Result.Result<Bool, Text> {
+  let user = msg.caller;
+  let pluginOpt = plugins.find((p) => p.id == pluginId);
+  switch (pluginOpt) {
+    case null { return #err("Plugin not found"); };
+    case (?plugin) {
+      var state = getUserState(user);
+      if (contains<Nat>(state.installed, pluginId, natEqual)) return #err("Already installed");
+      state.installed := Array.append<Nat>(state.installed, [pluginId]);
+      setUserState(user, state);
+      let idx = findIndex<PluginMarketplace.Plugin>(plugins, func(p) { p.id == pluginId });
+      if (idx != null) {
+        let updated : PluginMarketplace.Plugin = {
+          id = plugin.id;
+          name = plugin.name;
+          description = plugin.description;
+          category = plugin.category;
+          author = plugin.author;
+          version = plugin.version;
+          rating = plugin.rating;
+          downloads = plugin.downloads + 1;
+          size = plugin.size;
+          price = plugin.price;
+          tags = plugin.tags;
+          features = plugin.features;
+          status = plugin.status;
+          icon = plugin.icon;
+          screenshots = plugin.screenshots;
+          reviews = plugin.reviews;
+          createdAt = plugin.createdAt;
+          updatedAt = Time.now();
+        };
+        plugins[idx!] := updated;
+      };
+      return #ok(true);
+    }
+  }
+};
+
+public shared(msg) func uninstallPlugin(pluginId : Nat) : async Result.Result<Bool, Text> {
+  let user = msg.caller;
+  var state = getUserState(user);
+  if (!contains<Nat>(state.installed, pluginId, natEqual)) return #err("Not installed");
+  state.installed := Array.filter<Nat>(state.installed, func(id : Nat) : Bool { id != pluginId });
+  setUserState(user, state);
+  #ok(true)
+};
+
+public shared(msg) func getUserPlugins() : async [PluginMarketplace.Plugin] {
+  let user = msg.caller;
+  let state = getUserState(user);
+  Array.filter<PluginMarketplace.Plugin>(plugins, func(p : PluginMarketplace.Plugin) : Bool { contains<Nat>(state.installed, p.id, natEqual) })
+};
+
+}
