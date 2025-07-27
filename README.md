@@ -507,7 +507,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: [Wiki](https://github.com/KezzyNgotho/Nisto/wiki)
 - **Issues**: [GitHub Issues](https://github.com/KezzyNgotho/Nisto/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/KezzyNgotho/Nisto/discussions)
-- **Email**: support@nisto.com
+- **Email**: nistodefi@gmail.com
 
 ---
 
