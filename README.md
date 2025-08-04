@@ -58,6 +58,133 @@ Nisto isn't just another DeFi platform—it's a **revolutionary social finance e
 
 ---
 
+## 🪙 **Nisto Token (NST) - Native Platform Token**
+
+### 🚀 **Token Overview**
+The **Nisto Token (NST)** is the native utility token of the Nisto platform, designed to power the entire ecosystem and provide users with exclusive benefits, governance rights, and earning opportunities.
+
+### 📊 **Token Specifications**
+- **Symbol**: NST
+- **Decimals**: 8
+- **Total Supply**: 1,000,000,000,000,000 (1 Quadrillion NST)
+- **Circulating Supply**: Dynamic based on minting/burning
+- **Network**: Internet Computer (ICP)
+- **Standard**: ERC-20 compatible interface
+
+### 💎 **Token Features**
+
+#### **🔄 Core Token Functions**
+- **Transfer**: Send NST tokens to any address
+- **Approve**: Authorize spending allowances for DeFi protocols
+- **Transfer From**: Execute transfers on behalf of approved addresses
+- **Mint**: Create new tokens (restricted to authorized addresses)
+- **Burn**: Permanently remove tokens from circulation
+
+#### **🏦 Staking & Rewards System**
+- **Staking APY**: 5% annual percentage yield
+- **Minimum Stake**: No minimum requirement
+- **Lock Period**: Flexible staking with no lock-in period
+- **Reward Distribution**: Automatic daily reward calculations
+- **Compound Interest**: Rewards automatically compound
+
+#### **🎯 Governance & Utility**
+- **Voting Power**: Staked tokens provide governance voting rights
+- **Platform Fees**: Reduced fees for NST holders
+- **Exclusive Access**: Early access to new features and products
+- **Premium Features**: Unlock advanced platform capabilities
+
+### 🎨 **Token Dashboard Features**
+
+#### **📊 Overview Tab**
+- **Real-time Balance**: Live token balance display
+- **Portfolio Value**: Total portfolio worth in USD
+- **Market Statistics**: Price, market cap, and volume data
+- **Quick Actions**: Fast access to common operations
+
+#### **💸 Transfer Tab**
+- **Send Tokens**: Transfer NST to any address
+- **Receive Tokens**: Generate and share wallet addresses
+- **Transaction History**: Complete transfer history with timestamps
+- **Address Book**: Save and manage frequent recipients
+
+#### **🏦 Staking Tab**
+- **Stake Tokens**: Lock tokens to earn rewards
+- **Unstake Tokens**: Withdraw staked tokens (no lock period)
+- **Claim Rewards**: Collect earned staking rewards
+- **Staking Analytics**: Performance metrics and APY tracking
+
+#### **📈 History Tab**
+- **Transfer History**: Complete list of all transfers
+- **Mint History**: Track token creation events
+- **Burn History**: Monitor token destruction events
+- **Staking History**: Detailed staking and reward records
+
+### 🔧 **Technical Implementation**
+
+#### **Backend Integration (Motoko)**
+```motoko
+// Token state variables
+private stable var tokenSymbol: Text = "NST";
+private stable var tokenDecimals: Nat8 = 8;
+private stable var totalSupply: Nat = 1_000_000_000_000_000;
+private stable var circulatingSupply: Nat = 0;
+private stable var stakingRewardRate: Float = 0.05; // 5% APY
+
+// Core token functions
+public shared({caller}) func transfer(to: Principal, amount: Nat) : async Bool
+public shared({caller}) func approve(spender: Principal, amount: Nat) : async Bool
+public shared({caller}) func stake(amount: Nat) : async Bool
+public shared({caller}) func unstake(amount: Nat) : async Bool
+public shared({caller}) func claimRewards() : async Bool
+```
+
+#### **Frontend Integration (React)**
+```javascript
+// Token dashboard component
+import TokenDashboard from '../components/TokenDashboard';
+
+// Backend service integration
+const balance = await backendService.balanceOf(userPrincipal);
+const stakingInfo = await backendService.getStakingInfo(userPrincipal);
+const transferHistory = await backendService.getTransferHistory(userPrincipal);
+```
+
+### 🎯 **Use Cases & Benefits**
+
+#### **For Users**
+- **Passive Income**: Earn 5% APY through staking
+- **Platform Access**: Unlock premium features and early access
+- **Governance**: Participate in platform decision-making
+- **Reduced Fees**: Lower transaction costs for NST holders
+
+#### **For Developers**
+- **Integration**: Easy integration with existing DeFi protocols
+- **Liquidity**: Provide liquidity and earn trading fees
+- **Building**: Create applications that utilize NST tokens
+- **Rewards**: Earn rewards for contributing to the ecosystem
+
+#### **For the Platform**
+- **Sustainability**: Long-term tokenomics ensure platform growth
+- **Community**: Strong community engagement through token incentives
+- **Innovation**: Fund development through token sales and fees
+- **Adoption**: Drive platform adoption through token utility
+
+### 🔐 **Security Features**
+- **Pausable**: Emergency pause functionality for security
+- **Transaction Limits**: Configurable limits to prevent abuse
+- **Access Control**: Role-based permissions for admin functions
+- **Audit Trail**: Complete transaction history and logging
+- **Multi-signature**: Enhanced security for critical operations
+
+### 📱 **User Experience**
+- **Sleek UI**: Modern, responsive token dashboard design
+- **Real-time Updates**: Live balance and transaction updates
+- **Mobile Optimized**: Perfect experience on all devices
+- **Intuitive Navigation**: Easy-to-use interface for all users
+- **Comprehensive Analytics**: Detailed insights and performance tracking
+
+---
+
 ## 🚀 **Getting Started**
 
 ### **Prerequisites**
@@ -128,21 +255,21 @@ dfx canister id Nisto_frontend
 ### **Local Development Environment**
 ```bash
 # Internet Identity Canister
-internet_identity: uzt4z-lp777-77774-qaabq-cai
+internet_identity: ucwa4-rx777-77774-qaada-cai
 
 # Backend Canister  
-Nisto_backend: uxrrr-q7777-77774-qaaaq-cai
+Nisto_backend: uzt4z-lp777-77774-qaabq-cai
 
 # Frontend Canister
-Nisto_frontend: u6s2n-gx777-77774-qaaba-cai
+Nisto_frontend: umunu-kh777-77774-qaaca-cai
 ```
 
 ### **Environment Variables**
 The following environment variables are automatically set in `.env`:
 ```bash
-CANISTER_ID_INTERNET_IDENTITY=uzt4z-lp777-77774-qaabq-cai
-CANISTER_ID_NISTO_BACKEND=uxrrr-q7777-77774-qaaaq-cai
-CANISTER_ID_NISTO_FRONTEND=u6s2n-gx777-77774-qaaba-cai
+CANISTER_ID_INTERNET_IDENTITY=ucwa4-rx777-77774-qaada-cai
+CANISTER_ID_NISTO_BACKEND=uzt4z-lp777-77774-qaabq-cai
+CANISTER_ID_NISTO_FRONTEND=umunu-kh777-77774-qaaca-cai
 ```
 
 ---
@@ -455,6 +582,25 @@ dfx logs
 - `installPlugin(pluginId)` - Install plugin
 - `getUserPlugins()` - Get user plugins
 - `updatePluginSettings(pluginId, settings)` - Update plugin settings
+
+#### **Nisto Token (NST)**
+- `getTokenMetadata()` - Get token metadata (symbol, decimals, total supply)
+- `balanceOf(owner: Principal)` - Get token balance for address
+- `getTotalBalance(owner: Principal)` - Get total balance including staked tokens
+- `allowance(owner: Principal, spender: Principal)` - Get spending allowance
+- `transfer(to: Principal, amount: Nat)` - Transfer tokens to address
+- `approve(spender: Principal, amount: Nat)` - Approve spending allowance
+- `transferFrom(from: Principal, to: Principal, amount: Nat)` - Transfer on behalf
+- `mint(to: Principal, amount: Nat)` - Create new tokens (admin only)
+- `burn(amount: Nat)` - Destroy tokens from sender's balance
+- `stake(amount: Nat)` - Stake tokens to earn rewards
+- `unstake(amount: Nat)` - Unstake tokens (no lock period)
+- `claimRewards()` - Claim earned staking rewards
+- `getStakingInfo(owner: Principal)` - Get staking information and rewards
+- `getTotalStaked()` - Get total tokens staked across platform
+- `getTransferHistory(owner: Principal)` - Get transfer transaction history
+- `getMintHistory()` - Get token minting history
+- `getBurnHistory()` - Get token burning history
 
 ---
 
