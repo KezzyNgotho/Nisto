@@ -507,7 +507,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: [Wiki](https://github.com/KezzyNgotho/Nisto/wiki)
 - **Issues**: [GitHub Issues](https://github.com/KezzyNgotho/Nisto/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/KezzyNgotho/Nisto/discussions)
-- **Email**: support@nisto.com
+- **Email**: nistodefi@gmail.com
 
 ---
 
@@ -515,7 +515,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Built with ❤️ by the Nisto Team**
 
-[![Twitter](https://img.shields.io/twitter/follow/nisto_defi?style=social)](https://twitter.com/nisto_defi)
+[![Twitter](https://img.shields.io/twitter/follow/nisto_defi?style=social)](https://twitter.com/nisto)
 [![Discord](https://img.shields.io/discord/1234567890?style=flat&logo=discord)](https://discord.gg/nisto)
 [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?style=flat&logo=telegram&logoColor=white)](https://t.me/nisto_defi)
 
