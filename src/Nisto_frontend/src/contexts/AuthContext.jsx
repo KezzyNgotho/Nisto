@@ -50,13 +50,20 @@ export function AuthProvider({ children }) {
   const login = useCallback(async () => {
     setIsLoading(true);
     try {
+      console.log('AuthContext: Starting login process...');
       const result = await backend.login();
+      console.log('AuthContext: Login successful, result:', result);
       setIsAuthenticated(true);
       setPrincipal(backend.principal ? backend.principal.toString() : null);
+      console.log('AuthContext: Principal set to:', backend.principal?.toString());
       await fetchUser();
       await refreshRecoveryMethods();
       await refreshCryptoWallets();
+      console.log('AuthContext: Login process completed successfully');
       return result;
+    } catch (error) {
+      console.error('AuthContext: Login failed:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }

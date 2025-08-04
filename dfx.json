@@ -4,6 +4,8 @@
       "main": "src/Nisto_backend/main.mo",
       "type": "motoko"
     },
+
+
     "Nisto_frontend": {
       "dependencies": [
         "Nisto_backend"

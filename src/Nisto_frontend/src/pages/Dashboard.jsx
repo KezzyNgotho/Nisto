@@ -44,8 +44,27 @@ import SocialGames from '../components/SocialGames';
 import DeFiTools from '../components/DeFiTools';
 import PluginSystem from '../components/PluginSystem';
 import GroupVaults from '../components/GroupVaults';
+import TokenDashboard from '../components/TokenDashboard';
 
 function Dashboard() {
+  const auth = useAuth();
+  
+  // Safety check for when auth context is not ready
+  if (!auth) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        fontSize: '1.125rem',
+        color: '#6b7280'
+      }}>
+        Loading authentication...
+      </div>
+    );
+  }
+
   const { 
     user, 
     logout, 
@@ -57,7 +76,7 @@ function Dashboard() {
     cryptoWallets,
     refreshRecoveryMethods,
     refreshCryptoWallets
-  } = useAuth();
+  } = auth;
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [showRecoverySetup, setShowRecoverySetup] = useState(false);
@@ -177,6 +196,7 @@ function Dashboard() {
         <nav className="sidebar-nav">
           <button className={`sidebar-link${activeTab==='overview'?' active':''}`} onClick={()=>setActiveTab('overview')}><FiHome /><span>Overview</span></button>
           <button className={`sidebar-link${activeTab==='wallets'?' active':''}`} onClick={()=>setActiveTab('wallets')}><BiWallet /><span>Wallets</span></button>
+          <button className={`sidebar-link${activeTab==='tokens'?' active':''}`} onClick={()=>setActiveTab('tokens')}><BiCoin /><span>Tokens</span></button>
           <button className={`sidebar-link${activeTab==='vaults'?' active':''}`} onClick={()=>setActiveTab('vaults')}><FiUsers /><span>Group Vaults</span></button>
           <button className={`sidebar-link${activeTab==='games'?' active':''}`} onClick={()=>setActiveTab('games')}><FiAward /><span>Social Games</span></button>
           <button className={`sidebar-link${activeTab==='defi'?' active':''}`} onClick={()=>setActiveTab('defi')}><FiBarChart2 /><span>DeFi Tools</span></button>
@@ -261,6 +281,7 @@ function Dashboard() {
             </section>
           )}
           {activeTab === 'wallets' && <CryptoWallets />}
+          {activeTab === 'tokens' && <TokenDashboard />}
           {activeTab === 'vaults' && <GroupVaults />}
           {activeTab === 'games' && <SocialGames />}
           {activeTab === 'defi' && <DeFiTools />}

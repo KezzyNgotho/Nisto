@@ -174,9 +174,12 @@ export default function GroupVaults() {
     setSelectedVault(vault);
     setShowVaultDetails(true);
     try {
+      console.log('Getting vault details for vault:', vault.id);
       const details = await getVaultDetails(vault.id);
+      console.log('Vault details received:', details);
       setVaultDetails(details);
-    } catch {
+    } catch (error) {
+      console.error('Error getting vault details:', error);
       setVaultDetails(null);
       showToast({ message: 'Failed to load vault details', type: 'error', icon: <FiDollarSign /> });
     }

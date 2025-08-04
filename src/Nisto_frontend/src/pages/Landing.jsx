@@ -38,18 +38,12 @@ function Landing() {
     setWaitingListForm({ email: '', role: 'user', interests: [] });
   };
 
-  const handleLaunchApp = async () => {
+  const handleLaunchApp = () => {
     if (isAuthenticated) {
       navigate('/dashboard');
     } else {
-      try {
-        await login();
-        navigate('/dashboard');
-      } catch (error) {
-        console.error('Login failed:', error);
-        // Fallback to modal if Internet Identity fails
-        setLoginModalOpen(true);
-      }
+      // Always show the login modal first
+      setLoginModalOpen(true);
     }
   };
 

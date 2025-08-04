@@ -4,8 +4,9 @@ import Text "mo:base/Text";
 import Array "mo:base/Array";
 import Time "mo:base/Time";
 import Int "mo:base/Int";
-import Nat32 "mo:base/Nat32";
+import Nat "mo:base/Nat";
 import Nat8 "mo:base/Nat8";
+import Nat32 "mo:base/Nat32";
 import Float "mo:base/Float";
 import Result "mo:base/Result";
 import Option "mo:base/Option";
@@ -15,6 +16,7 @@ import Random "mo:base/Random";
 import Blob "mo:base/Blob";
 import Buffer "mo:base/Buffer";
 import Char "mo:base/Char";
+
 
 actor Nisto {
   
@@ -417,6 +419,21 @@ actor Nisto {
   private var userVaults = HashMap.HashMap<UserId, [Text]>(10, Principal.equal, Principal.hash);
   private var vaultMemberIndex = HashMap.HashMap<Text, [Text]>(50, Text.equal, Text.hash); // vaultId -> memberIds
   private var vaultTransactionIndex = HashMap.HashMap<Text, [Text]>(50, Text.equal, Text.hash); // vaultId -> transactionIds
+  
+  // ===== VAULT CHAT STORAGE =====
+  private var vaultMessages = HashMap.HashMap<Text, VaultMessage>(500, Text.equal, Text.hash);
+  private var vaultChatRooms = HashMap.HashMap<Text, VaultChatRoom>(50, Text.equal, Text.hash);
+  private var chatMembers = HashMap.HashMap<Text, ChatMember>(200, Text.equal, Text.hash); // userId_vaultId -> ChatMember
+  private var chatNotifications = HashMap.HashMap<Text, ChatNotification>(200, Text.equal, Text.hash);
+  private stable var nextVaultMessageId: Nat = 0;
+  private stable var nextVaultChatRoomId: Nat = 0;
+  private stable var nextChatNotificationId: Nat = 0;
+  
+  // Vault chat indexes
+  private var vaultMessageIndex = HashMap.HashMap<Text, [Text]>(50, Text.equal, Text.hash); // vaultId -> messageIds
+  private var vaultChatRoomIndex = HashMap.HashMap<Text, [Text]>(50, Text.equal, Text.hash); // vaultId -> chatRoomIds
+  private var vaultChatMemberIndex = HashMap.HashMap<Text, [Text]>(50, Text.equal, Text.hash); // vaultId -> userIds
+  private var userChatNotificationIndex = HashMap.HashMap<UserId, [Text]>(10, Principal.equal, Principal.hash); // userId -> notificationIds
   
   // ===== PLUGIN SYSTEM STORAGE =====
   // ===== PLUGIN SYSTEM STORAGE =====
@@ -1023,11 +1040,12 @@ actor Nisto {
         buffer.add(byte);
       };
       // Fill remaining with zeros
-      let remaining = 32 - Array.size(hashBytes);
+      let hashSize = Array.size(hashBytes);
+      let remaining = if (hashSize < 32) 32 - hashSize else 0;
       if (remaining > 0) {
         let endIndex = remaining - 1;
         for (i in Iter.range(0, endIndex)) {
-          buffer.add(0);
+        buffer.add(0);
         };
       };
       Buffer.toArray(buffer);
@@ -3385,7 +3403,7 @@ actor Nisto {
     let codeSize = codeText.size();
     if (codeSize < 6) {
       // Pad with leading zeros
-      let padding = 6 - codeSize;
+      let padding = if (codeSize < 6) 6 - codeSize else 0;
       var paddedCode = "";
       var i = 0;
       while (i < padding) {
@@ -3399,7 +3417,7 @@ actor Nisto {
       var result = "";
       var count = 0;
       for (char in chars) {
-        if (count >= codeSize - 6) {
+        if (count >= (if (codeSize > 6) codeSize - 6 else 0)) {
           result := result # Text.fromChar(char);
         };
         count += 1;
@@ -3514,7 +3532,90 @@ actor Nisto {
     metadata: ?Text;
   };
 
-   // ===== PLUGIN SYSTEM TYPES =====
+  // ===== VAULT CHAT TYPES =====
+  
+  public type MessageType = {
+    #Text;
+    #System;
+    #Transaction;
+    #Image;
+    #File;
+    #Reaction;
+  };
+
+  public type MessageStatus = {
+    #Sent;
+    #Delivered;
+    #Read;
+    #Failed;
+  };
+
+  public type VaultMessage = {
+    id: Text;
+    vaultId: Text;
+    userId: UserId;
+    userName: Text;
+    messageType: MessageType;
+    content: Text;
+    status: MessageStatus;
+    timestamp: Int;
+    editedAt: ?Int;
+    replyTo: ?Text; // ID of message being replied to
+    reactions: [MessageReaction];
+    metadata: ?Text;
+  };
+
+  public type MessageReaction = {
+    userId: UserId;
+    reaction: Text; // emoji or reaction type
+    timestamp: Int;
+  };
+
+  public type VaultChatRoom = {
+    id: Text;
+    vaultId: Text;
+    name: Text;
+    description: ?Text;
+    isActive: Bool;
+    createdAt: Int;
+    updatedAt: Int;
+    lastMessageAt: ?Int;
+    memberCount: Nat;
+    metadata: ?Text;
+  };
+
+  public type ChatMember = {
+    userId: UserId;
+    userName: Text;
+    joinedAt: Int;
+    lastSeenAt: Int;
+    isTyping: Bool;
+    typingSince: ?Int;
+    unreadCount: Nat;
+    isMuted: Bool;
+    role: Text; // "member" | "admin" | "moderator"
+  };
+
+  public type TypingIndicator = {
+    userId: UserId;
+    userName: Text;
+    isTyping: Bool;
+    startedAt: Int;
+  };
+
+  public type ChatNotification = {
+    id: Text;
+    vaultId: Text;
+    userId: UserId;
+    notificationType: Text; // "message" | "reaction" | "member_joined" | "member_left"
+    title: Text;
+    body: Text;
+    timestamp: Int;
+    isRead: Bool;
+    metadata: ?Text;
+  };
+
+  // ===== PLUGIN SYSTEM TYPES =====
   
   public type PluginCategory = {
     #Finance;
@@ -3863,6 +3964,25 @@ actor Nisto {
         let currentVaultMembers = Option.get(vaultMemberIndex.get(vaultId), []);
         vaultMemberIndex.put(vaultId, Array.append(currentVaultMembers, [memberId]));
         
+        // Automatically add vault creator to vault chat
+        let memberKey = Text.concat(Principal.toText(caller), Text.concat("_", vaultId));
+        let chatMember: ChatMember = {
+          userId = caller;
+          userName = user.username;
+          joinedAt = now;
+          lastSeenAt = now;
+          isTyping = false;
+          typingSince = null;
+          unreadCount = 0;
+          isMuted = false;
+          role = "admin";
+        };
+        chatMembers.put(memberKey, chatMember);
+        
+        // Update chat member index
+        let currentChatMembers = Option.get(vaultChatMemberIndex.get(vaultId), []);
+        vaultChatMemberIndex.put(vaultId, Array.append(currentChatMembers, [Principal.toText(caller)]));
+        
         await logAuditEvent(?caller, "VAULT_CREATED", "Group vault created: " # name, true);
         return #ok(newVault);
       };
@@ -3927,7 +4047,7 @@ actor Nisto {
       };
     };
   };
-  
+
   // Join a public vault
   public shared(msg) func joinVault(vaultId: Text): async Result.Result<VaultMember, Text> {
     let caller = msg.caller;
@@ -3977,12 +4097,31 @@ actor Nisto {
         let currentVaultMembers = Option.get(vaultMemberIndex.get(vaultId), []);
         vaultMemberIndex.put(vaultId, Array.append(currentVaultMembers, [memberId]));
         
+        // Automatically add new member to vault chat
+        let memberKey = Text.concat(Principal.toText(caller), Text.concat("_", vaultId));
+        let chatMember: ChatMember = {
+          userId = caller;
+          userName = "New Member"; // Will be updated when user joins chat
+          joinedAt = now;
+          lastSeenAt = now;
+          isTyping = false;
+          typingSince = null;
+          unreadCount = 0;
+          isMuted = false;
+          role = "member";
+        };
+        chatMembers.put(memberKey, chatMember);
+        
+        // Update chat member index
+        let currentChatMembers = Option.get(vaultChatMemberIndex.get(vaultId), []);
+        vaultChatMemberIndex.put(vaultId, Array.append(currentChatMembers, [Principal.toText(caller)]));
+        
         await logAuditEvent(?caller, "VAULT_JOINED", "Joined vault: " # vault.name, true);
         return #ok(newMember);
       };
     };
   };
-  
+   
   // Deposit to vault
   public shared(msg) func depositToVault(
     vaultId: Text,
@@ -4278,6 +4417,507 @@ actor Nisto {
     #ok(newPlugin)
   };
 
+  // ============ VAULT CHAT MANAGEMENT ============
+  
+  // Create a chat room for a vault
+  public shared(msg) func createVaultChatRoom(
+    vaultId: Text,
+    name: Text,
+    description: ?Text
+  ): async Result.Result<VaultChatRoom, Text> {
+    let caller = msg.caller;
+    
+    // Check if user is a member of the vault
+    let userMemberIds = Option.get(vaultMemberIndex.get(vaultId), []);
+    let isMember = Array.find<Text>(userMemberIds, func(memberId) {
+      switch (vaultMembers.get(memberId)) {
+        case (?member) { member.userId == caller and member.isActive };
+        case null { false };
+      };
+    });
+    
+    switch (isMember) {
+      case null { return #err("Not a member of this vault"); };
+      case (?memberId) {
+        let chatRoomId = generateId("chat_room", nextVaultChatRoomId);
+        nextVaultChatRoomId += 1;
+
+        let chatRoom: VaultChatRoom = {
+          id = chatRoomId;
+          vaultId = vaultId;
+          name = name;
+          description = description;
+          isActive = true;
+          createdAt = getCurrentTime();
+          updatedAt = getCurrentTime();
+          lastMessageAt = null;
+          memberCount = 0;
+          metadata = null;
+        };
+
+        vaultChatRooms.put(chatRoomId, chatRoom);
+        
+        // Update chat room index
+        let currentChatRooms = Option.get(vaultChatRoomIndex.get(vaultId), []);
+        vaultChatRoomIndex.put(vaultId, Array.append(currentChatRooms, [chatRoomId]));
+
+        #ok(chatRoom)
+      };
+    };
+  };
+
+  // Join a vault chat room
+  public shared(msg) func joinVaultChat(
+    vaultId: Text,
+    userName: Text
+  ): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    
+    // Check if user is a member of the vault
+    let userMemberIds = Option.get(vaultMemberIndex.get(vaultId), []);
+    let isMember = Array.find<Text>(userMemberIds, func(memberId) {
+      switch (vaultMembers.get(memberId)) {
+        case (?member) { member.userId == caller and member.isActive };
+        case null { false };
+      };
+    });
+    
+    switch (isMember) {
+      case null { return #err("Not a member of this vault"); };
+      case (?memberId) {
+        let memberKey = Text.concat(Principal.toText(caller), Text.concat("_", vaultId));
+        
+        // Check if user is already a chat member
+        switch (chatMembers.get(memberKey)) {
+          case (?existingMember) {
+            // User is already a chat member, just update last seen
+            let updatedMember: ChatMember = {
+              userId = existingMember.userId;
+              userName = existingMember.userName;
+              joinedAt = existingMember.joinedAt;
+              lastSeenAt = getCurrentTime();
+              isTyping = existingMember.isTyping;
+              typingSince = existingMember.typingSince;
+              unreadCount = existingMember.unreadCount;
+              isMuted = existingMember.isMuted;
+              role = existingMember.role;
+            };
+            chatMembers.put(memberKey, updatedMember);
+            return #ok(true);
+          };
+          case null {
+            // User is not a chat member, add them
+            let member: ChatMember = {
+              userId = caller;
+              userName = userName;
+              joinedAt = getCurrentTime();
+              lastSeenAt = getCurrentTime();
+              isTyping = false;
+              typingSince = null;
+              unreadCount = 0;
+              isMuted = false;
+              role = "member";
+            };
+
+            chatMembers.put(memberKey, member);
+            
+            // Update chat member index
+            let currentChatMembers = Option.get(vaultChatMemberIndex.get(vaultId), []);
+            vaultChatMemberIndex.put(vaultId, Array.append(currentChatMembers, [Principal.toText(caller)]));
+
+            // Create notification for other members
+            let notificationId = generateId("notif", nextChatNotificationId);
+            nextChatNotificationId += 1;
+
+            let notification: ChatNotification = {
+              id = notificationId;
+              vaultId = vaultId;
+              userId = caller;
+              notificationType = "member_joined";
+              title = "New Member";
+              body = Text.concat(userName, Text.concat(" joined the vault chat", ""));
+              timestamp = getCurrentTime();
+              isRead = false;
+              metadata = null;
+            };
+            
+            chatNotifications.put(notificationId, notification);
+            
+            // Update user notification index
+            let currentUserNotifications = Option.get(userChatNotificationIndex.get(caller), []);
+            userChatNotificationIndex.put(caller, Array.append(currentUserNotifications, [notificationId]));
+
+            #ok(true)
+          };
+        };
+      };
+    };
+  };
+
+  // Send a message to vault chat
+  public shared(msg) func sendVaultMessage(
+    vaultId: Text,
+    content: Text,
+    messageType: MessageType,
+    replyTo: ?Text
+  ): async Result.Result<VaultMessage, Text> {
+    let caller = msg.caller;
+    let memberKey = Text.concat(Principal.toText(caller), Text.concat("_", vaultId));
+    
+    // Check if user is a chat member
+    switch (chatMembers.get(memberKey)) {
+      case null { return #err("User is not a member of this vault chat"); };
+      case (?member) {
+        let messageId = generateId("msg", nextVaultMessageId);
+        nextVaultMessageId += 1;
+
+        let message: VaultMessage = {
+          id = messageId;
+          vaultId = vaultId;
+          userId = caller;
+          userName = member.userName;
+          messageType = messageType;
+          content = content;
+          status = #Sent;
+          timestamp = getCurrentTime();
+          editedAt = null;
+          replyTo = replyTo;
+          reactions = [];
+          metadata = null;
+        };
+        
+        vaultMessages.put(messageId, message);
+        
+        // Update message index
+        let currentMessages = Option.get(vaultMessageIndex.get(vaultId), []);
+        vaultMessageIndex.put(vaultId, Array.append(currentMessages, [messageId]));
+
+        // Update member's last seen
+        let updatedMember: ChatMember = {
+          userId = member.userId;
+          userName = member.userName;
+          joinedAt = member.joinedAt;
+          lastSeenAt = getCurrentTime();
+          isTyping = false;
+          typingSince = null;
+          unreadCount = member.unreadCount;
+          isMuted = member.isMuted;
+          role = member.role;
+        };
+        chatMembers.put(memberKey, updatedMember);
+
+        // Create notification for other members
+        let notificationId = generateId("notif", nextChatNotificationId);
+        nextChatNotificationId += 1;
+
+        let notification: ChatNotification = {
+          id = notificationId;
+          vaultId = vaultId;
+          userId = caller;
+          notificationType = "message";
+          title = member.userName;
+          body = content;
+          timestamp = getCurrentTime();
+          isRead = false;
+          metadata = ?messageId;
+        };
+
+        chatNotifications.put(notificationId, notification);
+
+        #ok(message)
+      };
+    };
+  };
+  
+  // Get vault messages
+  public shared(msg) func getVaultMessages(
+    vaultId: Text,
+    limit: Nat,
+    offset: Nat
+  ): async Result.Result<[VaultMessage], Text> {
+    let caller = msg.caller;
+    
+    // Check if user is a member of the vault
+    let userMemberIds = Option.get(vaultMemberIndex.get(vaultId), []);
+    let isMember = Array.find<Text>(userMemberIds, func(memberId) {
+      switch (vaultMembers.get(memberId)) {
+        case (?member) { member.userId == caller and member.isActive };
+            case null { false };
+          };
+    });
+    
+    switch (isMember) {
+      case null { return #err("Not a member of this vault"); };
+      case (?memberId) {
+        switch (vaultMessageIndex.get(vaultId)) {
+      case null { #ok([]) };
+          case (?messageIds) {
+            let allMessages = Array.mapFilter<Text, VaultMessage>(messageIds, func(id) {
+              vaultMessages.get(id)
+            });
+            
+            // Sort by timestamp (newest first) and apply pagination
+            let sortedMessages = Array.sort<VaultMessage>(
+              allMessages,
+              func(a: VaultMessage, b: VaultMessage): { #less; #equal; #greater } {
+                if (a.timestamp > b.timestamp) { #greater }
+                else if (a.timestamp < b.timestamp) { #less }
+                else { #equal }
+              }
+            );
+            
+            let startIndex = offset;
+            let endIndex = Nat.min(startIndex + limit, sortedMessages.size());
+            
+            if (startIndex >= sortedMessages.size()) {
+              #ok([])
+            } else {
+              let paginatedMessages = Array.subArray<VaultMessage>(sortedMessages, startIndex, endIndex - startIndex);
+              #ok(paginatedMessages)
+            }
+          };
+        };
+      };
+    };
+  };
+
+  // Update typing indicator
+  public shared(msg) func updateTypingStatus(
+    vaultId: Text,
+    isTyping: Bool
+  ): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    let memberKey = Text.concat(Principal.toText(caller), Text.concat("_", vaultId));
+    
+    switch (chatMembers.get(memberKey)) {
+      case null { return #err("User is not a member of this vault chat"); };
+      case (?member) {
+        let updatedMember: ChatMember = {
+          userId = member.userId;
+          userName = member.userName;
+          joinedAt = member.joinedAt;
+          lastSeenAt = getCurrentTime();
+          isTyping = isTyping;
+          typingSince = if (isTyping) ?getCurrentTime() else null;
+          unreadCount = member.unreadCount;
+          isMuted = member.isMuted;
+          role = member.role;
+        };
+        
+        chatMembers.put(memberKey, updatedMember);
+        #ok(true)
+      };
+    };
+  };
+  
+  // Get typing indicators for a vault
+  public shared(msg) func getTypingIndicators(vaultId: Text): async Result.Result<[TypingIndicator], Text> {
+    let caller = msg.caller;
+    
+    // Check if user is a member of the vault
+    let userMemberIds = Option.get(vaultMemberIndex.get(vaultId), []);
+    let isMember = Array.find<Text>(userMemberIds, func(memberId) {
+      switch (vaultMembers.get(memberId)) {
+        case (?member) { member.userId == caller and member.isActive };
+        case null { false };
+      };
+    });
+    
+    switch (isMember) {
+      case null { return #err("Not a member of this vault"); };
+      case (?memberId) {
+        switch (vaultChatMemberIndex.get(vaultId)) {
+          case null { #ok([]) };
+          case (?userIds) {
+            let typingUsers = Array.filter<Text>(
+              userIds,
+              func(userId: Text): Bool {
+                let memberKey = Text.concat(userId, Text.concat("_", vaultId));
+                switch (chatMembers.get(memberKey)) {
+                  case null { false };
+                  case (?member) { member.isTyping };
+                };
+              }
+            );
+            
+            let typingIndicators = Array.map<Text, TypingIndicator>(
+              typingUsers,
+              func(userId: Text): TypingIndicator {
+                let memberKey = Text.concat(userId, Text.concat("_", vaultId));
+                switch (chatMembers.get(memberKey)) {
+                  case null {
+                    {
+                      userId = Principal.fromText("2vxsx-fae");
+                      userName = "";
+                      isTyping = false;
+                      startedAt = 0;
+                    }
+                  };
+                  case (?member) {
+                    {
+                      userId = member.userId;
+                      userName = member.userName;
+                      isTyping = member.isTyping;
+                      startedAt = switch (member.typingSince) {
+                        case null { 0 };
+                        case (?time) { time };
+                      };
+                    }
+                  };
+                };
+              }
+            );
+            
+            #ok(typingIndicators)
+          };
+        };
+      };
+    };
+  };
+  
+  // Mark messages as read
+  public shared(msg) func markMessagesAsRead(
+    vaultId: Text,
+    messageIds: [Text]
+  ): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    let memberKey = Text.concat(Principal.toText(caller), Text.concat("_", vaultId));
+    
+    switch (chatMembers.get(memberKey)) {
+      case null { return #err("User is not a member of this vault chat"); };
+      case (?member) {
+        // Update member's unread count
+        let updatedMember: ChatMember = {
+          userId = member.userId;
+          userName = member.userName;
+          joinedAt = member.joinedAt;
+          lastSeenAt = getCurrentTime();
+          isTyping = member.isTyping;
+          typingSince = member.typingSince;
+          unreadCount = 0; // Reset unread count
+          isMuted = member.isMuted;
+          role = member.role;
+        };
+        
+        chatMembers.put(memberKey, updatedMember);
+        #ok(true)
+      };
+    };
+  };
+  
+  // Get user chat notifications
+  public shared(msg) func getUserChatNotifications(
+    limit: Nat,
+    offset: Nat
+  ): async Result.Result<[ChatNotification], Text> {
+    let caller = msg.caller;
+    
+    switch (userChatNotificationIndex.get(caller)) {
+      case null { #ok([]) };
+      case (?notificationIds) {
+        let allNotifications = Array.mapFilter<Text, ChatNotification>(notificationIds, func(id) {
+          chatNotifications.get(id)
+        });
+        
+        // Sort by timestamp (newest first) and apply pagination
+        let sortedNotifications = Array.sort<ChatNotification>(
+          allNotifications,
+          func(a: ChatNotification, b: ChatNotification): { #less; #equal; #greater } {
+            if (a.timestamp > b.timestamp) { #greater }
+            else if (a.timestamp < b.timestamp) { #less }
+            else { #equal }
+          }
+        );
+        
+        let startIndex = offset;
+        let endIndex = Nat.min(startIndex + limit, sortedNotifications.size());
+        
+        if (startIndex >= sortedNotifications.size()) {
+          #ok([])
+        } else {
+          let paginatedNotifications = Array.subArray<ChatNotification>(sortedNotifications, startIndex, endIndex - startIndex);
+          #ok(paginatedNotifications)
+        }
+      };
+    };
+  };
+  
+  // Leave vault chat
+  public shared(msg) func leaveVaultChat(vaultId: Text): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    let memberKey = Text.concat(Principal.toText(caller), Text.concat("_", vaultId));
+    
+    switch (chatMembers.get(memberKey)) {
+      case null { return #err("User is not a member of this vault chat"); };
+      case (?member) {
+        // Remove member
+        chatMembers.delete(memberKey);
+        
+        // Update chat member index
+        switch (vaultChatMemberIndex.get(vaultId)) {
+          case null { };
+          case (?userIds) {
+            let filteredUserIds = Array.filter<Text>(userIds, func(id: Text): Bool { id != Principal.toText(caller) });
+            vaultChatMemberIndex.put(vaultId, filteredUserIds);
+          };
+        };
+
+        // Create notification for other members
+        let notificationId = generateId("notif", nextChatNotificationId);
+        nextChatNotificationId += 1;
+
+        let notification: ChatNotification = {
+          id = notificationId;
+          vaultId = vaultId;
+          userId = caller;
+          notificationType = "member_left";
+          title = "Member Left";
+          body = Text.concat(member.userName, Text.concat(" left the vault chat", ""));
+          timestamp = getCurrentTime();
+          isRead = false;
+          metadata = null;
+        };
+
+        chatNotifications.put(notificationId, notification);
+
+        #ok(true)
+      };
+    };
+  };
+  
+  // Get vault chat members
+  public shared(msg) func getVaultChatMembers(vaultId: Text): async Result.Result<[ChatMember], Text> {
+    let caller = msg.caller;
+    
+    // Check if user is a member of the vault
+    let userMemberIds = Option.get(vaultMemberIndex.get(vaultId), []);
+    let isMember = Array.find<Text>(userMemberIds, func(memberId) {
+      switch (vaultMembers.get(memberId)) {
+        case (?member) { member.userId == caller and member.isActive };
+        case null { false };
+      };
+    });
+    
+    switch (isMember) {
+      case null { return #err("Not a member of this vault"); };
+      case (?memberId) {
+        switch (vaultChatMemberIndex.get(vaultId)) {
+          case null { #ok([]) };
+          case (?userIds) {
+            let members = Array.mapFilter<Text, ChatMember>(
+              userIds,
+              func(userId: Text): ?ChatMember {
+                let memberKey = Text.concat(userId, Text.concat("_", vaultId));
+                chatMembers.get(memberKey)
+              }
+            );
+            
+            #ok(members)
+          };
+        };
+      };
+    };
+  };
 
   // ============ SOCIAL GAMES MANAGEMENT ============
   
@@ -5987,4 +6627,481 @@ actor Nisto {
     let randomValue = Int.abs(Time.now()) % 100;
     randomValue < 95; // 95% success rate
   };
+
+  // ============ NISTO TOKEN TYPES ============
+  public type TokenTransfer = {
+    id: Text;
+    from: UserId;
+    to: UserId;
+    amount: Nat;
+    timestamp: Int;
+    transactionHash: Text;
+    blockNumber: Nat;
+  };
+  public type TokenMint = {
+    id: Text;
+    to: UserId;
+    amount: Nat;
+    reason: Text;
+    timestamp: Int;
+    blockNumber: Nat;
+  };
+  public type TokenBurn = {
+    id: Text;
+    from: UserId;
+    amount: Nat;
+    reason: Text;
+    timestamp: Int;
+    blockNumber: Nat;
+  };
+  public type TokenBalance = {
+    owner: UserId;
+    balance: Nat;
+    lockedBalance: Nat;
+    stakedBalance: Nat;
+    lastUpdated: Int;
+  };
+  public type TokenAllowance = {
+    owner: UserId;
+    spender: UserId;
+    amount: Nat;
+    lastUpdated: Int;
+  };
+  public type TokenMetadata = {
+    name: Text;
+    symbol: Text;
+    decimals: Nat8;
+    totalSupply: Nat;
+    circulatingSupply: Nat;
+    treasuryAddress: UserId;
+    burnAddress: UserId;
+    isPaused: Bool;
+    maxTransactionLimit: Nat;
+    maxWalletLimit: Nat;
+    createdAt: Int;
+    updatedAt: Int;
+  };
+  public type StakingInfo = {
+    userId: UserId;
+    stakedAmount: Nat;
+    stakingStartTime: Int;
+    lastRewardTime: Int;
+    totalRewardsEarned: Nat;
+    isStaking: Bool;
+  };
+  public type GovernanceVote = {
+    proposalId: Text;
+    userId: UserId;
+    vote: Bool;
+    votingPower: Nat;
+    timestamp: Int;
+  };
+
+  // ============ NISTO TOKEN STATE ============
+  private var tokenName: Text = "Nisto Token";
+  private var tokenSymbol: Text = "NST";
+  private var tokenDecimals: Nat8 = 8;
+  private var totalSupply: Nat = 1_000_000_000_000_000;
+  private var circulatingSupply: Nat = 0;
+  private var treasuryAddress: UserId = Principal.fromText("2vxsx-fae");
+  private var burnAddress: UserId = Principal.fromText("2vxsx-fae");
+  private var isPaused: Bool = false;
+  private var maxTransactionLimit: Nat = 10_000_000_000_000;
+  private var maxWalletLimit: Nat = 100_000_000_000_000;
+  private var tokenBalances = HashMap.HashMap<UserId, Nat>(0, Principal.equal, Principal.hash);
+  private var tokenAllowances = HashMap.HashMap<Text, Nat>(0, Text.equal, Text.hash);
+  private var lockedBalances = HashMap.HashMap<UserId, Nat>(0, Principal.equal, Principal.hash);
+  private var stakedBalances = HashMap.HashMap<UserId, Nat>(0, Principal.equal, Principal.hash);
+  private var tokenTransfers = Buffer.Buffer<TokenTransfer>(0);
+  private var tokenMints = Buffer.Buffer<TokenMint>(0);
+  private var tokenBurns = Buffer.Buffer<TokenBurn>(0);
+  private var stakingInfo = HashMap.HashMap<UserId, StakingInfo>(0, Principal.equal, Principal.hash);
+  private var stakingRewardRate: Float = 0.05;
+  private var totalStaked: Nat = 0;
+  private var governanceVotes = HashMap.HashMap<Text, [GovernanceVote]>(0, Text.equal, Text.hash);
+  private var minVotingPower: Nat = 1_000_000_000;
+  private var currentBlockNumber: Nat = 0;
+
+  // ============ NISTO TOKEN HELPER FUNCTIONS ============
+  private func generateTokenId(prefix: Text, counter: Nat): Text {
+    Text.concat(prefix, Text.concat("_", Nat.toText(counter)));
+  };
+  private func getCurrentBlock(): Nat {
+    currentBlockNumber;
+  };
+  private func incrementBlock(): Nat {
+    currentBlockNumber += 1;
+    currentBlockNumber;
+  };
+  private func generateTransactionHash(from: UserId, to: UserId, amount: Nat, timestamp: Int): Text {
+    let fromText = Principal.toText(from);
+    let toText = Principal.toText(to);
+    let amountText = Nat.toText(amount);
+    let timestampText = Int.toText(timestamp);
+    let blockText = Nat.toText(getCurrentBlock());
+    Text.concat(fromText, Text.concat("_", Text.concat(toText, Text.concat("_", Text.concat(amountText, Text.concat("_", Text.concat(timestampText, Text.concat("_", blockText))))))));
+  };
+  private func getAllowanceKey(owner: UserId, spender: UserId): Text {
+    Text.concat(Principal.toText(owner), Text.concat("_", Principal.toText(spender)));
+  };
+  private func calculateStakingRewards(userId: UserId): Nat {
+    switch (stakingInfo.get(userId)) {
+      case null { 0 };
+      case (?info) {
+        if (not info.isStaking) { 
+          0 
+        } else {
+          let currentTime = Time.now();
+          let timeStaked = currentTime - info.lastRewardTime;
+          // TODO: Implement proper staking rewards calculation
+          0;
+        };
+      };
+    };
+  };
+
+  // ============ NISTO TOKEN PUBLIC FUNCTIONS ============
+  public query func getTokenMetadata(): async TokenMetadata {
+    {
+      name = tokenName;
+      symbol = tokenSymbol;
+      decimals = tokenDecimals;
+      totalSupply = totalSupply;
+      circulatingSupply = circulatingSupply;
+      treasuryAddress = treasuryAddress;
+      burnAddress = burnAddress;
+      isPaused = isPaused;
+      maxTransactionLimit = maxTransactionLimit;
+      maxWalletLimit = maxWalletLimit;
+      createdAt = Time.now();
+          updatedAt = Time.now();
+    }
+  };
+  public query func balanceOf(owner: UserId): async Nat {
+    Option.get(tokenBalances.get(owner), 0)
+  };
+  public query func getTotalBalance(owner: UserId): async TokenBalance {
+    let balance = Option.get(tokenBalances.get(owner), 0);
+    let locked = Option.get(lockedBalances.get(owner), 0);
+    let staked = Option.get(stakedBalances.get(owner), 0);
+    {
+      owner = owner;
+      balance = balance;
+      lockedBalance = locked;
+      stakedBalance = staked;
+      lastUpdated = Time.now();
+    }
+  };
+  public query func allowance(owner: UserId, spender: UserId): async Nat {
+    let key = getAllowanceKey(owner, spender);
+    Option.get(tokenAllowances.get(key), 0)
+  };
+  public shared(msg) func transfer(to: UserId, amount: Nat): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    if (isPaused) {
+      return #err("Token transfers are currently paused");
+    };
+    if (amount == 0) {
+      return #err("Transfer amount must be greater than 0");
+    };
+    if (amount > maxTransactionLimit) {
+      return #err("Transfer amount exceeds maximum transaction limit");
+    };
+    let callerBalance = Option.get(tokenBalances.get(caller), 0);
+    if (callerBalance < amount) {
+      return #err("Insufficient balance");
+    };
+    let toBalance = Option.get(tokenBalances.get(to), 0);
+    if (toBalance + amount > maxWalletLimit) {
+      return #err("Recipient would exceed maximum wallet limit");
+    };
+    // Update balances
+    tokenBalances.put(caller, callerBalance - amount);
+    tokenBalances.put(to, toBalance + amount);
+    // Record transfer
+    let blockNumber = incrementBlock();
+    let timestamp = Time.now();
+    let transactionHash = generateTransactionHash(caller, to, amount, timestamp);
+    let transfer: TokenTransfer = {
+      id = generateTokenId("transfer", tokenTransfers.size());
+      from = caller;
+      to = to;
+      amount = amount;
+      timestamp = timestamp;
+      transactionHash = transactionHash;
+      blockNumber = blockNumber;
+    };
+    tokenTransfers.add(transfer);
+  #ok(true)
+};
+  public shared(msg) func approve(spender: UserId, amount: Nat): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    let key = getAllowanceKey(caller, spender);
+    tokenAllowances.put(key, amount);
+    #ok(true)
+  };
+  public shared(msg) func transferFrom(from: UserId, to: UserId, amount: Nat): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    if (isPaused) {
+      return #err("Token transfers are currently paused");
+    };
+    let key = getAllowanceKey(from, caller);
+    let allowance = Option.get(tokenAllowances.get(key), 0);
+    if (allowance < amount) {
+      return #err("Insufficient allowance");
+    };
+    let fromBalance = Option.get(tokenBalances.get(from), 0);
+    if (fromBalance < amount) {
+      return #err("Insufficient balance");
+    };
+    // Update balances and allowance
+    tokenBalances.put(from, fromBalance - amount);
+    let toBalance = Option.get(tokenBalances.get(to), 0);
+    tokenBalances.put(to, toBalance + amount);
+    tokenAllowances.put(key, allowance - amount);
+    // Record transfer
+    let blockNumber = incrementBlock();
+    let timestamp = Time.now();
+    let transactionHash = generateTransactionHash(from, to, amount, timestamp);
+    let transfer: TokenTransfer = {
+      id = generateTokenId("transfer", tokenTransfers.size());
+      from = from;
+      to = to;
+      amount = amount;
+      timestamp = timestamp;
+      transactionHash = transactionHash;
+      blockNumber = blockNumber;
+    };
+    tokenTransfers.add(transfer);
+    #ok(true)
+  };
+  public shared(msg) func mint(to: UserId, amount: Nat, reason: Text): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    // Only treasury or authorized addresses can mint
+    if (caller != treasuryAddress) {
+      return #err("Only treasury can mint tokens");
+    };
+    if (amount == 0) {
+      return #err("Mint amount must be greater than 0");
+    };
+    if (circulatingSupply + amount > totalSupply) {
+      return #err("Mint would exceed total supply");
+    };
+    let toBalance = Option.get(tokenBalances.get(to), 0);
+    tokenBalances.put(to, toBalance + amount);
+    circulatingSupply += amount;
+    // Record mint
+    let blockNumber = incrementBlock();
+    let timestamp = Time.now();
+    let mint: TokenMint = {
+      id = generateTokenId("mint", tokenMints.size());
+      to = to;
+      amount = amount;
+      reason = reason;
+      timestamp = timestamp;
+      blockNumber = blockNumber;
+    };
+    tokenMints.add(mint);
+    #ok(true)
+  };
+  public shared(msg) func burn(amount: Nat, reason: Text): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    if (amount == 0) {
+      return #err("Burn amount must be greater than 0");
+    };
+    let callerBalance = Option.get(tokenBalances.get(caller), 0);
+    if (callerBalance < amount) {
+      return #err("Insufficient balance to burn");
+    };
+    tokenBalances.put(caller, callerBalance - amount);
+    circulatingSupply -= amount;
+    // Record burn
+    let blockNumber = incrementBlock();
+    let timestamp = Time.now();
+    let burn: TokenBurn = {
+      id = generateTokenId("burn", tokenBurns.size());
+      from = caller;
+      amount = amount;
+      reason = reason;
+      timestamp = timestamp;
+      blockNumber = blockNumber;
+    };
+    tokenBurns.add(burn);
+    #ok(true)
+  };
+  public shared(msg) func stake(amount: Nat): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    if (amount == 0) {
+      return #err("Stake amount must be greater than 0");
+    };
+    let callerBalance = Option.get(tokenBalances.get(caller), 0);
+    if (callerBalance < amount) {
+      return #err("Insufficient balance to stake");
+    };
+    // Calculate and distribute existing rewards
+    let existingRewards = calculateStakingRewards(caller);
+    if (existingRewards > 0) {
+      tokenBalances.put(caller, callerBalance + existingRewards);
+      circulatingSupply += existingRewards;
+    };
+    // Update staking info
+    let currentTime = Time.now();
+    let currentStaked = Option.get(stakedBalances.get(caller), 0);
+    let newStakedAmount = currentStaked + amount;
+    stakedBalances.put(caller, newStakedAmount);
+    tokenBalances.put(caller, callerBalance - amount);
+    let newStakingInfo: StakingInfo = {
+      userId = caller;
+      stakedAmount = newStakedAmount;
+      stakingStartTime = currentTime;
+      lastRewardTime = currentTime;
+      totalRewardsEarned = existingRewards;
+      isStaking = true;
+    };
+    stakingInfo.put(caller, newStakingInfo);
+    totalStaked += amount;
+    #ok(true)
+  };
+  public shared(msg) func unstake(amount: Nat): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    if (amount == 0) {
+      return #err("Unstake amount must be greater than 0");
+    };
+    switch (stakingInfo.get(caller)) {
+      case null { return #err("No staking found for user"); };
+      case (?info) {
+        if (not info.isStaking) {
+          return #err("User is not currently staking");
+        };
+        if (info.stakedAmount < amount) {
+          return #err("Insufficient staked amount");
+        };
+        // Calculate and distribute rewards
+        let rewards = calculateStakingRewards(caller);
+        let callerBalance = Option.get(tokenBalances.get(caller), 0);
+        let newBalance = callerBalance + amount;
+        tokenBalances.put(caller, newBalance + rewards);
+        circulatingSupply += rewards;
+        let newStakedAmount = if (info.stakedAmount >= amount) info.stakedAmount - amount else 0;
+        let currentTime = Time.now();
+        stakedBalances.put(caller, newStakedAmount);
+        totalStaked := if (totalStaked >= amount) totalStaked - amount else 0;
+        let updatedInfo: StakingInfo = {
+          userId = caller;
+          stakedAmount = newStakedAmount;
+          stakingStartTime = info.stakingStartTime;
+          lastRewardTime = currentTime;
+          totalRewardsEarned = info.totalRewardsEarned + rewards;
+          isStaking = newStakedAmount > 0;
+        };
+        stakingInfo.put(caller, updatedInfo);
+        #ok(true);
+      };
+    };
+  };
+  public shared(msg) func claimRewards(): async Result.Result<Nat, Text> {
+    let caller = msg.caller;
+    let rewards = calculateStakingRewards(caller);
+    if (rewards == 0) {
+      return #err("No rewards to claim");
+    };
+    let callerBalance = Option.get(tokenBalances.get(caller), 0);
+    tokenBalances.put(caller, callerBalance + rewards);
+    circulatingSupply += rewards;
+    // Update last reward time
+    switch (stakingInfo.get(caller)) {
+      case null { return #err("No staking found for user"); };
+      case (?info) {
+        let updatedInfo: StakingInfo = {
+          userId = caller;
+          stakedAmount = info.stakedAmount;
+          stakingStartTime = info.stakingStartTime;
+          lastRewardTime = Time.now();
+          totalRewardsEarned = info.totalRewardsEarned + rewards;
+          isStaking = info.isStaking;
+        };
+        stakingInfo.put(caller, updatedInfo);
+      };
+    };
+    #ok(rewards)
+  };
+  public query func getStakingInfo(userId: UserId): async ?StakingInfo {
+    stakingInfo.get(userId);
+  };
+  public query func getTotalStaked(): async Nat {
+    totalStaked;
+  };
+  public query func getTransferHistory(limit: Nat, offset: Nat): async [TokenTransfer] {
+    let size = tokenTransfers.size();
+    let start = if (offset < size) offset else size;
+    let end = if (start + limit < size) start + limit else size;
+    let result = Buffer.Buffer<TokenTransfer>(0);
+    var i = start;
+    while (i < end) {
+      result.add(tokenTransfers.get(i));
+      i += 1;
+    };
+    Buffer.toArray(result)
+  };
+  public query func getMintHistory(limit: Nat, offset: Nat): async [TokenMint] {
+    let size = tokenMints.size();
+    let start = if (offset < size) offset else size;
+    let end = if (start + limit < size) start + limit else size;
+    let result = Buffer.Buffer<TokenMint>(0);
+    var i = start;
+    while (i < end) {
+      result.add(tokenMints.get(i));
+      i += 1;
+    };
+    Buffer.toArray(result)
+  };
+  public query func getBurnHistory(limit: Nat, offset: Nat): async [TokenBurn] {
+    let size = tokenBurns.size();
+    let start = if (offset < size) offset else size;
+    let end = if (start + limit < size) start + limit else size;
+    let result = Buffer.Buffer<TokenBurn>(0);
+    var i = start;
+    while (i < end) {
+      result.add(tokenBurns.get(i));
+      i += 1;
+    };
+    Buffer.toArray(result)
+  };
+  public shared(msg) func setTreasuryAddress(newTreasury: UserId): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    if (caller != treasuryAddress) {
+      return #err("Only current treasury can change treasury address");
+    };
+    treasuryAddress := newTreasury;
+    #ok(true)
+  };
+  public shared(msg) func setPaused(paused: Bool): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    if (caller != treasuryAddress) {
+      return #err("Only treasury can pause/unpause transfers");
+    };
+    isPaused := paused;
+    #ok(true)
+  };
+  public shared(msg) func setTransactionLimits(maxTransaction: Nat, maxWallet: Nat): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    if (caller != treasuryAddress) {
+      return #err("Only treasury can set transaction limits");
+    };
+    maxTransactionLimit := maxTransaction;
+    maxWalletLimit := maxWallet;
+    #ok(true)
+  };
+  public shared(msg) func setStakingRewardRate(rate: Float): async Result.Result<Bool, Text> {
+    let caller = msg.caller;
+    if (caller != treasuryAddress) {
+      return #err("Only treasury can set staking reward rate");
+    };
+    if (rate < 0.0 or rate > 1.0) {
+      return #err("Reward rate must be between 0 and 1");
+    };
+    stakingRewardRate := rate;
+    #ok(true)
+  };
+
 };

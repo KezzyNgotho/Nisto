@@ -50,7 +50,9 @@ type AuthnMethodConfirmationCode = record {
   expiration : Timestamp;
 };
 type AuthnMethodConfirmationError = variant {
+  InternalCanisterError : text;
   RegistrationModeOff;
+  Unauthorized : principal;
   NoAuthnMethodToConfirm;
   WrongCode : record { retries_left : nat8 };
 };
@@ -77,9 +79,9 @@ type AuthnMethodRegistrationInfo = record {
 };
 type AuthnMethodRegistrationModeEnterError = variant {
   InvalidRegistrationId : text;
+  InternalCanisterError : text;
   AlreadyInProgress;
   Unauthorized : principal;
-  InternalError : text;
 };
 type AuthnMethodReplaceError = variant {
   AuthnMethodNotFound;
@@ -275,6 +277,7 @@ type InternetIdentityInit = record {
   canister_creation_cycles_cost : opt nat64;
   analytics_config : opt opt AnalyticsConfig;
   related_origins : opt vec text;
+  feature_flag_continue_from_another_device : opt bool;
   captcha_config : opt CaptchaConfig;
   dummy_auth : opt opt DummyAuthConfig;
   register_rate_limit : opt RateLimitConfig;

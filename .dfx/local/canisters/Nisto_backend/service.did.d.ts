@@ -59,6 +59,28 @@ export interface Budget {
   'amount' : number,
   'startDate' : bigint,
 }
+export interface ChatMember {
+  'userName' : string,
+  'typingSince' : [] | [bigint],
+  'lastSeenAt' : bigint,
+  'userId' : UserId,
+  'joinedAt' : bigint,
+  'role' : string,
+  'unreadCount' : bigint,
+  'isMuted' : boolean,
+  'isTyping' : boolean,
+}
+export interface ChatNotification {
+  'id' : string,
+  'title' : string,
+  'metadata' : [] | [string],
+  'body' : string,
+  'userId' : UserId,
+  'notificationType' : string,
+  'isRead' : boolean,
+  'vaultId' : string,
+  'timestamp' : bigint,
+}
 export interface CryptoTransaction {
   'id' : string,
   'fee' : number,
@@ -275,6 +297,21 @@ export interface LocalPayment {
   'amount' : number,
   'recipientName' : [] | [string],
 }
+export interface MessageReaction {
+  'userId' : UserId,
+  'timestamp' : bigint,
+  'reaction' : string,
+}
+export type MessageStatus = { 'Failed' : null } |
+  { 'Read' : null } |
+  { 'Sent' : null } |
+  { 'Delivered' : null };
+export type MessageType = { 'System' : null } |
+  { 'File' : null } |
+  { 'Transaction' : null } |
+  { 'Text' : null } |
+  { 'Image' : null } |
+  { 'Reaction' : null };
 export interface NotificationSettings {
   'social' : boolean,
   'push' : boolean,
@@ -401,23 +438,25 @@ export type Result = { 'ok' : VaultTransaction } |
   { 'err' : string };
 export type Result_1 = { 'ok' : RecoveryMethod } |
   { 'err' : string };
-export type Result_10 = {
+export type Result_10 = { 'ok' : CryptoWallet } |
+  { 'err' : string };
+export type Result_11 = { 'ok' : VaultMessage } |
+  { 'err' : string };
+export type Result_12 = {
     'ok' : { 'expiresIn' : bigint, 'otpId' : string, 'message' : string }
   } |
   { 'err' : string };
-export type Result_11 = { 'ok' : AIMessage } |
+export type Result_13 = { 'ok' : AIMessage } |
   { 'err' : string };
-export type Result_12 = { 'ok' : boolean } |
+export type Result_14 = { 'ok' : DeFiTransaction } |
   { 'err' : string };
-export type Result_13 = { 'ok' : DeFiTransaction } |
+export type Result_15 = { 'ok' : LocalPayment } |
   { 'err' : string };
-export type Result_14 = { 'ok' : LocalPayment } |
+export type Result_16 = { 'ok' : AIRecommendation } |
   { 'err' : string };
-export type Result_15 = { 'ok' : AIRecommendation } |
+export type Result_17 = { 'ok' : VaultMember } |
   { 'err' : string };
-export type Result_16 = { 'ok' : VaultMember } |
-  { 'err' : string };
-export type Result_17 = {
+export type Result_18 = {
     'ok' : {
       'recoveryRequestId' : string,
       'message' : string,
@@ -425,9 +464,13 @@ export type Result_17 = {
     }
   } |
   { 'err' : string };
-export type Result_18 = { 'ok' : Wallet } |
+export type Result_19 = { 'ok' : Wallet } |
   { 'err' : string };
-export type Result_19 = {
+export type Result_2 = { 'ok' : string } |
+  { 'err' : string };
+export type Result_20 = { 'ok' : Array<VaultMessage> } |
+  { 'err' : string };
+export type Result_21 = {
     'ok' : {
       'members' : Array<VaultMember>,
       'vault' : GroupVault,
@@ -435,11 +478,11 @@ export type Result_19 = {
     }
   } |
   { 'err' : string };
-export type Result_2 = { 'ok' : string } |
+export type Result_22 = { 'ok' : Array<ChatMember> } |
   { 'err' : string };
-export type Result_20 = { 'ok' : Array<Wallet> } |
+export type Result_23 = { 'ok' : Array<Wallet> } |
   { 'err' : string };
-export type Result_21 = {
+export type Result_24 = {
     'ok' : {
       'allAddresses' : Array<string>,
       'principalId' : string,
@@ -448,49 +491,53 @@ export type Result_21 = {
     }
   } |
   { 'err' : string };
-export type Result_22 = { 'ok' : Array<Transaction> } |
+export type Result_25 = { 'ok' : Array<Transaction> } |
   { 'err' : string };
-export type Result_23 = { 'ok' : Array<RecoveryMethod> } |
+export type Result_26 = { 'ok' : Array<RecoveryMethod> } |
   { 'err' : string };
-export type Result_24 = { 'ok' : Array<PaymentMethod> } |
+export type Result_27 = { 'ok' : Array<PaymentMethod> } |
   { 'err' : string };
-export type Result_25 = { 'ok' : Array<LocalPayment> } |
+export type Result_28 = { 'ok' : Array<LocalPayment> } |
   { 'err' : string };
-export type Result_26 = { 'ok' : Array<OTPRequest> } |
-  { 'err' : string };
-export type Result_27 = { 'ok' : Array<GroupVault> } |
-  { 'err' : string };
-export type Result_28 = { 'ok' : Array<Goal> } |
-  { 'err' : string };
-export type Result_29 = { 'ok' : Array<SocialGame> } |
+export type Result_29 = { 'ok' : Array<OTPRequest> } |
   { 'err' : string };
 export type Result_3 = {
     'ok' : { 'verified' : boolean, 'recipient' : string, 'purpose' : string }
   } |
   { 'err' : string };
-export type Result_30 = { 'ok' : Array<GameReward> } |
+export type Result_30 = { 'ok' : Array<GroupVault> } |
   { 'err' : string };
-export type Result_31 = { 'ok' : Array<ExternalWalletConnection> } |
+export type Result_31 = { 'ok' : Array<Goal> } |
   { 'err' : string };
-export type Result_32 = { 'ok' : Array<DeFiTransaction> } |
+export type Result_32 = { 'ok' : Array<SocialGame> } |
   { 'err' : string };
-export type Result_33 = { 'ok' : Array<DeFiPosition> } |
+export type Result_33 = { 'ok' : Array<GameReward> } |
   { 'err' : string };
-export type Result_34 = { 'ok' : Array<CryptoWallet> } |
+export type Result_34 = { 'ok' : Array<ExternalWalletConnection> } |
   { 'err' : string };
-export type Result_35 = { 'ok' : Array<CryptoTransaction> } |
+export type Result_35 = { 'ok' : Array<DeFiTransaction> } |
   { 'err' : string };
-export type Result_36 = { 'ok' : Array<Budget> } |
+export type Result_36 = { 'ok' : Array<DeFiPosition> } |
   { 'err' : string };
-export type Result_37 = { 'ok' : Array<AuditLog> } |
+export type Result_37 = { 'ok' : Array<CryptoWallet> } |
   { 'err' : string };
-export type Result_38 = { 'ok' : Array<AIRecommendation> } |
+export type Result_38 = { 'ok' : Array<CryptoTransaction> } |
   { 'err' : string };
-export type Result_39 = { 'ok' : Array<AIInsight> } |
+export type Result_39 = { 'ok' : Array<ChatNotification> } |
   { 'err' : string };
 export type Result_4 = { 'ok' : User } |
   { 'err' : string };
-export type Result_40 = {
+export type Result_40 = { 'ok' : Array<Budget> } |
+  { 'err' : string };
+export type Result_41 = { 'ok' : Array<AuditLog> } |
+  { 'err' : string };
+export type Result_42 = { 'ok' : Array<AIRecommendation> } |
+  { 'err' : string };
+export type Result_43 = { 'ok' : Array<AIInsight> } |
+  { 'err' : string };
+export type Result_44 = { 'ok' : Array<TypingIndicator> } |
+  { 'err' : string };
+export type Result_45 = {
     'ok' : {
       'topProvider' : [] | [string],
       'successRate' : number,
@@ -500,13 +547,13 @@ export type Result_40 = {
     }
   } |
   { 'err' : string };
-export type Result_41 = { 'ok' : Array<GameParticipant> } |
+export type Result_46 = { 'ok' : Array<GameParticipant> } |
   { 'err' : string };
-export type Result_42 = { 'ok' : WalletPortfolio } |
+export type Result_47 = { 'ok' : WalletPortfolio } |
   { 'err' : string };
-export type Result_43 = { 'ok' : Array<[string, string]> } |
+export type Result_48 = { 'ok' : Array<[string, string]> } |
   { 'err' : string };
-export type Result_44 = {
+export type Result_49 = {
     'ok' : {
       'totalVolume' : number,
       'averageApy' : number,
@@ -515,7 +562,9 @@ export type Result_44 = {
     }
   } |
   { 'err' : string };
-export type Result_45 = {
+export type Result_5 = { 'ok' : boolean } |
+  { 'err' : string };
+export type Result_50 = {
     'ok' : {
       'totalValue' : number,
       'totalRewards' : number,
@@ -525,7 +574,7 @@ export type Result_45 = {
     }
   } |
   { 'err' : string };
-export type Result_46 = {
+export type Result_51 = {
     'ok' : {
       'activeWallets' : bigint,
       'monthlySpent' : number,
@@ -534,9 +583,9 @@ export type Result_46 = {
     }
   } |
   { 'err' : string };
-export type Result_47 = { 'ok' : Array<AIMessage> } |
+export type Result_52 = { 'ok' : Array<AIMessage> } |
   { 'err' : string };
-export type Result_48 = {
+export type Result_53 = {
     'ok' : {
       'implementedRecommendations' : bigint,
       'totalRecommendations' : bigint,
@@ -546,41 +595,43 @@ export type Result_48 = {
     }
   } |
   { 'err' : string };
-export type Result_49 = { 'ok' : SocialGame } |
+export type Result_54 = { 'ok' : SocialGame } |
   { 'err' : string };
-export type Result_5 = { 'ok' : PaymentMethod } |
+export type Result_55 = { 'ok' : VaultChatRoom } |
   { 'err' : string };
-export type Result_50 = { 'ok' : Transaction } |
+export type Result_56 = { 'ok' : Transaction } |
   { 'err' : string };
-export type Result_51 = { 'ok' : GroupVault } |
+export type Result_57 = { 'ok' : GroupVault } |
   { 'err' : string };
-export type Result_52 = { 'ok' : CryptoTransaction } |
+export type Result_58 = { 'ok' : CryptoTransaction } |
   { 'err' : string };
-export type Result_53 = { 'ok' : Budget } |
+export type Result_59 = { 'ok' : Budget } |
   { 'err' : string };
-export type Result_54 = { 'ok' : ExternalWalletConnection } |
+export type Result_6 = { 'ok' : PaymentMethod } |
   { 'err' : string };
-export type Result_55 = {
+export type Result_60 = { 'ok' : ExternalWalletConnection } |
+  { 'err' : string };
+export type Result_61 = {
     'ok' : { 'userId' : Principal, 'instructions' : string }
   } |
   { 'err' : string };
-export type Result_56 = { 'ok' : GameReward } |
+export type Result_62 = { 'ok' : bigint } |
   { 'err' : string };
-export type Result_57 = { 'ok' : number } |
+export type Result_63 = { 'ok' : GameReward } |
   { 'err' : string };
-export type Result_58 = { 'ok' : Array<SecurityQuestion> } |
+export type Result_64 = { 'ok' : number } |
   { 'err' : string };
-export type Result_59 = { 'ok' : Plugin } |
+export type Result_65 = { 'ok' : Array<SecurityQuestion> } |
   { 'err' : string };
-export type Result_6 = { 'ok' : Goal } |
+export type Result_66 = { 'ok' : Plugin } |
   { 'err' : string };
-export type Result_60 = { 'ok' : EmergencyContact } |
+export type Result_67 = { 'ok' : EmergencyContact } |
   { 'err' : string };
-export type Result_7 = { 'ok' : GameParticipant } |
+export type Result_7 = { 'ok' : Goal } |
   { 'err' : string };
-export type Result_8 = { 'ok' : DeFiPosition } |
+export type Result_8 = { 'ok' : GameParticipant } |
   { 'err' : string };
-export type Result_9 = { 'ok' : CryptoWallet } |
+export type Result_9 = { 'ok' : DeFiPosition } |
   { 'err' : string };
 export interface SecurityQuestion {
   'id' : string,
@@ -615,6 +666,60 @@ export interface SocialGame {
   'rules' : [] | [string],
   'prizePool' : number,
 }
+export interface StakingInfo {
+  'lastRewardTime' : bigint,
+  'isStaking' : boolean,
+  'userId' : UserId,
+  'stakingStartTime' : bigint,
+  'totalRewardsEarned' : bigint,
+  'stakedAmount' : bigint,
+}
+export interface TokenBalance {
+  'balance' : bigint,
+  'owner' : UserId,
+  'lastUpdated' : bigint,
+  'lockedBalance' : bigint,
+  'stakedBalance' : bigint,
+}
+export interface TokenBurn {
+  'id' : string,
+  'blockNumber' : bigint,
+  'from' : UserId,
+  'timestamp' : bigint,
+  'amount' : bigint,
+  'reason' : string,
+}
+export interface TokenMetadata {
+  'decimals' : number,
+  'burnAddress' : UserId,
+  'circulatingSupply' : bigint,
+  'isPaused' : boolean,
+  'name' : string,
+  'createdAt' : bigint,
+  'totalSupply' : bigint,
+  'updatedAt' : bigint,
+  'maxWalletLimit' : bigint,
+  'maxTransactionLimit' : bigint,
+  'treasuryAddress' : UserId,
+  'symbol' : string,
+}
+export interface TokenMint {
+  'id' : string,
+  'to' : UserId,
+  'blockNumber' : bigint,
+  'timestamp' : bigint,
+  'amount' : bigint,
+  'reason' : string,
+}
+export interface TokenTransfer {
+  'id' : string,
+  'to' : UserId,
+  'transactionHash' : string,
+  'blockNumber' : bigint,
+  'from' : UserId,
+  'timestamp' : bigint,
+  'amount' : bigint,
+}
 export interface Transaction {
   'id' : string,
   'status' : string,
@@ -627,6 +732,12 @@ export interface Transaction {
   'category' : string,
   'amount' : number,
   'walletId' : string,
+}
+export interface TypingIndicator {
+  'userName' : string,
+  'startedAt' : bigint,
+  'userId' : UserId,
+  'isTyping' : boolean,
 }
 export interface User {
   'id' : UserId,
@@ -652,6 +763,18 @@ export interface UserPreferences {
   'privacy' : PrivacySettings,
   'currency' : string,
 }
+export interface VaultChatRoom {
+  'id' : string,
+  'lastMessageAt' : [] | [bigint],
+  'metadata' : [] | [string],
+  'name' : string,
+  'createdAt' : bigint,
+  'memberCount' : bigint,
+  'description' : [] | [string],
+  'isActive' : boolean,
+  'updatedAt' : bigint,
+  'vaultId' : string,
+}
 export interface VaultMember {
   'id' : string,
   'permissions' : Array<string>,
@@ -662,6 +785,20 @@ export interface VaultMember {
   'contributionLimit' : [] | [number],
   'vaultId' : string,
   'withdrawalLimit' : [] | [number],
+}
+export interface VaultMessage {
+  'id' : string,
+  'status' : MessageStatus,
+  'userName' : string,
+  'content' : string,
+  'metadata' : [] | [string],
+  'userId' : UserId,
+  'messageType' : MessageType,
+  'vaultId' : string,
+  'timestamp' : bigint,
+  'replyTo' : [] | [string],
+  'editedAt' : [] | [bigint],
+  'reactions' : Array<MessageReaction>,
 }
 export interface VaultTransaction {
   'id' : string,
@@ -705,31 +842,36 @@ export interface WalletPortfolio {
   'defiPositions' : Array<DeFiPosition>,
 }
 export interface _SERVICE {
-  'addEmergencyContact' : ActorMethod<[string, string, string], Result_60>,
+  'addEmergencyContact' : ActorMethod<[string, string, string], Result_67>,
   'addPaymentMethod' : ActorMethod<
     [string, [] | [string], [] | [string], string, boolean],
-    Result_5
+    Result_6
   >,
-  'addPlugin' : ActorMethod<[Plugin], Result_59>,
+  'addPlugin' : ActorMethod<[Plugin], Result_66>,
   'addRecoveryMethod' : ActorMethod<[string, string, [] | [string]], Result_1>,
-  'addSecurityQuestions' : ActorMethod<[Array<[string, string]>], Result_58>,
+  'addSecurityQuestions' : ActorMethod<[Array<[string, string]>], Result_65>,
+  'allowance' : ActorMethod<[UserId, UserId], bigint>,
+  'approve' : ActorMethod<[UserId, bigint], Result_5>,
   'awardGameReward' : ActorMethod<
     [string, UserId, string, number, [] | [string], string],
-    Result_56
+    Result_63
   >,
-  'calculateDefiRewards' : ActorMethod<[string], Result_57>,
-  'cancelPayment' : ActorMethod<[string], Result_14>,
-  'claimGameReward' : ActorMethod<[string], Result_56>,
-  'closeDefiPosition' : ActorMethod<[string], Result_8>,
-  'completeRecovery' : ActorMethod<[string, [] | [string]], Result_55>,
+  'balanceOf' : ActorMethod<[UserId], bigint>,
+  'burn' : ActorMethod<[bigint, string], Result_5>,
+  'calculateDefiRewards' : ActorMethod<[string], Result_64>,
+  'cancelPayment' : ActorMethod<[string], Result_15>,
+  'claimGameReward' : ActorMethod<[string], Result_63>,
+  'claimRewards' : ActorMethod<[], Result_62>,
+  'closeDefiPosition' : ActorMethod<[string], Result_9>,
+  'completeRecovery' : ActorMethod<[string, [] | [string]], Result_61>,
   'completeRecoverySetup' : ActorMethod<[], Result_4>,
   'connectExternalWallet' : ActorMethod<
     [string, [] | [string], [] | [string], Array<string>],
-    Result_54
+    Result_60
   >,
   'createBudget' : ActorMethod<
     [string, string, number, string, bigint, bigint],
-    Result_53
+    Result_59
   >,
   'createCryptoTransaction' : ActorMethod<
     [
@@ -741,23 +883,23 @@ export interface _SERVICE {
       [] | [string],
       number,
     ],
-    Result_52
+    Result_58
   >,
   'createCryptoWallet' : ActorMethod<
     [string, string, boolean, [] | [string], [] | [string]],
-    Result_9
+    Result_10
   >,
   'createDeFiPosition' : ActorMethod<
     [string, string, string, [] | [string], number, number],
-    Result_8
+    Result_9
   >,
   'createDefiPosition' : ActorMethod<
     [string, string, string, [] | [string], number, number],
-    Result_8
+    Result_9
   >,
   'createGoal' : ActorMethod<
     [string, string, number, string, [] | [bigint], string],
-    Result_6
+    Result_7
   >,
   'createGroupVault' : ActorMethod<
     [
@@ -769,7 +911,7 @@ export interface _SERVICE {
       boolean,
       [] | [string],
     ],
-    Result_51
+    Result_57
   >,
   'createSocialGame' : ActorMethod<
     [
@@ -785,37 +927,44 @@ export interface _SERVICE {
       [] | [string],
       boolean,
     ],
-    Result_49
+    Result_54
   >,
   'createTransaction' : ActorMethod<
     [string, string, number, string, string],
-    Result_50
+    Result_56
   >,
   'createUser' : ActorMethod<[string, string, [] | [string]], Result_4>,
-  'createWallet' : ActorMethod<[string, string, string], Result_18>,
+  'createVaultChatRoom' : ActorMethod<
+    [string, string, [] | [string]],
+    Result_55
+  >,
+  'createWallet' : ActorMethod<[string, string, string], Result_19>,
   'depositToVault' : ActorMethod<[string, number, [] | [string]], Result>,
-  'endGame' : ActorMethod<[string], Result_49>,
-  'generateAIInsights' : ActorMethod<[], Result_39>,
-  'generateAIRecommendations' : ActorMethod<[], Result_38>,
+  'endGame' : ActorMethod<[string], Result_54>,
+  'generateAIInsights' : ActorMethod<[], Result_43>,
+  'generateAIRecommendations' : ActorMethod<[], Result_42>,
   'generateDepositAddress' : ActorMethod<[string], Result_2>,
-  'getAIAnalytics' : ActorMethod<[], Result_48>,
-  'getAIConversationHistory' : ActorMethod<[], Result_47>,
-  'getAvailableGames' : ActorMethod<[], Result_29>,
-  'getDashboardStats' : ActorMethod<[], Result_46>,
-  'getDefiAnalytics' : ActorMethod<[], Result_45>,
-  'getDefiPositionsByProductType' : ActorMethod<[string], Result_33>,
-  'getDefiPositionsByProtocol' : ActorMethod<[string], Result_33>,
-  'getDefiProtocolStats' : ActorMethod<[string], Result_44>,
-  'getDefiTransactionsByProtocol' : ActorMethod<[string], Result_32>,
+  'getAIAnalytics' : ActorMethod<[], Result_53>,
+  'getAIConversationHistory' : ActorMethod<[], Result_52>,
+  'getAvailableGames' : ActorMethod<[], Result_32>,
+  'getBurnHistory' : ActorMethod<[bigint, bigint], Array<TokenBurn>>,
+  'getDashboardStats' : ActorMethod<[], Result_51>,
+  'getDefiAnalytics' : ActorMethod<[], Result_50>,
+  'getDefiPositionsByProductType' : ActorMethod<[string], Result_36>,
+  'getDefiPositionsByProtocol' : ActorMethod<[string], Result_36>,
+  'getDefiProtocolStats' : ActorMethod<[string], Result_49>,
+  'getDefiTransactionsByProtocol' : ActorMethod<[string], Result_35>,
   'getDepositAddress' : ActorMethod<[string], Result_2>,
-  'getDepositAddresses' : ActorMethod<[], Result_43>,
-  'getFullWalletPortfolio' : ActorMethod<[], Result_42>,
-  'getGameLeaderboard' : ActorMethod<[string], Result_41>,
-  'getGamesByType' : ActorMethod<[string], Result_29>,
-  'getPaymentStats' : ActorMethod<[], Result_40>,
-  'getPaymentsByProvider' : ActorMethod<[string], Result_25>,
+  'getDepositAddresses' : ActorMethod<[], Result_48>,
+  'getFullWalletPortfolio' : ActorMethod<[], Result_47>,
+  'getGameLeaderboard' : ActorMethod<[string], Result_46>,
+  'getGamesByType' : ActorMethod<[string], Result_32>,
+  'getMintHistory' : ActorMethod<[bigint, bigint], Array<TokenMint>>,
+  'getPaymentStats' : ActorMethod<[], Result_45>,
+  'getPaymentsByProvider' : ActorMethod<[string], Result_28>,
   'getPrincipalId' : ActorMethod<[], string>,
   'getRecoveryRequestStatus' : ActorMethod<[string], [] | [RecoveryRequest]>,
+  'getStakingInfo' : ActorMethod<[UserId], [] | [StakingInfo]>,
   'getSystemStats' : ActorMethod<
     [],
     {
@@ -831,32 +980,40 @@ export interface _SERVICE {
       'totalDeFiPositions' : bigint,
     }
   >,
+  'getTokenMetadata' : ActorMethod<[], TokenMetadata>,
+  'getTotalBalance' : ActorMethod<[UserId], TokenBalance>,
+  'getTotalStaked' : ActorMethod<[], bigint>,
+  'getTransferHistory' : ActorMethod<[bigint, bigint], Array<TokenTransfer>>,
+  'getTypingIndicators' : ActorMethod<[string], Result_44>,
   'getUser' : ActorMethod<[], Result_4>,
-  'getUserAIInsights' : ActorMethod<[], Result_39>,
-  'getUserAIRecommendations' : ActorMethod<[], Result_38>,
-  'getUserAuditLogs' : ActorMethod<[], Result_37>,
-  'getUserBudgets' : ActorMethod<[], Result_36>,
+  'getUserAIInsights' : ActorMethod<[], Result_43>,
+  'getUserAIRecommendations' : ActorMethod<[], Result_42>,
+  'getUserAuditLogs' : ActorMethod<[], Result_41>,
+  'getUserBudgets' : ActorMethod<[], Result_40>,
   'getUserByEmail' : ActorMethod<[string], [] | [UserId]>,
   'getUserByPhone' : ActorMethod<[string], [] | [UserId]>,
-  'getUserCryptoTransactions' : ActorMethod<[], Result_35>,
-  'getUserCryptoWallets' : ActorMethod<[], Result_34>,
-  'getUserDeFiPositions' : ActorMethod<[], Result_33>,
-  'getUserDefiPositions' : ActorMethod<[], Result_33>,
-  'getUserDefiTransactions' : ActorMethod<[], Result_32>,
-  'getUserExternalConnections' : ActorMethod<[], Result_31>,
-  'getUserGameRewards' : ActorMethod<[], Result_30>,
-  'getUserGames' : ActorMethod<[], Result_29>,
-  'getUserGoals' : ActorMethod<[], Result_28>,
-  'getUserGroupVaults' : ActorMethod<[], Result_27>,
-  'getUserOTPRequests' : ActorMethod<[], Result_26>,
-  'getUserPaymentHistory' : ActorMethod<[], Result_25>,
-  'getUserPaymentMethods' : ActorMethod<[], Result_24>,
-  'getUserRecoveryMethods' : ActorMethod<[], Result_23>,
-  'getUserTransactions' : ActorMethod<[], Result_22>,
-  'getUserWalletAddresses' : ActorMethod<[], Result_21>,
-  'getUserWallets' : ActorMethod<[], Result_20>,
-  'getVaultDetails' : ActorMethod<[string], Result_19>,
-  'getWallet' : ActorMethod<[string], Result_18>,
+  'getUserChatNotifications' : ActorMethod<[bigint, bigint], Result_39>,
+  'getUserCryptoTransactions' : ActorMethod<[], Result_38>,
+  'getUserCryptoWallets' : ActorMethod<[], Result_37>,
+  'getUserDeFiPositions' : ActorMethod<[], Result_36>,
+  'getUserDefiPositions' : ActorMethod<[], Result_36>,
+  'getUserDefiTransactions' : ActorMethod<[], Result_35>,
+  'getUserExternalConnections' : ActorMethod<[], Result_34>,
+  'getUserGameRewards' : ActorMethod<[], Result_33>,
+  'getUserGames' : ActorMethod<[], Result_32>,
+  'getUserGoals' : ActorMethod<[], Result_31>,
+  'getUserGroupVaults' : ActorMethod<[], Result_30>,
+  'getUserOTPRequests' : ActorMethod<[], Result_29>,
+  'getUserPaymentHistory' : ActorMethod<[], Result_28>,
+  'getUserPaymentMethods' : ActorMethod<[], Result_27>,
+  'getUserRecoveryMethods' : ActorMethod<[], Result_26>,
+  'getUserTransactions' : ActorMethod<[], Result_25>,
+  'getUserWalletAddresses' : ActorMethod<[], Result_24>,
+  'getUserWallets' : ActorMethod<[], Result_23>,
+  'getVaultChatMembers' : ActorMethod<[string], Result_22>,
+  'getVaultDetails' : ActorMethod<[string], Result_21>,
+  'getVaultMessages' : ActorMethod<[string, bigint, bigint], Result_20>,
+  'getWallet' : ActorMethod<[string], Result_19>,
   'getWalletByAddress' : ActorMethod<[string], [] | [string]>,
   'greet' : ActorMethod<[string], string>,
   'initiateLocalPayment' : ActorMethod<
@@ -869,16 +1026,20 @@ export interface _SERVICE {
       [] | [string],
       [] | [string],
     ],
-    Result_14
+    Result_15
   >,
-  'initiateRecovery' : ActorMethod<[string, string], Result_17>,
-  'inviteToVault' : ActorMethod<[string, UserId, string], Result_16>,
-  'joinGame' : ActorMethod<[string], Result_7>,
-  'joinVault' : ActorMethod<[string], Result_16>,
+  'initiateRecovery' : ActorMethod<[string, string], Result_18>,
+  'inviteToVault' : ActorMethod<[string, UserId, string], Result_17>,
+  'joinGame' : ActorMethod<[string], Result_8>,
+  'joinVault' : ActorMethod<[string], Result_17>,
+  'joinVaultChat' : ActorMethod<[string, string], Result_5>,
+  'leaveVaultChat' : ActorMethod<[string], Result_5>,
   'linkRecoveredAccount' : ActorMethod<[string, Principal], Result_4>,
   'loginOrCreateUser' : ActorMethod<[], Result_4>,
-  'markRecommendationImplemented' : ActorMethod<[string], Result_15>,
-  'processPayment' : ActorMethod<[string], Result_14>,
+  'markMessagesAsRead' : ActorMethod<[string, Array<string>], Result_5>,
+  'markRecommendationImplemented' : ActorMethod<[string], Result_16>,
+  'mint' : ActorMethod<[UserId, bigint, string], Result_5>,
+  'processPayment' : ActorMethod<[string], Result_15>,
   'recordDefiTransaction' : ActorMethod<
     [
       string,
@@ -890,24 +1051,37 @@ export interface _SERVICE {
       number,
       [] | [string],
     ],
-    Result_13
+    Result_14
   >,
   'regenerateWalletAddress' : ActorMethod<[string], Result_2>,
-  'removePaymentMethod' : ActorMethod<[string], Result_12>,
-  'sendAIMessage' : ActorMethod<[string], Result_11>,
-  'sendOTP' : ActorMethod<[string, string, string, string], Result_10>,
+  'removePaymentMethod' : ActorMethod<[string], Result_5>,
+  'sendAIMessage' : ActorMethod<[string], Result_13>,
+  'sendOTP' : ActorMethod<[string, string, string, string], Result_12>,
+  'sendVaultMessage' : ActorMethod<
+    [string, string, MessageType, [] | [string]],
+    Result_11
+  >,
   'sendVerificationCode' : ActorMethod<[string, string], Result_2>,
-  'updateCryptoWalletBalance' : ActorMethod<[string, number], Result_9>,
+  'setPaused' : ActorMethod<[boolean], Result_5>,
+  'setStakingRewardRate' : ActorMethod<[number], Result_5>,
+  'setTransactionLimits' : ActorMethod<[bigint, bigint], Result_5>,
+  'setTreasuryAddress' : ActorMethod<[UserId], Result_5>,
+  'stake' : ActorMethod<[bigint], Result_5>,
+  'transfer' : ActorMethod<[UserId, bigint], Result_5>,
+  'transferFrom' : ActorMethod<[UserId, UserId, bigint], Result_5>,
+  'unstake' : ActorMethod<[bigint], Result_5>,
+  'updateCryptoWalletBalance' : ActorMethod<[string, number], Result_10>,
   'updateDefiPosition' : ActorMethod<
     [string, number, number, number],
-    Result_8
+    Result_9
   >,
-  'updateGameScore' : ActorMethod<[string, number], Result_7>,
-  'updateGoalProgress' : ActorMethod<[string, number], Result_6>,
+  'updateGameScore' : ActorMethod<[string, number], Result_8>,
+  'updateGoalProgress' : ActorMethod<[string, number], Result_7>,
   'updatePaymentMethod' : ActorMethod<
     [string, [] | [string], [] | [string], string, boolean],
-    Result_5
+    Result_6
   >,
+  'updateTypingStatus' : ActorMethod<[string, boolean], Result_5>,
   'updateUser' : ActorMethod<[[] | [string], [] | [string]], Result_4>,
   'userExists' : ActorMethod<[], boolean>,
   'validateAddress' : ActorMethod<[string, string], boolean>,

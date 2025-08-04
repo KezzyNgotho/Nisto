@@ -46,6 +46,7 @@ export const idlFactory = ({ IDL }) => {
     'canister_creation_cycles_cost' : IDL.Opt(IDL.Nat64),
     'analytics_config' : IDL.Opt(IDL.Opt(AnalyticsConfig)),
     'related_origins' : IDL.Opt(IDL.Vec(IDL.Text)),
+    'feature_flag_continue_from_another_device' : IDL.Opt(IDL.Bool),
     'captcha_config' : IDL.Opt(CaptchaConfig),
     'dummy_auth' : IDL.Opt(IDL.Opt(DummyAuthConfig)),
     'register_rate_limit' : IDL.Opt(RateLimitConfig),
@@ -142,7 +143,9 @@ export const idlFactory = ({ IDL }) => {
   });
   const AuthnMethodAddError = IDL.Variant({ 'InvalidMetadata' : IDL.Text });
   const AuthnMethodConfirmationError = IDL.Variant({
+    'InternalCanisterError' : IDL.Text,
     'RegistrationModeOff' : IDL.Null,
+    'Unauthorized' : IDL.Principal,
     'NoAuthnMethodToConfirm' : IDL.Null,
     'WrongCode' : IDL.Record({ 'retries_left' : IDL.Nat8 }),
   });
@@ -162,9 +165,9 @@ export const idlFactory = ({ IDL }) => {
   const RegistrationId = IDL.Text;
   const AuthnMethodRegistrationModeEnterError = IDL.Variant({
     'InvalidRegistrationId' : IDL.Text,
+    'InternalCanisterError' : IDL.Text,
     'AlreadyInProgress' : IDL.Null,
     'Unauthorized' : IDL.Principal,
-    'InternalError' : IDL.Text,
   });
   const AuthnMethodReplaceError = IDL.Variant({
     'AuthnMethodNotFound' : IDL.Null,
@@ -798,6 +801,7 @@ export const init = ({ IDL }) => {
     'canister_creation_cycles_cost' : IDL.Opt(IDL.Nat64),
     'analytics_config' : IDL.Opt(IDL.Opt(AnalyticsConfig)),
     'related_origins' : IDL.Opt(IDL.Vec(IDL.Text)),
+    'feature_flag_continue_from_another_device' : IDL.Opt(IDL.Bool),
     'captcha_config' : IDL.Opt(CaptchaConfig),
     'dummy_auth' : IDL.Opt(IDL.Opt(DummyAuthConfig)),
     'register_rate_limit' : IDL.Opt(RateLimitConfig),

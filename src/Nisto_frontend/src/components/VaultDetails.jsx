@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
+import BackendService from '../services/BackendService';
 import { 
   FiUsers, FiDollarSign, FiTarget, FiTrendingUp, FiCheck, FiX, FiLock, FiUnlock, 
   FiEdit2, FiTrash2, FiUserPlus, FiShield, FiArrowDownCircle, FiArrowUpCircle, 
@@ -9,6 +10,9 @@ import {
 import { AiFillCrown } from 'react-icons/ai';
 
 export default function VaultDetails({ vault, details, onBack, user, showToast }) {
+  // Create BackendService instance
+  const backendService = React.useRef(new BackendService()).current;
+  
   // Add CSS for animations
   useEffect(() => {
     const style = document.createElement('style');
@@ -94,60 +98,55 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
   const [typingUsers, setTypingUsers] = useState([]);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Initialize BackendService
+  useEffect(() => {
+    const initBackend = async () => {
+      try {
+        await backendService.init();
+      } catch (error) {
+        console.error('Failed to initialize backend service:', error);
+      }
+    };
+    initBackend();
+  }, [backendService]);
   const [lastReadMessageId, setLastReadMessageId] = useState(null);
   const chatContainerRef = useRef(null);
 
   const isOwner = vault?.ownerId === user?.principal;
   const isAdmin = details?.members?.some(m => m.userId === user?.principal && m.role === 'admin');
 
-  // Initialize mock chat messages
+  // Load real chat messages from backend
   useEffect(() => {
-    if (showChat) {
-      const mockMessages = [
-        {
-          id: 1,
-          userId: 'user1',
-          userName: 'Alice',
-          message: 'Great progress on the savings goal! 🎉',
-          timestamp: Date.now() - 3600000,
-          type: 'message'
-        },
-        {
-          id: 2,
-          userId: 'user2',
-          userName: 'Bob',
-          message: 'Should we increase the target amount?',
-          timestamp: Date.now() - 1800000,
-          type: 'message'
-        },
-        {
-          id: 3,
-          userId: user?.principal,
-          userName: 'You',
-          message: 'I think we\'re doing well with the current target',
-          timestamp: Date.now() - 900000,
-          type: 'message'
-        },
-        {
-          id: 4,
-          userId: 'system',
-          userName: 'System',
-          message: 'Alice joined the vault',
-          timestamp: Date.now() - 7200000,
-          type: 'system'
-        },
-        {
-          id: 5,
-          userId: 'user1',
-          userName: 'Alice',
-          message: 'Just made a deposit of 500 KES 💰',
-          timestamp: Date.now() - 300000,
-          type: 'message'
+    if (showChat && vault?.id && user?.username) {
+      const loadMessages = async () => {
+        try {
+          console.log('Loading messages for vault:', vault.id);
+          console.log('Current user:', user);
+          console.log('User principal:', user?.id);
+          
+          // Load messages directly (vault members are automatically added to chat)
+          const result = await backendService.getVaultMessages(vault.id, 50, 0);
+          if (result.ok) {
+            setChatMessages(result.ok);
+          } else {
+            console.error('Failed to load messages:', result.err);
+            showToast('Failed to load chat messages', 'error');
+          }
+        } catch (error) {
+          console.error('Error loading messages:', error);
+          showToast('Error loading chat messages', 'error');
         }
-      ];
-      setChatMessages(mockMessages);
+      };
+      
+      loadMessages();
+      
+      // Refresh messages every 5 seconds for real-time updates
+      const interval = setInterval(loadMessages, 5000);
+      
+      return () => clearInterval(interval);
     }
-  }, [showChat, user]);
+  }, [showChat, vault?.id, user?.username, showToast]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -180,18 +179,30 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
     }
   }, [isTyping, user]);
 
-  // Simulate other users typing
+  // Load real typing indicators from backend
   useEffect(() => {
-    if (showChat && Math.random() > 0.7) {
-      const mockUsers = ['user1', 'user2'];
-      const randomUser = mockUsers[Math.floor(Math.random() * mockUsers.length)];
-      setTypingUsers(prev => [...prev, randomUser]);
+    if (showChat && vault?.id) {
+      const loadTypingIndicators = async () => {
+        try {
+          const result = await backendService.getTypingIndicators(vault.id);
+          if (result.ok) {
+            const typingUserIds = result.ok
+              .filter(indicator => indicator.isTyping && indicator.userId !== user?.principal)
+              .map(indicator => indicator.userId);
+            setTypingUsers(typingUserIds);
+          }
+        } catch (error) {
+          console.error('Error loading typing indicators:', error);
+        }
+      };
       
-      setTimeout(() => {
-        setTypingUsers(prev => prev.filter(u => u !== randomUser));
-      }, 2000 + Math.random() * 3000);
+      // Load typing indicators every 2 seconds
+      const interval = setInterval(loadTypingIndicators, 2000);
+      loadTypingIndicators(); // Load immediately
+      
+      return () => clearInterval(interval);
     }
-  }, [showChat, chatMessages.length]);
+  }, [showChat, vault?.id, user?.principal]);
 
   // Handle scroll events
   useEffect(() => {
@@ -208,6 +219,14 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
         setUnreadCount(0);
         if (chatMessages.length > 0) {
           setLastReadMessageId(chatMessages[chatMessages.length - 1].id);
+          
+          // Mark messages as read on backend
+          if (vault?.id) {
+            const messageIds = chatMessages.map(msg => msg.id);
+            backendService.markMessagesAsRead(vault.id, messageIds).catch(error => {
+              console.error('Error marking messages as read:', error);
+            });
+          }
         }
       }
     };
@@ -271,37 +290,75 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
     }
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (newMessage.trim()) {
-      const message = {
-        id: Date.now(),
-        userId: user?.principal,
-        userName: 'You',
-        message: newMessage.trim(),
-        timestamp: Date.now(),
-        type: 'message'
-      };
-      setChatMessages(prev => [...prev, message]);
+    if (newMessage.trim() && vault?.id) {
+      try {
+        const result = await backendService.sendVaultMessage(
+          vault.id, 
+          newMessage.trim(), 
+          'Text', 
+          null
+        );
+        
+        if (result.ok) {
+          // Add the new message to the chat
+          setChatMessages(prev => [...prev, result.ok]);
       setNewMessage('');
       setIsTyping(false);
       setTypingUsers(prev => prev.filter(u => u !== user?.principal));
+        } else {
+          console.error('Failed to send message:', result.err);
+          showToast('Failed to send message', 'error');
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+        showToast('Error sending message', 'error');
+      }
     }
   };
 
-  const handleTyping = (e) => {
+  const handleTyping = async (e) => {
     setNewMessage(e.target.value);
     if (!isTyping && e.target.value.length > 0) {
       setIsTyping(true);
       setTypingUsers(prev => [...prev, user?.principal]);
+      
+      // Update typing status on backend
+      if (vault?.id) {
+        try {
+          await backendService.updateTypingStatus(vault.id, true);
+        } catch (error) {
+          console.error('Error updating typing status:', error);
+        }
+      }
     } else if (isTyping && e.target.value.length === 0) {
       setIsTyping(false);
       setTypingUsers(prev => prev.filter(u => u !== user?.principal));
+      
+      // Update typing status on backend
+      if (vault?.id) {
+        try {
+          await backendService.updateTypingStatus(vault.id, false);
+        } catch (error) {
+          console.error('Error updating typing status:', error);
+        }
+      }
     }
   };
 
   const formatTime = (timestamp) => {
-    const date = new Date(timestamp);
+    // Convert BigInt nanoseconds to milliseconds
+    let timestampMs;
+    if (typeof timestamp === 'bigint') {
+      timestampMs = Number(timestamp) / 1000000; // Convert nanoseconds to milliseconds
+    } else if (typeof timestamp === 'string' && timestamp.endsWith('n')) {
+      timestampMs = parseInt(timestamp.slice(0, -1)) / 1000000; // Remove 'n' and convert
+    } else {
+      timestampMs = timestamp;
+    }
+    
+    const date = new Date(timestampMs);
     const now = new Date();
     const diff = now - date;
     
@@ -309,6 +366,27 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m ago`;
     if (diff < 86400000) return `${Math.floor(diff / 3600000)}h ago`;
     return date.toLocaleDateString();
+  };
+
+  const formatDate = (timestamp) => {
+    // Convert BigInt nanoseconds to milliseconds
+    let timestampMs;
+    if (typeof timestamp === 'bigint') {
+      timestampMs = Number(timestamp) / 1000000; // Convert nanoseconds to milliseconds
+    } else if (typeof timestamp === 'string' && timestamp.endsWith('n')) {
+      timestampMs = parseInt(timestamp.slice(0, -1)) / 1000000; // Remove 'n' and convert
+    } else {
+      timestampMs = timestamp;
+    }
+    
+    const date = new Date(timestampMs);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   const getUserAvatar = (userId) => {
@@ -494,7 +572,7 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>Members:</span>
                     <span style={{ fontWeight: 600 }}>
-                      {details?.members?.length || 0}
+                      {details?.ok?.members?.length || details?.members?.length || 0}
                     </span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -603,7 +681,7 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
               </div>
               
               <div style={{ display: 'grid', gap: '1rem' }}>
-                {details?.members?.map(member => (
+                {(details?.ok?.members || details?.members || []).map(member => (
                   <div key={member.id} style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
@@ -625,14 +703,14 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                         color: 'var(--primary-600)',
                         fontWeight: 600
                       }}>
-                        {member.userId === vault.ownerId ? <AiFillCrown size={20} /> : <FiUsers size={20} />}
+                        {member.role === 'owner' ? <AiFillCrown size={20} /> : <FiUsers size={20} />}
                       </div>
                       <div>
                         <div style={{ fontWeight: 600, color: 'var(--primary-700)' }}>
-                          {member.userId === user?.principal ? 'You' : `User ${member.userId.toString().slice(0, 8)}...`}
+                          {member.userId === user?.id ? 'You' : `User ${member.userId.toString().slice(0, 8)}...`}
                         </div>
                         <div style={{ fontSize: '0.9rem', color: 'var(--neutral-600)' }}>
-                          Joined {new Date(Number(member.joinedAt)).toLocaleDateString()}
+                          Joined {formatDate(member.joinedAt)}
                         </div>
                       </div>
                     </div>
@@ -701,7 +779,7 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
               <div>
                 <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Vault Chat</h4>
                 <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', opacity: 0.9 }}>
-                  {details?.members?.length || 0} members • {chatMessages.length} messages
+                  {details?.ok?.members?.length || details?.members?.length || 0} members • {chatMessages.length} messages
                 </p>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -749,7 +827,7 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                 <span style={{ fontSize: '0.8rem', color: 'var(--neutral-600)', fontWeight: 600 }}>Online:</span>
-                {details?.members?.slice(0, 3).map((member, index) => (
+                {(details?.ok?.members || details?.members || []).slice(0, 3).map((member, index) => (
                   <div key={member.id} style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
@@ -771,9 +849,9 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                     </span>
                   </div>
                 ))}
-                {details?.members?.length > 3 && (
+                {(details?.ok?.members || details?.members || []).length > 3 && (
                   <span style={{ fontSize: '0.75rem', color: 'var(--neutral-500)' }}>
-                    +{details.members.length - 3} more
+                    +{(details?.ok?.members || details?.members || []).length - 3} more
                   </span>
                 )}
               </div>
@@ -873,14 +951,14 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                      display: 'flex',
                      flexDirection: message.userId === user?.principal ? 'row-reverse' : 'row',
                      gap: '0.75rem',
-                     opacity: message.type === 'system' ? 0.7 : 1
+                     opacity: (message.messageType === 'System' || message.type === 'system') ? 0.7 : 1
                    }}>
                     {/* Avatar */}
                     <div style={{ 
                       width: 36, 
                       height: 36, 
                       borderRadius: '50%', 
-                      background: message.type === 'system' ? 'var(--neutral-300)' : getUserAvatar(message.userId),
+                      background: (message.messageType === 'System' || message.type === 'system') ? 'var(--neutral-300)' : getUserAvatar(message.userId),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -889,7 +967,7 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                       fontWeight: 600,
                       flexShrink: 0
                     }}>
-                      {message.type === 'system' ? '⚙️' : message.userName?.charAt(0)?.toUpperCase() || 'U'}
+                      {(message.messageType === 'System' || message.type === 'system') ? '⚙️' : message.userName?.charAt(0)?.toUpperCase() || 'U'}
                     </div>
                     
                     {/* Message Content */}
@@ -899,7 +977,7 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                       flexDirection: 'column',
                       gap: '0.25rem'
                     }}>
-                      {message.type !== 'system' && (
+                      {(message.messageType !== 'System' && message.type !== 'system') && (
                         <div style={{ 
                           display: 'flex', 
                           alignItems: 'center', 
@@ -919,19 +997,19 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                         </div>
                       )}
                                              <div style={{ 
-                         background: message.type === 'system' ? 'var(--neutral-200)' :
+                         background: (message.messageType === 'System' || message.type === 'system') ? 'var(--neutral-200)' :
                                    message.userId === user?.principal ? 'var(--primary-500)' : 'white',
-                         color: message.type === 'system' ? 'var(--neutral-700)' :
+                         color: (message.messageType === 'System' || message.type === 'system') ? 'var(--neutral-700)' :
                                 message.userId === user?.principal ? 'white' : 'var(--neutral-800)',
-                         padding: message.type === 'system' ? '0.5rem 0.75rem' : '0.75rem 1rem',
-                         borderRadius: message.type === 'system' ? 8 : 12,
+                         padding: (message.messageType === 'System' || message.type === 'system') ? '0.5rem 0.75rem' : '0.75rem 1rem',
+                         borderRadius: (message.messageType === 'System' || message.type === 'system') ? 8 : 12,
                          fontSize: '0.9rem',
-                         border: message.type !== 'system' && message.userId !== user?.principal ? '1px solid var(--neutral-200)' : 'none',
-                         boxShadow: message.type !== 'system' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                         border: (message.messageType !== 'System' && message.type !== 'system') && message.userId !== user?.principal ? '1px solid var(--neutral-200)' : 'none',
+                         boxShadow: (message.messageType !== 'System' && message.type !== 'system') ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
                          position: 'relative'
                        }}>
                          <div style={{ lineHeight: '1.4' }}>
-                           {formatMessage(message.message || '')}
+                           {formatMessage(message.content || message.message || '')}
                          </div>
                          
                          {/* Message Reactions */}
@@ -1760,7 +1838,7 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                   <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--primary-700)' }}>Current Members</span>
                 </div>
                 <div style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--primary-700)' }}>
-                  {details?.members?.length || 0} member{details?.members?.length !== 1 ? 's' : ''}
+                  {details?.ok?.members?.length || details?.members?.length || 0} member{(details?.ok?.members?.length || details?.members?.length || 0) !== 1 ? 's' : ''}
                 </div>
               </div>
             </div>

@@ -15,12 +15,12 @@ const getCanisterId = () => {
   // Check if we're in a deployed environment
   if (!isLocal) {
     // In production, the canister ID should be available from the dfx deployment
-    return import.meta.env.VITE_CANISTER_ID_NISTO_BACKEND || 'uxrrr-q7777-77774-qaaaq-cai';
+    return import.meta.env.VITE_CANISTER_ID_NISTO_BACKEND || 'uzt4z-lp777-77774-qaabq-cai';
   }
   
   // In local development, use the environment variable from .env file
   // This is automatically set by dfx when running locally
-  return import.meta.env.VITE_CANISTER_ID_NISTO_BACKEND || import.meta.env.CANISTER_ID_NISTO_BACKEND || 'uxrrr-q7777-77774-qaaaq-cai';
+  return import.meta.env.VITE_CANISTER_ID_NISTO_BACKEND || import.meta.env.CANISTER_ID_NISTO_BACKEND || 'uzt4z-lp777-77774-qaabq-cai';
 };
 
 // Get Internet Identity canister ID
@@ -30,11 +30,15 @@ const getInternetIdentityCanisterId = () => {
     return 'rdmx6-jaaaa-aaaaa-aaadq-cai';
   }
   // In local development, use the local Internet Identity canister
-  return import.meta.env.VITE_INTERNET_IDENTITY_CANISTER_ID || import.meta.env.CANISTER_ID_INTERNET_IDENTITY || 'uzt4z-lp777-77774-qaabq-cai';
+  return 'ucwa4-rx777-77774-qaada-cai';
 };
 
 const CANISTER_ID = getCanisterId();
 const INTERNET_IDENTITY_CANISTER_ID = getInternetIdentityCanisterId();
+
+// Debug logging
+console.log('Backend canister ID:', CANISTER_ID);
+console.log('Internet Identity canister ID:', INTERNET_IDENTITY_CANISTER_ID);
 
 class BackendService {
   constructor() {
@@ -47,16 +51,20 @@ class BackendService {
 
   async init() {
     try {
+      console.log('Initializing BackendService...');
+      
       // Initialize auth client
       this.authClient = await AuthClient.create();
       
       // Check if already authenticated
       const isAuthenticated = await this.authClient.isAuthenticated();
+      console.log('User authentication status:', isAuthenticated);
       
       if (isAuthenticated) {
         this.identity = this.authClient.getIdentity();
         this.principal = this.identity.getPrincipal();
         this.isAuthenticated = true;
+        console.log('User already authenticated with principal:', this.principal.toString());
       }
       
       // Always create actor for both authenticated and unauthenticated operations
@@ -71,6 +79,9 @@ class BackendService {
 
   async createActor() {
     try {
+      console.log('Creating actor with canister ID:', CANISTER_ID);
+      console.log('Using identity:', this.identity ? 'authenticated' : 'anonymous');
+      
       const agent = new HttpAgent({ 
         identity: this.identity, // Can be null for unauthenticated operations
         host: isLocal ? 'http://localhost:4943' : 'https://ic0.app'
@@ -79,15 +90,15 @@ class BackendService {
       // Fetch root key for certificate validation in development
       if (isLocal) {
         await agent.fetchRootKey();
+        console.log('Root key fetched for local development');
       }
 
-      console.log('Creating actor with canister ID:', CANISTER_ID);
-      
       this.actor = Actor.createActor(idlFactory, {
         agent,
         canisterId: CANISTER_ID,
       });
 
+      console.log('Actor created successfully');
       return this.actor;
     } catch (error) {
       console.error('Failed to create actor:', error);
@@ -104,29 +115,43 @@ class BackendService {
 
   async login() {
     try {
+      console.log('BackendService.login() called');
+      // Initialize auth client if not already done
       if (!this.authClient) {
-        await this.init();
+        console.log('Creating AuthClient...');
+        this.authClient = await AuthClient.create();
+        console.log('AuthClient created successfully');
       }
 
       return new Promise((resolve, reject) => {
-        // Use the correct Internet Identity provider based on environment
+        // Configure Internet Identity provider URL
         const identityProvider = isLocal 
           ? `http://${INTERNET_IDENTITY_CANISTER_ID}.localhost:4943`
           : 'https://identity.ic0.app';
         
-        console.log('Using Internet Identity provider:', identityProvider);
+        console.log('Initiating Internet Identity login with provider:', identityProvider);
+        console.log('INTERNET_IDENTITY_CANISTER_ID value:', INTERNET_IDENTITY_CANISTER_ID);
+        console.log('isLocal value:', isLocal);
         
+        // Start the Internet Identity login flow
         this.authClient.login({
           identityProvider,
+          maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000), // 7 days in nanoseconds
           onSuccess: async () => {
             try {
+              console.log('Internet Identity login successful');
+              
+              // Get the authenticated identity
               this.identity = this.authClient.getIdentity();
               this.principal = this.identity.getPrincipal();
               this.isAuthenticated = true;
               
+              console.log('User principal:', this.principal.toString());
+              
+              // Create actor with authenticated identity
               await this.createActor();
               
-              // Auto-create user if they don't exist
+              // Auto-create user account if they don't exist
               const user = await this.loginOrCreateUser();
               const sanitizedResponse = sanitizeForAuth({ success: true, user });
               resolve(sanitizedResponse);
@@ -136,13 +161,13 @@ class BackendService {
             }
           },
           onError: (error) => {
-            console.error('Login failed:', error);
+            console.error('Internet Identity login failed:', error);
             reject(error);
           },
         });
       });
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Login initialization failed:', error);
       throw error;
     }
   }
@@ -864,6 +889,320 @@ class BackendService {
       return { ok: [] };
     } catch (error) {
       console.error('Failed to get vault proposals:', error);
+      throw error;
+    }
+  }
+
+  // ========== VAULT CHAT FUNCTIONS ==========
+
+  async createVaultChatRoom(vaultId, name, description = null) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.createVaultChatRoom(vaultId, name, description ? [description] : []);
+      return result;
+    } catch (error) {
+      console.error('Failed to create vault chat room:', error);
+      throw error;
+    }
+  }
+
+  async joinVaultChat(vaultId, userName) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.joinVaultChat(vaultId, userName);
+      return result;
+    } catch (error) {
+      console.error('Failed to join vault chat:', error);
+      throw error;
+    }
+  }
+
+  async sendVaultMessage(vaultId, content, messageType = 'Text', replyTo = null) {
+    try {
+      await this.ensureActor();
+      
+      // Convert string messageType to enum format
+      let messageTypeEnum;
+      switch (messageType) {
+        case 'Text':
+          messageTypeEnum = { Text: null };
+          break;
+        case 'System':
+          messageTypeEnum = { System: null };
+          break;
+        case 'Transaction':
+          messageTypeEnum = { Transaction: null };
+          break;
+        case 'Image':
+          messageTypeEnum = { Image: null };
+          break;
+        case 'File':
+          messageTypeEnum = { File: null };
+          break;
+        case 'Reaction':
+          messageTypeEnum = { Reaction: null };
+          break;
+        default:
+          messageTypeEnum = { Text: null };
+      }
+      
+      const result = await this.actor.sendVaultMessage(vaultId, content, messageTypeEnum, replyTo ? [replyTo] : []);
+      return result;
+    } catch (error) {
+      console.error('Failed to send vault message:', error);
+      throw error;
+    }
+  }
+
+  async getVaultMessages(vaultId, limit = 50, offset = 0) {
+    try {
+      await this.ensureActor();
+      console.log('Getting vault messages for vaultId:', vaultId);
+      console.log('Current principal:', this.principal?.toString());
+      console.log('Is authenticated:', this.isAuthenticated);
+      
+      const result = await this.actor.getVaultMessages(vaultId, limit, offset);
+      return result;
+    } catch (error) {
+      console.error('Failed to get vault messages:', error);
+      throw error;
+    }
+  }
+
+  async updateTypingStatus(vaultId, isTyping) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.updateTypingStatus(vaultId, isTyping);
+      return result;
+    } catch (error) {
+      console.error('Failed to update typing status:', error);
+      throw error;
+    }
+  }
+
+  async getTypingIndicators(vaultId) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.getTypingIndicators(vaultId);
+      return result;
+    } catch (error) {
+      console.error('Failed to get typing indicators:', error);
+      throw error;
+    }
+  }
+
+  async markMessagesAsRead(vaultId, messageIds) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.markMessagesAsRead(vaultId, messageIds);
+      return result;
+    } catch (error) {
+      console.error('Failed to mark messages as read:', error);
+      throw error;
+    }
+  }
+
+  async getUserChatNotifications(limit = 20, offset = 0) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.getUserChatNotifications(limit, offset);
+      return result;
+    } catch (error) {
+      console.error('Failed to get user chat notifications:', error);
+      throw error;
+    }
+  }
+
+  async leaveVaultChat(vaultId) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.leaveVaultChat(vaultId);
+      return result;
+    } catch (error) {
+      console.error('Failed to leave vault chat:', error);
+      throw error;
+    }
+  }
+
+  async getVaultChatMembers(vaultId) {
+    try {
+      await this.ensureActor();
+      const result = await this.actor.getVaultChatMembers(vaultId);
+      return result;
+    } catch (error) {
+      console.error('Failed to get vault chat members:', error);
+      throw error;
+    }
+  }
+
+  // ============ NISTO TOKEN FUNCTIONS ============
+  
+  async getTokenMetadata() {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.getTokenMetadata();
+    } catch (error) {
+      console.error('Error getting token metadata:', error);
+      throw error;
+    }
+  }
+
+  async balanceOf(owner) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.balanceOf(owner);
+    } catch (error) {
+      console.error('Error getting balance:', error);
+      throw error;
+    }
+  }
+
+  async getTotalBalance(owner) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.getTotalBalance(owner);
+    } catch (error) {
+      console.error('Error getting total balance:', error);
+      throw error;
+    }
+  }
+
+  async allowance(owner, spender) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.allowance(owner, spender);
+    } catch (error) {
+      console.error('Error getting allowance:', error);
+      throw error;
+    }
+  }
+
+  async transfer(to, amount) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.transfer(to, amount);
+    } catch (error) {
+      console.error('Error transferring tokens:', error);
+      throw error;
+    }
+  }
+
+  async approve(spender, amount) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.approve(spender, amount);
+    } catch (error) {
+      console.error('Error approving tokens:', error);
+      throw error;
+    }
+  }
+
+  async transferFrom(from, to, amount) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.transferFrom(from, to, amount);
+    } catch (error) {
+      console.error('Error transferring from:', error);
+      throw error;
+    }
+  }
+
+  async mint(to, amount, reason) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.mint(to, amount, reason);
+    } catch (error) {
+      console.error('Error minting tokens:', error);
+      throw error;
+    }
+  }
+
+  async burn(amount, reason) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.burn(amount, reason);
+    } catch (error) {
+      console.error('Error burning tokens:', error);
+      throw error;
+    }
+  }
+
+  async stake(amount) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.stake(amount);
+    } catch (error) {
+      console.error('Error staking tokens:', error);
+      throw error;
+    }
+  }
+
+  async unstake(amount) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.unstake(amount);
+    } catch (error) {
+      console.error('Error unstaking tokens:', error);
+      throw error;
+    }
+  }
+
+  async claimRewards() {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.claimRewards();
+    } catch (error) {
+      console.error('Error claiming rewards:', error);
+      throw error;
+    }
+  }
+
+  async getStakingInfo(userId) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.getStakingInfo(userId);
+    } catch (error) {
+      console.error('Error getting staking info:', error);
+      throw error;
+    }
+  }
+
+  async getTotalStaked() {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.getTotalStaked();
+    } catch (error) {
+      console.error('Error getting total staked:', error);
+      throw error;
+    }
+  }
+
+  async getTransferHistory(limit = 10, offset = 0) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.getTransferHistory(limit, offset);
+    } catch (error) {
+      console.error('Error getting transfer history:', error);
+      throw error;
+    }
+  }
+
+  async getMintHistory(limit = 10, offset = 0) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.getMintHistory(limit, offset);
+    } catch (error) {
+      console.error('Error getting mint history:', error);
+      throw error;
+    }
+  }
+
+  async getBurnHistory(limit = 10, offset = 0) {
+    try {
+      const actor = await this.ensureActor();
+      return await actor.getBurnHistory(limit, offset);
+    } catch (error) {
+      console.error('Error getting burn history:', error);
       throw error;
     }
   }

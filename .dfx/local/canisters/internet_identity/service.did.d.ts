@@ -54,7 +54,11 @@ export interface AuthnMethodConfirmationCode {
   'confirmation_code' : string,
   'expiration' : Timestamp,
 }
-export type AuthnMethodConfirmationError = { 'RegistrationModeOff' : null } |
+export type AuthnMethodConfirmationError = {
+    'InternalCanisterError' : string
+  } |
+  { 'RegistrationModeOff' : null } |
+  { 'Unauthorized' : Principal } |
   { 'NoAuthnMethodToConfirm' : null } |
   { 'WrongCode' : { 'retries_left' : number } };
 export interface AuthnMethodData {
@@ -79,9 +83,9 @@ export interface AuthnMethodRegistrationInfo {
 export type AuthnMethodRegistrationModeEnterError = {
     'InvalidRegistrationId' : string
   } |
+  { 'InternalCanisterError' : string } |
   { 'AlreadyInProgress' : null } |
-  { 'Unauthorized' : Principal } |
-  { 'InternalError' : string };
+  { 'Unauthorized' : Principal };
 export type AuthnMethodReplaceError = { 'AuthnMethodNotFound' : null } |
   { 'InvalidMetadata' : string };
 export interface AuthnMethodSecuritySettings {
@@ -266,6 +270,7 @@ export interface InternetIdentityInit {
   'canister_creation_cycles_cost' : [] | [bigint],
   'analytics_config' : [] | [[] | [AnalyticsConfig]],
   'related_origins' : [] | [Array<string>],
+  'feature_flag_continue_from_another_device' : [] | [boolean],
   'captcha_config' : [] | [CaptchaConfig],
   'dummy_auth' : [] | [[] | [DummyAuthConfig]],
   'register_rate_limit' : [] | [RateLimitConfig],

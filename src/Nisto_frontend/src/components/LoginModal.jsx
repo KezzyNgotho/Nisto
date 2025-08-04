@@ -12,7 +12,9 @@ function LoginModal({ isOpen, onClose }) {
 
   const handleLogin = async () => {
     try {
+      console.log('Login button clicked, starting login process...');
       await login();
+      console.log('Login successful, navigating to dashboard...');
       onClose();
       navigate('/dashboard');
     } catch (error) {

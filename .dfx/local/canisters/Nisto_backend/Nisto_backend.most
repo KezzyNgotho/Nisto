@@ -5,6 +5,7 @@ actor {
   stable var nextAIRecommendationId : Nat;
   stable var nextAuditLogId : Nat;
   stable var nextBudgetId : Nat;
+  stable var nextChatNotificationId : Nat;
   stable var nextCryptoTransactionId : Nat;
   stable var nextCryptoWalletId : Nat;
   stable var nextDeFiPositionId : Nat;
@@ -26,8 +27,10 @@ actor {
   stable var nextTransactionId : Nat;
   stable var nextUserId : Nat;
   stable var nextUserPluginId : Nat;
+  stable var nextVaultChatRoomId : Nat;
   stable var nextVaultId : Nat;
   stable var nextVaultMemberId : Nat;
+  stable var nextVaultMessageId : Nat;
   stable var nextVaultTransactionId : Nat;
   stable var nextVerificationCodeId : Nat;
   stable var nextWalletId : Nat
