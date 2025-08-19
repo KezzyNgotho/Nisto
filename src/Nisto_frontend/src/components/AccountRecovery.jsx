@@ -1,19 +1,97 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
-import { FiMail, FiPhone, FiKey, FiUserCheck, FiCheck, FiAlertCircle } from 'react-icons/fi';
+import { 
+  FiMail, 
+  FiPhone, 
+  FiKey, 
+  FiUserCheck, 
+  FiCheck, 
+  FiAlertCircle,
+  FiShield,
+  FiLock,
+  FiEye,
+  FiEyeOff,
+  FiClock,
+  FiRefreshCw,
+  FiDownload,
+  FiCopy,
+  FiGrid,
+  FiSmartphone,
+  FiInfo,
+  FiAlertTriangle,
+  FiCheckCircle,
+  FiX,
+  FiArrowLeft,
+  FiArrowRight,
+  FiSave,
+  FiUpload
+} from 'react-icons/fi';
 
 const methodOptions = [
-  { value: 'email', label: 'Email', icon: <FiMail /> },
-  { value: 'phone', label: 'Phone', icon: <FiPhone /> },
-  { value: 'security', label: 'Security Questions', icon: <FiKey /> },
-  { value: 'emergency', label: 'Emergency Contact', icon: <FiUserCheck /> },
+  { 
+    value: 'email', 
+    label: 'Email Recovery', 
+    icon: <FiMail />, 
+    description: 'Receive recovery code via email',
+    security: 'Medium',
+    time: '2-5 minutes'
+  },
+  { 
+    value: 'phone', 
+    label: 'SMS Recovery', 
+    icon: <FiPhone />, 
+    description: 'Receive recovery code via SMS',
+    security: 'Medium',
+    time: '1-3 minutes'
+  },
+  { 
+    value: 'authenticator', 
+    label: 'Authenticator App', 
+    icon: <FiSmartphone />, 
+    description: 'Use your authenticator app code',
+    security: 'High',
+    time: 'Instant'
+  },
+  { 
+    value: 'security', 
+    label: 'Security Questions', 
+    icon: <FiKey />, 
+    description: 'Answer your security questions',
+    security: 'Medium',
+    time: 'Instant'
+  },
+  { 
+    value: 'backup_phrase', 
+    label: 'Recovery Phrase', 
+    icon: <FiLock />, 
+    description: 'Enter your 12-word recovery phrase',
+    security: 'Very High',
+    time: 'Instant'
+  },
+  { 
+    value: 'emergency', 
+    label: 'Emergency Contact', 
+    icon: <FiUserCheck />, 
+    description: 'Contact your emergency backup person',
+    security: 'High',
+    time: '24-48 hours'
+  },
+  { 
+    value: 'biometric', 
+    label: 'Biometric Recovery', 
+    icon: <FiShield />, 
+    description: 'Use fingerprint or face recognition',
+    security: 'Very High',
+    time: 'Instant'
+  }
 ];
 
-export default function AccountRecovery({ isOpen, onClose, onRecoveryComplete }) {
+export default function AccountRecovery({ isOpen, onClose, onRecoveryComplete, mode = 'recovery' }) {
   const { initiateRecovery, verifyRecovery, completeRecovery, linkRecoveredAccount } = useAuth();
   const { showToast } = useNotification();
 
+  // Enhanced state management
   const [step, setStep] = useState(1);
   const [method, setMethod] = useState('email');
   const [identifier, setIdentifier] = useState('');
@@ -24,6 +102,23 @@ export default function AccountRecovery({ isOpen, onClose, onRecoveryComplete })
   const [recoveryToken, setRecoveryToken] = useState(null);
   const [instructions, setInstructions] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  
+  // Enhanced recovery features
+  const [backupPhrase, setBackupPhrase] = useState(Array(12).fill(''));
+  const [backupPhraseVisible, setBackupPhraseVisible] = useState(false);
+  const [emergencyContactInfo, setEmergencyContactInfo] = useState({ name: '', email: '', phone: '' });
+  const [biometricSupported, setBiometricSupported] = useState(false);
+  const [attemptCount, setAttemptCount] = useState(0);
+  const [lockoutTime, setLockoutTime] = useState(null);
+  const [securityScore, setSecurityScore] = useState(0);
+  const [recoveryProgress, setRecoveryProgress] = useState(0);
+  const [validationErrors, setValidationErrors] = useState({});
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [recoveryHistory, setRecoveryHistory] = useState([]);
+  
+  // Refs for focus management
+  const codeInputRefs = useRef([]);
+  const phraseInputRefs = useRef([]);
 
   if (!isOpen) return null;
 

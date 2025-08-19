@@ -17,7 +17,6 @@ type SetAssetContentArguments = record {
   key: Key;
   content_encoding: text;
   chunk_ids: vec ChunkId;
-  last_chunk: opt blob;
   sha256: opt blob;
 };
 
@@ -81,7 +80,6 @@ type HttpResponse = record {
   headers: vec HeaderField;
   body: blob;
   streaming_strategy: opt StreamingStrategy;
-  upgrade: opt bool;
 };
 
 type StreamingCallbackHttpResponse = record {
@@ -146,9 +144,7 @@ type AssetCanisterArgs = variant {
   Upgrade: UpgradeArgs;
 };
 
-type InitArgs = record {
-  set_permissions: opt SetPermissions;
-};
+type InitArgs = record {};
 
 type UpgradeArgs = record {
   set_permissions: opt SetPermissions;
@@ -203,7 +199,6 @@ service: (asset_canister_args: opt AssetCanisterArgs) -> {
   create_batch : (record {}) -> (record { batch_id: BatchId });
 
   create_chunk: (record { batch_id: BatchId; content: blob }) -> (record { chunk_id: ChunkId });
-  create_chunks: (record { batch_id: BatchId; content: vec blob }) -> (record { chunk_ids: vec ChunkId });
 
   // Perform all operations successfully, or reject
   commit_batch: (CommitBatchArguments) -> ();

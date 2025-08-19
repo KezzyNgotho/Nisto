@@ -3,9 +3,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
 import BackendService from '../services/BackendService';
 import { 
-  FiUsers, FiDollarSign, FiTarget, FiTrendingUp, FiCheck, FiX, FiLock, FiUnlock, 
-  FiEdit2, FiTrash2, FiUserPlus, FiShield, FiArrowDownCircle, FiArrowUpCircle, 
-  FiList, FiSend, FiChevronLeft, FiChevronUp, FiChevronDown, FiMessageCircle
+  FiUsers, FiPlus, FiDollarSign, FiTarget, FiTrendingUp, FiCheck, FiX, FiLock, FiUnlock, 
+  FiEdit2, FiTrash2, FiUserPlus, FiEye, FiChevronDown, FiChevronUp, FiShield, FiArrowDownCircle, FiArrowUpCircle, 
+  FiList, FiSend, FiChevronLeft, FiGlobe, FiMessageCircle, FiMoreVertical, FiSmile, FiPaperclip, FiSearch, FiBell, FiSettings
 } from 'react-icons/fi';
 import { AiFillCrown } from 'react-icons/ai';
 
@@ -432,19 +432,26 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
   };
 
   return (
-    <div className="vault-details-container" style={{ width: '100%', height: '100vh', background: 'var(--neutral-50)', overflow: 'hidden' }}>
-            {/* Header */}
+    <div className="vault-details-container" style={{ 
+      width: '100%', 
+      height: '100vh', 
+      background: 'linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%)',
+      overflow: 'hidden',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    }}>
+      {/* Enhanced Header */}
       <div style={{ 
-        background: 'linear-gradient(135deg, var(--primary-600), var(--primary-800))',
+        background: 'linear-gradient(135deg, #075B5E 0%, #1C352D 100%)',
         color: 'white',
-        padding: '1rem 1.5rem',
+        padding: '1.5rem 2rem',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        boxShadow: '0 4px 12px rgba(59,130,246,0.15)',
+        boxShadow: '0 8px 32px rgba(7, 91, 94, 0.25)',
         position: 'sticky',
         top: 0,
-        zIndex: 100
+        zIndex: 100,
+        borderBottom: '1px solid rgba(255,255,255,0.1)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button 
@@ -524,155 +531,394 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
         </div>
       </div>
 
-      {/* Main Content */}
-      <div style={{ display: 'flex', height: 'calc(100vh - 70px)' }}>
+      {/* Enhanced Main Content */}
+      <div style={{ display: 'flex', height: 'calc(100vh - 90px)' }}>
         {/* Left Panel - Main Content */}
         <div style={{ flex: 1, padding: '2rem', overflow: 'auto' }}>
-          {/* Tabs */}
-          <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem', borderBottom: '2px solid var(--neutral-100)' }}>
+          {/* Enhanced Tabs */}
+          <div style={{ 
+            display: 'flex', 
+            gap: '0.5rem', 
+            marginBottom: '2rem', 
+            borderBottom: '2px solid rgba(59,130,246,0.1)',
+            paddingBottom: '0.5rem'
+          }}>
             {['overview', 'members', 'transactions', 'governance'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
+                className={`tab-button ${activeTab === tab ? 'active' : ''}`}
                 style={{
-                  background: activeTab === tab ? 'var(--primary-600)' : 'transparent',
-                  color: activeTab === tab ? 'white' : 'var(--neutral-600)',
+                  background: activeTab === tab ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' : 'transparent',
+                  color: activeTab === tab ? 'white' : '#64748b',
                   border: 'none',
                   padding: '0.75rem 1.5rem',
-                  borderRadius: '8px 8px 0 0',
+                  borderRadius: '12px 12px 0 0',
                   cursor: 'pointer',
                   fontWeight: 600,
-                  textTransform: 'capitalize'
+                  textTransform: 'capitalize',
+                  transition: 'all 0.3s ease',
+                  position: 'relative'
                 }}
               >
+                {tab === 'overview' && <FiEye size={16} style={{ marginRight: '0.5rem' }} />}
+                {tab === 'members' && <FiUsers size={16} style={{ marginRight: '0.5rem' }} />}
+                {tab === 'transactions' && <FiList size={16} style={{ marginRight: '0.5rem' }} />}
+                {tab === 'governance' && <FiShield size={16} style={{ marginRight: '0.5rem' }} />}
                 {tab}
               </button>
             ))}
           </div>
 
-          {/* Tab Content */}
+          {/* Enhanced Tab Content */}
           {activeTab === 'overview' && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
-              {/* Vault Stats */}
-              <div style={{ background: 'white', borderRadius: 12, padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ margin: '0 0 1rem 0', color: 'var(--primary-700)' }}>Vault Statistics</h3>
-                <div style={{ display: 'grid', gap: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Total Balance:</span>
-                    <span style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--success-600)' }}>
+              {/* Enhanced Vault Stats */}
+              <div className="vault-card" style={{ padding: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{
+                    width: 48,
+                    height: 48,
+                    background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <FiTrendingUp size={24} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Vault Statistics</h3>
+                    <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Real-time vault metrics</p>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'grid', gap: '1.5rem' }}>
+                  <div className="vault-stat">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>Total Balance</span>
+                      <span className="status-badge success">
+                        {vault?.isPublic ? 'Public' : 'Private'}
+                    </span>
+                  </div>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#10b981' }}>
                       {vault?.totalBalance || 0} {vault?.currency}
-                    </span>
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.25rem' }}>
+                      Available for transactions
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Target Amount:</span>
-                    <span style={{ fontWeight: 600 }}>
+                  
+                  <div className="vault-stat">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>Target Amount</span>
+                      <FiTarget size={16} color="#64748b" />
+                    </div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1e293b' }}>
                       {vault?.targetAmount || 'N/A'} {vault?.currency}
-                    </span>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Members:</span>
-                    <span style={{ fontWeight: 600 }}>
+                    {vault?.targetAmount && (
+                      <div style={{ marginTop: '0.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', color: '#64748b', marginBottom: '0.25rem' }}>
+                          <span>Progress</span>
+                          <span>{Math.round((vault?.totalBalance / vault?.targetAmount) * 100)}%</span>
+                  </div>
+                        <div style={{ 
+                          background: '#e2e8f0', 
+                          height: '6px', 
+                          borderRadius: '3px',
+                          overflow: 'hidden'
+                        }}>
+                          <div 
+                            className="progress-bar"
+                            style={{ 
+                              width: `${Math.min((vault?.totalBalance / vault?.targetAmount) * 100, 100)}%`,
+                              height: '100%'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="vault-stat">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>Members</span>
+                      <FiUsers size={16} color="#64748b" />
+                    </div>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 600, color: '#1e293b' }}>
                       {details?.ok?.members?.length || details?.members?.length || 0}
-                    </span>
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.25rem' }}>
+                      Active participants
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>Status:</span>
-                    <span style={{ 
+                  
+                  <div className="vault-stat">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                      <span style={{ color: '#64748b', fontSize: '0.9rem', fontWeight: 500 }}>Status</span>
+                      {vault?.isPublic ? <FiUnlock size={16} color="#10b981" /> : <FiLock size={16} color="#f59e0b" />}
+                    </div>
+                    <div style={{ 
+                      fontSize: '1.25rem', 
                       fontWeight: 600, 
-                      color: vault?.isPublic ? 'var(--success-600)' : 'var(--warning-600)',
+                      color: vault?.isPublic ? '#10b981' : '#f59e0b',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '0.5rem'
                     }}>
-                      {vault?.isPublic ? <FiUnlock size={14} /> : <FiLock size={14} />}
                       {vault?.isPublic ? 'Public' : 'Private'}
-                    </span>
+                    </div>
+                    <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '0.25rem' }}>
+                      {vault?.isPublic ? 'Anyone can join' : 'Invitation only'}
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Quick Actions */}
-              <div style={{ background: 'white', borderRadius: 12, padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ margin: '0 0 1rem 0', color: 'var(--primary-700)' }}>Quick Actions</h3>
-                <div style={{ display: 'grid', gap: '0.75rem' }}>
+              {/* Enhanced Quick Actions */}
+              <div className="vault-card" style={{ padding: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{
+                    width: 48,
+                    height: 48,
+                    background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <FiPlus size={24} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Quick Actions</h3>
+                    <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>Manage your vault</p>
+                  </div>
+                </div>
+                
+                <div style={{ display: 'grid', gap: '1rem' }}>
                   <button 
                     onClick={() => setShowDeposit(true)}
                     style={{ 
-                      background: 'var(--success-500)', 
+                      background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
                       color: 'white', 
                       border: 'none', 
-                      borderRadius: 8, 
-                      padding: '0.75rem', 
+                      borderRadius: '12px',
+                      padding: '1rem 1.5rem',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '0.5rem',
-                      fontWeight: 600
+                      gap: '0.75rem',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
                     }}
                   >
+                    <div style={{
+                      width: 24,
+                      height: 24,
+                      background: 'rgba(255,255,255,0.2)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
                     <FiArrowDownCircle size={16} />
-                    Deposit
+                    </div>
+                    <span>Deposit Funds</span>
                   </button>
                   <button 
                     onClick={() => setShowWithdraw(true)}
                     style={{ 
-                      background: 'var(--warning-500)', 
+                      background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
                       color: 'white', 
                       border: 'none', 
-                      borderRadius: 8, 
-                      padding: '0.75rem', 
+                      borderRadius: '12px',
+                      padding: '1rem 1.5rem',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      gap: '0.5rem',
-                      fontWeight: 600
+                      gap: '0.75rem',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 6px 20px rgba(245, 158, 11, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.3)';
                     }}
                   >
+                    <div style={{
+                      width: 24,
+                      height: 24,
+                      background: 'rgba(255,255,255,0.2)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
                     <FiArrowUpCircle size={16} />
-                    Withdraw
+                    </div>
+                    <span>Withdraw Funds</span>
                   </button>
                   <button 
                     onClick={() => setShowInvite(true)}
                     style={{ 
-                      background: 'var(--primary-500)', 
+                      background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                       color: 'white', 
                       border: 'none', 
-                      borderRadius: 8, 
+                      borderRadius: '12px',
+                      padding: '1rem 1.5rem',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.75rem',
+                      fontSize: '1rem',
+                      fontWeight: 600,
+                      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                      boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 6px 20px rgba(59, 130, 246, 0.4)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+                    }}
+                  >
+                    <div style={{
+                      width: 24,
+                      height: 24,
+                      background: 'rgba(255,255,255,0.2)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <FiUserPlus size={16} />
+                    </div>
+                    <span>Invite Member</span>
+                  </button>
+                  
+                  {/* Additional Actions */}
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: '1fr 1fr', 
+                    gap: '0.75rem',
+                    marginTop: '0.5rem'
+                  }}>
+                    <button 
+                      onClick={() => setShowChat(!showChat)}
+                      style={{ 
+                        background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: '12px', 
                       padding: '0.75rem', 
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       gap: '0.5rem',
-                      fontWeight: 600
-                    }}
-                  >
-                    <FiUserPlus size={16} />
-                    Invite Member
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 4px 12px rgba(139, 92, 246, 0.3)'
+                      }}
+                      onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                      onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                    >
+                      <FiMessageCircle size={16} />
+                      Chat
+                    </button>
+                    <button 
+                      onClick={() => setShowEdit(true)}
+                      style={{ 
+                        background: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)',
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: '12px', 
+                        padding: '0.75rem', 
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        fontWeight: 600,
+                        fontSize: '0.9rem',
+                        transition: 'all 0.3s ease',
+                        boxShadow: '0 4px 12px rgba(107, 114, 128, 0.3)'
+                      }}
+                      onMouseEnter={(e) => e.target.style.transform = 'translateY(-2px)'}
+                      onMouseLeave={(e) => e.target.style.transform = 'translateY(0)'}
+                    >
+                      <FiSettings size={16} />
+                      Settings
                   </button>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {activeTab === 'members' && (
-            <div style={{ background: 'white', borderRadius: 12, padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h3 style={{ margin: 0, color: 'var(--primary-700)' }}>Members</h3>
-                <button 
-                  onClick={() => setShowInvite(true)}
-                  style={{ 
-                    background: 'var(--primary-500)', 
-                    color: 'white', 
-                    border: 'none', 
-                    borderRadius: 8, 
-                    padding: '0.5rem 1rem',
-                    cursor: 'pointer',
+            <div className="vault-card" style={{ padding: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                  <div style={{
+                    width: 48,
+                    height: 48,
+                    background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+                    borderRadius: '12px',
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '0.5rem'
+                    justifyContent: 'center',
+                    color: 'white'
+                  }}>
+                    <FiUsers size={24} />
+                  </div>
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: '1.25rem', fontWeight: 700, color: '#1e293b' }}>Vault Members</h3>
+                    <p style={{ margin: '0.25rem 0 0 0', color: '#64748b', fontSize: '0.9rem' }}>
+                      {(details?.ok?.members || details?.members || []).length} active members
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowInvite(true)}
+                  className="btn-primary"
+                  style={{ 
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    fontSize: '0.9rem',
+                    padding: '0.75rem 1.25rem'
                   }}
                 >
                   <FiUserPlus size={16} />
@@ -682,51 +928,110 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
               
               <div style={{ display: 'grid', gap: '1rem' }}>
                 {(details?.ok?.members || details?.members || []).map(member => (
-                  <div key={member.id} style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    justifyContent: 'space-between',
-                    padding: '1rem',
-                    background: 'var(--neutral-50)',
-                    borderRadius: 8,
-                    border: '1px solid var(--neutral-100)'
-                  }}>
+                  <div key={member.id} className="member-card">
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                       <div style={{ 
-                        width: 40, 
-                        height: 40, 
+                          width: 48, 
+                          height: 48, 
                         borderRadius: '50%', 
-                        background: 'var(--primary-100)',
+                          background: member.role === 'owner' ? 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' :
+                                    member.role === 'admin' ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' :
+                                    'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        color: 'var(--primary-600)',
-                        fontWeight: 600
+                          color: 'white',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                       }}>
-                        {member.role === 'owner' ? <AiFillCrown size={20} /> : <FiUsers size={20} />}
+                          {member.role === 'owner' ? <AiFillCrown size={20} /> : 
+                           member.role === 'admin' ? <FiShield size={20} /> : <FiUsers size={20} />}
                       </div>
                       <div>
-                        <div style={{ fontWeight: 600, color: 'var(--primary-700)' }}>
-                          {member.userId === user?.id ? 'You' : `User ${member.userId.toString().slice(0, 8)}...`}
+                          <div style={{ 
+                            fontWeight: 600, 
+                            color: '#1e293b',
+                            fontSize: '1rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                          }}>
+                          {member.userId === user?.principal ? 'You' : `User ${member.userId.toString().slice(0, 8)}...`}
+                            {member.userId === user?.principal && (
+                              <span style={{
+                                background: '#10b981',
+                                color: 'white',
+                                padding: '0.125rem 0.5rem',
+                                borderRadius: '8px',
+                                fontSize: '0.7rem',
+                                fontWeight: 600
+                              }}>
+                                YOU
+                              </span>
+                            )}
                         </div>
-                        <div style={{ fontSize: '0.9rem', color: 'var(--neutral-600)' }}>
-                          Joined {formatDate(member.joinedAt)}
-                        </div>
-                      </div>
-                    </div>
+                          <div style={{ 
+                            fontSize: '0.85rem', 
+                            color: '#64748b',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem'
+                          }}>
+                            <span>Joined {formatDate(member.joinedAt)}</span>
+                            <span>•</span>
                     <span style={{ 
-                      background: member.role === 'owner' ? 'var(--primary-100)' : 
-                                member.role === 'admin' ? 'var(--success-100)' : 'var(--neutral-100)',
-                      color: member.role === 'owner' ? 'var(--primary-600)' : 
-                             member.role === 'admin' ? 'var(--success-600)' : 'var(--neutral-600)',
-                      padding: '0.25rem 0.75rem',
-                      borderRadius: 12,
-                      fontSize: '0.8rem',
+                              background: member.role === 'owner' ? 'rgba(251, 191, 36, 0.1)' : 
+                                        member.role === 'admin' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(59, 130, 246, 0.1)',
+                              color: member.role === 'owner' ? '#d97706' : 
+                                     member.role === 'admin' ? '#059669' : '#1d4ed8',
+                              padding: '0.125rem 0.5rem',
+                              borderRadius: '6px',
+                              fontSize: '0.75rem',
                       fontWeight: 600,
                       textTransform: 'capitalize'
                     }}>
                       {member.role}
                     </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button
+                          style={{
+                            background: 'rgba(59, 130, 246, 0.1)',
+                            border: 'none',
+                            borderRadius: '8px',
+                            padding: '0.5rem',
+                            cursor: 'pointer',
+                            color: '#3b82f6',
+                            transition: 'all 0.2s'
+                          }}
+                          onMouseEnter={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.2)'}
+                          onMouseLeave={(e) => e.target.style.background = 'rgba(59, 130, 246, 0.1)'}
+                          title="View Profile"
+                        >
+                          <FiEye size={16} />
+                        </button>
+                        {(isOwner || isAdmin) && member.role !== 'owner' && (
+                          <button
+                            style={{
+                              background: 'rgba(239, 68, 68, 0.1)',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '0.5rem',
+                              cursor: 'pointer',
+                              color: '#ef4444',
+                              transition: 'all 0.2s'
+                            }}
+                            onMouseEnter={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.2)'}
+                            onMouseLeave={(e) => e.target.style.background = 'rgba(239, 68, 68, 0.1)'}
+                            title="Remove Member"
+                          >
+                            <FiTrash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -756,31 +1061,47 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
           )}
         </div>
 
-        {/* Right Panel - Chat */}
+        {/* Enhanced Right Panel - Chat */}
         {showChat && (
           <div style={{ 
-            width: chatExpanded ? '450px' : '350px', 
-            background: 'white', 
-            borderLeft: '1px solid var(--neutral-100)',
+            width: chatExpanded ? '450px' : '380px', 
+            background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)', 
+            borderLeft: '1px solid rgba(59,130,246,0.1)',
             display: 'flex',
             flexDirection: 'column',
-            transition: 'width 0.3s ease'
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            boxShadow: '-4px 0 20px rgba(0,0,0,0.1)',
+            animation: 'slideInRight 0.3s ease-out'
           }}>
-            {/* Chat Header */}
+            {/* Enhanced Chat Header */}
             <div style={{ 
-              padding: '1rem', 
-              borderBottom: '1px solid var(--neutral-100)',
-              background: 'linear-gradient(135deg, var(--primary-500), var(--primary-700))',
+              padding: '1.25rem', 
+              borderBottom: '1px solid rgba(59,130,246,0.1)',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
               color: 'white',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
+              boxShadow: '0 2px 8px rgba(139, 92, 246, 0.2)'
             }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{
+                  width: 40,
+                  height: 40,
+                  background: 'rgba(255,255,255,0.2)',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <FiMessageCircle size={20} />
+                </div>
               <div>
-                <h4 style={{ margin: 0, fontSize: '1rem', fontWeight: 600 }}>Vault Chat</h4>
-                <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.8rem', opacity: 0.9 }}>
-                  {details?.ok?.members?.length || details?.members?.length || 0} members • {chatMessages.length} messages
-                </p>
+                  <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 700 }}>Vault Chat</h4>
+                  <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.85rem', opacity: 0.9 }}>
+                    {details?.ok?.members?.length || details?.members?.length || 0} members • {chatMessages.length} messages
+                  </p>
+                </div>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 <button
@@ -1128,11 +1449,12 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
               </div>
             </div>
             
-            {/* Chat Input */}
+            {/* Enhanced Chat Input */}
             <form onSubmit={handleSendMessage} style={{ 
-              padding: '1rem', 
-              borderTop: '1px solid var(--neutral-100)',
-              background: 'white'
+              padding: '1.25rem', 
+              borderTop: '1px solid rgba(59,130,246,0.1)',
+              background: 'white',
+              boxShadow: '0 -2px 8px rgba(0,0,0,0.05)'
             }}>
               <div style={{ 
                 display: 'flex', 
@@ -1144,17 +1466,20 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                     value={newMessage}
                     onChange={handleTyping}
                     placeholder="Type a message..."
+                    className="chat-input"
                     style={{ 
                       width: '100%', 
-                      minHeight: '40px',
+                      minHeight: '44px',
                       maxHeight: '120px',
-                      padding: '0.75rem', 
-                      border: '1px solid var(--neutral-200)', 
-                      borderRadius: 8,
+                      padding: '0.875rem 1rem', 
+                      border: '1px solid rgba(59,130,246,0.1)', 
+                      borderRadius: '12px',
                       fontSize: '0.9rem',
                       resize: 'none',
                       fontFamily: 'inherit',
-                      outline: 'none'
+                      outline: 'none',
+                      background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                      transition: 'all 0.3s ease'
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
@@ -1168,118 +1493,237 @@ export default function VaultDetails({ vault, details, onBack, user, showToast }
                   type="submit"
                   disabled={!newMessage.trim()}
                   style={{ 
-                    background: newMessage.trim() ? 'var(--primary-500)' : 'var(--neutral-300)', 
+                    background: newMessage.trim() ? 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)' : '#e2e8f0', 
                     color: 'white', 
                     border: 'none', 
-                    borderRadius: 8, 
-                    padding: '0.75rem',
+                    borderRadius: '12px', 
+                    padding: '0.875rem',
                     cursor: newMessage.trim() ? 'pointer' : 'not-allowed',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    transition: 'background 0.2s'
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    boxShadow: newMessage.trim() ? '0 4px 12px rgba(139, 92, 246, 0.3)' : 'none',
+                    width: '44px',
+                    height: '44px'
                   }}
+                  onMouseEnter={(e) => newMessage.trim() && (e.target.style.transform = 'translateY(-2px)')}
+                  onMouseLeave={(e) => newMessage.trim() && (e.target.style.transform = 'translateY(0)')}
                 >
-                  <FiSend size={16} />
+                  <FiSend size={18} />
                 </button>
               </div>
               
-                             {/* Quick Actions */}
+                             {/* Enhanced Quick Actions */}
                <div style={{ 
-                 display: 'flex', 
-                 gap: '0.5rem', 
-                 marginTop: '0.75rem',
-                 flexWrap: 'wrap'
+                 display: 'grid', 
+                 gridTemplateColumns: 'repeat(3, 1fr)',
+                 gap: '0.75rem', 
+                 marginTop: '1rem'
                }}>
                  <button
                    type="button"
                    onClick={() => setNewMessage(prev => prev + '💰')}
                    style={{
-                     background: 'var(--success-100)',
-                     color: 'var(--success-600)',
-                     border: '1px solid var(--success-200)',
-                     borderRadius: 6,
-                     padding: '0.25rem 0.5rem',
+                     background: 'rgba(16, 185, 129, 0.1)',
+                     color: '#059669',
+                     border: '1px solid rgba(16, 185, 129, 0.2)',
+                     borderRadius: '10px',
+                     padding: '0.75rem 0.5rem',
                      fontSize: '0.75rem',
                      cursor: 'pointer',
-                     transition: 'all 0.2s'
+                     transition: 'all 0.2s ease',
+                     fontWeight: 600,
+                     display: 'flex',
+                     flexDirection: 'column',
+                     alignItems: 'center',
+                     gap: '0.25rem',
+                     minHeight: '60px',
+                     justifyContent: 'center'
                    }}
-                   onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                   onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                   onMouseEnter={(e) => {
+                     e.target.style.background = 'rgba(16, 185, 129, 0.15)';
+                     e.target.style.transform = 'translateY(-2px)';
+                     e.target.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.2)';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.target.style.background = 'rgba(16, 185, 129, 0.1)';
+                     e.target.style.transform = 'translateY(0)';
+                     e.target.style.boxShadow = 'none';
+                   }}
                  >
-                   💰 Deposit
+                   <span style={{ fontSize: '1.2rem' }}>💰</span>
+                   <span>Deposit</span>
                  </button>
                  <button
                    type="button"
                    onClick={() => setNewMessage(prev => prev + '📊')}
                    style={{
-                     background: 'var(--primary-100)',
-                     color: 'var(--primary-600)',
-                     border: '1px solid var(--primary-200)',
-                     borderRadius: 6,
-                     padding: '0.25rem 0.5rem',
+                     background: 'rgba(59, 130, 246, 0.1)',
+                     color: '#1d4ed8',
+                     border: '1px solid rgba(59, 130, 246, 0.2)',
+                     borderRadius: '10px',
+                     padding: '0.75rem 0.5rem',
                      fontSize: '0.75rem',
                      cursor: 'pointer',
-                     transition: 'all 0.2s'
+                     transition: 'all 0.2s ease',
+                     fontWeight: 600,
+                     display: 'flex',
+                     flexDirection: 'column',
+                     alignItems: 'center',
+                     gap: '0.25rem',
+                     minHeight: '60px',
+                     justifyContent: 'center'
                    }}
-                   onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                   onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                   onMouseEnter={(e) => {
+                     e.target.style.background = 'rgba(59, 130, 246, 0.15)';
+                     e.target.style.transform = 'translateY(-2px)';
+                     e.target.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.2)';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.target.style.background = 'rgba(59, 130, 246, 0.1)';
+                     e.target.style.transform = 'translateY(0)';
+                     e.target.style.boxShadow = 'none';
+                   }}
                  >
-                   📊 Stats
+                   <span style={{ fontSize: '1.2rem' }}>📊</span>
+                   <span>Stats</span>
                  </button>
                  <button
                    type="button"
                    onClick={() => setNewMessage(prev => prev + '🎯')}
                    style={{
-                     background: 'var(--warning-100)',
-                     color: 'var(--warning-600)',
-                     border: '1px solid var(--warning-200)',
-                     borderRadius: 6,
-                     padding: '0.25rem 0.5rem',
+                     background: 'rgba(245, 158, 11, 0.1)',
+                     color: '#d97706',
+                     border: '1px solid rgba(245, 158, 11, 0.2)',
+                     borderRadius: '10px',
+                     padding: '0.75rem 0.5rem',
                      fontSize: '0.75rem',
                      cursor: 'pointer',
-                     transition: 'all 0.2s'
+                     transition: 'all 0.2s ease',
+                     fontWeight: 600,
+                     display: 'flex',
+                     flexDirection: 'column',
+                     alignItems: 'center',
+                     gap: '0.25rem',
+                     minHeight: '60px',
+                     justifyContent: 'center'
                    }}
-                   onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                   onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                   onMouseEnter={(e) => {
+                     e.target.style.background = 'rgba(245, 158, 11, 0.15)';
+                     e.target.style.transform = 'translateY(-2px)';
+                     e.target.style.boxShadow = '0 4px 12px rgba(245, 158, 11, 0.2)';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.target.style.background = 'rgba(245, 158, 11, 0.1)';
+                     e.target.style.transform = 'translateY(0)';
+                     e.target.style.boxShadow = 'none';
+                   }}
                  >
-                   🎯 Goal
+                   <span style={{ fontSize: '1.2rem' }}>🎯</span>
+                   <span>Goal</span>
                  </button>
                  <button
                    type="button"
                    onClick={() => setNewMessage(prev => prev + '🎉')}
                    style={{
-                     background: 'var(--purple-100)',
-                     color: 'var(--purple-600)',
-                     border: '1px solid var(--purple-200)',
-                     borderRadius: 6,
-                     padding: '0.25rem 0.5rem',
+                     background: 'rgba(139, 92, 246, 0.1)',
+                     color: '#7c3aed',
+                     border: '1px solid rgba(139, 92, 246, 0.2)',
+                     borderRadius: '10px',
+                     padding: '0.75rem 0.5rem',
                      fontSize: '0.75rem',
                      cursor: 'pointer',
-                     transition: 'all 0.2s'
+                     transition: 'all 0.2s ease',
+                     fontWeight: 600,
+                     display: 'flex',
+                     flexDirection: 'column',
+                     alignItems: 'center',
+                     gap: '0.25rem',
+                     minHeight: '60px',
+                     justifyContent: 'center'
                    }}
-                   onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                   onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                   onMouseEnter={(e) => {
+                     e.target.style.background = 'rgba(139, 92, 246, 0.15)';
+                     e.target.style.transform = 'translateY(-2px)';
+                     e.target.style.boxShadow = '0 4px 12px rgba(139, 92, 246, 0.2)';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.target.style.background = 'rgba(139, 92, 246, 0.1)';
+                     e.target.style.transform = 'translateY(0)';
+                     e.target.style.boxShadow = 'none';
+                   }}
                  >
-                   🎉 Celebrate
+                   <span style={{ fontSize: '1.2rem' }}>🎉</span>
+                   <span>Celebrate</span>
                  </button>
                  <button
                    type="button"
                    onClick={() => setNewMessage(prev => prev + '📝')}
                    style={{
-                     background: 'var(--neutral-100)',
-                     color: 'var(--neutral-600)',
-                     border: '1px solid var(--neutral-200)',
-                     borderRadius: 6,
-                     padding: '0.25rem 0.5rem',
+                     background: 'rgba(107, 114, 128, 0.1)',
+                     color: '#4b5563',
+                     border: '1px solid rgba(107, 114, 128, 0.2)',
+                     borderRadius: '10px',
+                     padding: '0.75rem 0.5rem',
                      fontSize: '0.75rem',
                      cursor: 'pointer',
-                     transition: 'all 0.2s'
+                     transition: 'all 0.2s ease',
+                     fontWeight: 600,
+                     display: 'flex',
+                     flexDirection: 'column',
+                     alignItems: 'center',
+                     gap: '0.25rem',
+                     minHeight: '60px',
+                     justifyContent: 'center'
                    }}
-                   onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                   onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
+                   onMouseEnter={(e) => {
+                     e.target.style.background = 'rgba(107, 114, 128, 0.15)';
+                     e.target.style.transform = 'translateY(-2px)';
+                     e.target.style.boxShadow = '0 4px 12px rgba(107, 114, 128, 0.2)';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.target.style.background = 'rgba(107, 114, 128, 0.1)';
+                     e.target.style.transform = 'translateY(0)';
+                     e.target.style.boxShadow = 'none';
+                   }}
                  >
-                   📝 Note
+                   <span style={{ fontSize: '1.2rem' }}>📝</span>
+                   <span>Note</span>
+                 </button>
+                 <button
+                   type="button"
+                   onClick={() => setNewMessage(prev => prev + '🔥')}
+                   style={{
+                     background: 'rgba(239, 68, 68, 0.1)',
+                     color: '#dc2626',
+                     border: '1px solid rgba(239, 68, 68, 0.2)',
+                     borderRadius: '10px',
+                     padding: '0.75rem 0.5rem',
+                     fontSize: '0.75rem',
+                     cursor: 'pointer',
+                     transition: 'all 0.2s ease',
+                     fontWeight: 600,
+                     display: 'flex',
+                     flexDirection: 'column',
+                     alignItems: 'center',
+                     gap: '0.25rem',
+                     minHeight: '60px',
+                     justifyContent: 'center'
+                   }}
+                   onMouseEnter={(e) => {
+                     e.target.style.background = 'rgba(239, 68, 68, 0.15)';
+                     e.target.style.transform = 'translateY(-2px)';
+                     e.target.style.boxShadow = '0 4px 12px rgba(239, 68, 68, 0.2)';
+                   }}
+                   onMouseLeave={(e) => {
+                     e.target.style.background = 'rgba(239, 68, 68, 0.1)';
+                     e.target.style.transform = 'translateY(0)';
+                     e.target.style.boxShadow = 'none';
+                   }}
+                 >
+                   <span style={{ fontSize: '1.2rem' }}>🔥</span>
+                   <span>Hot</span>
                  </button>
                </div>
             </form>

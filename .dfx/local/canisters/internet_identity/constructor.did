@@ -35,7 +35,7 @@ type AnchorCredentials = record {
 type ArchiveConfig = record {
   polling_interval_ns : nat64;
   entries_buffer_limit : nat64;
-  module_hash : blob;
+  module_hash : vec nat8;
   entries_fetch_limit : nat16;
 };
 type ArchiveInfo = record {
@@ -75,6 +75,7 @@ type AuthnMethodRegisterError = variant {
 };
 type AuthnMethodRegistrationInfo = record {
   expiration : Timestamp;
+  session : opt principal;
   authn_method : opt AuthnMethodData;
 };
 type AuthnMethodRegistrationModeEnterError = variant {
@@ -82,6 +83,12 @@ type AuthnMethodRegistrationModeEnterError = variant {
   InternalCanisterError : text;
   AlreadyInProgress;
   Unauthorized : principal;
+};
+type AuthnMethodRegistrationModeExitError = variant {
+  InternalCanisterError : text;
+  RegistrationModeOff;
+  Unauthorized : principal;
+  InvalidMetadata : text;
 };
 type AuthnMethodReplaceError = variant {
   AuthnMethodNotFound;
@@ -92,9 +99,10 @@ type AuthnMethodSecuritySettings = record {
   purpose : AuthnMethodPurpose;
 };
 type AuthnMethodSecuritySettingsReplaceError = variant { AuthnMethodNotFound };
+type AuthnMethodSessionInfo = record { name : opt text };
 type BufferedArchiveEntry = record {
   sequence_number : nat64;
-  entry : blob;
+  entry : vec nat8;
   anchor_number : UserNumber;
   timestamp : Timestamp;
 };
@@ -125,7 +133,7 @@ type CreateAccountError = variant {
   Unauthorized : principal;
   NameTooLong;
 };
-type CredentialId = blob;
+type CredentialId = vec nat8;
 type Delegation = record {
   pubkey : PublicKey;
   targets : opt vec principal;
@@ -155,6 +163,7 @@ type DeviceProtection = variant { unprotected; protected };
 type DeviceRegistrationInfo = record {
   tentative_device : opt DeviceData;
   expiration : Timestamp;
+  tentative_session : opt principal;
 };
 type DeviceWithUsage = record {
   alias : text;
@@ -193,12 +202,12 @@ type HeaderField = record { text; text };
 type HttpRequest = record {
   url : text;
   method : text;
-  body : blob;
+  body : vec nat8;
   headers : vec HeaderField;
   certificate_version : opt nat16;
 };
 type HttpResponse = record {
-  body : blob;
+  body : vec nat8;
   headers : vec HeaderField;
   upgrade : opt bool;
   streaming_strategy : opt StreamingStrategy;
@@ -302,11 +311,11 @@ type KeyType = variant {
 type LookupByRegistrationIdError = variant { InvalidRegistrationId : text };
 type MetadataMap = vec record {
   text;
-  variant { map : MetadataMap; string : text; bytes : blob };
+  variant { map : MetadataMap; string : text; bytes : vec nat8 };
 };
 type MetadataMapV2 = vec record {
   text;
-  variant { Map : MetadataMapV2; String : text; Bytes : blob };
+  variant { Map : MetadataMapV2; String : text; Bytes : vec nat8 };
 };
 type OpenIDRegFinishArg = record { jwt : JWT; salt : Salt };
 type OpenIdConfig = record { client_id : text };
@@ -359,7 +368,7 @@ type PreparedIdAlias = record {
   issuer_id_alias_jwt : text;
   canister_sig_pk_der : PublicKey;
 };
-type PublicKey = blob;
+type PublicKey = vec nat8;
 type PublicKeyAuthn = record { pubkey : PublicKey };
 type Purpose = variant { authentication; recovery };
 type RateLimitConfig = record { max_tokens : nat64; time_per_token_ns : nat64 };
@@ -373,15 +382,21 @@ type RegistrationFlowNextStep = variant {
   Finish;
 };
 type RegistrationId = text;
-type Salt = blob;
+type Salt = vec nat8;
 type SessionKey = PublicKey;
-type SignedDelegation = record { signature : blob; delegation : Delegation };
+type SignedDelegation = record {
+  signature : vec nat8;
+  delegation : Delegation;
+};
 type SignedIdAlias = record {
   credential_jws : text;
   id_alias : principal;
   id_dapp : principal;
 };
-type StreamingCallbackHttpResponse = record { token : opt Token; body : blob };
+type StreamingCallbackHttpResponse = record {
+  token : opt Token;
+  body : vec nat8;
+};
 type StreamingStrategy = variant {
   Callback : record {
     token : Token;
@@ -442,9 +457,10 @@ service : (opt InternetIdentityInit) -> {
         Err : AuthnMethodRegistrationModeEnterError;
       },
     );
-  authn_method_registration_mode_exit : (IdentityNumber) -> (
-      variant { Ok; Err },
-    );
+  authn_method_registration_mode_exit : (
+      IdentityNumber,
+      opt AuthnMethodData,
+    ) -> (variant { Ok; Err : AuthnMethodRegistrationModeExitError });
   authn_method_remove : (IdentityNumber, PublicKey) -> (variant { Ok; Err });
   authn_method_replace : (IdentityNumber, PublicKey, AuthnMethodData) -> (
       variant { Ok; Err : AuthnMethodReplaceError },
@@ -454,6 +470,15 @@ service : (opt InternetIdentityInit) -> {
       PublicKey,
       AuthnMethodSecuritySettings,
     ) -> (variant { Ok; Err : AuthnMethodSecuritySettingsReplaceError });
+  authn_method_session_info : (IdentityNumber) -> (
+      opt AuthnMethodSessionInfo,
+    ) query;
+  authn_method_session_register : (IdentityNumber) -> (
+      variant {
+        Ok : AuthnMethodConfirmationCode;
+        Err : AuthnMethodRegisterError;
+      },
+    );
   check_captcha : (CheckCaptchaArg) -> (
       variant { Ok : IdRegNextStepResult; Err : CheckCaptchaError },
     );
@@ -462,7 +487,7 @@ service : (opt InternetIdentityInit) -> {
       variant { Ok : AccountInfo; Err : CreateAccountError },
     );
   create_challenge : () -> (Challenge);
-  deploy_archive : (blob) -> (DeployArchiveResult);
+  deploy_archive : (vec nat8) -> (DeployArchiveResult);
   enter_device_registration_mode : (UserNumber) -> (Timestamp);
   exit_device_registration_mode : (UserNumber) -> ();
   fetch_entries : () -> (vec BufferedArchiveEntry);
@@ -512,7 +537,7 @@ service : (opt InternetIdentityInit) -> {
   lookup_by_registration_mode_id : (RegistrationId) -> (
       opt IdentityNumber,
     ) query;
-  lookup_device_key : (blob) -> (opt DeviceKeyWithAnchor) query;
+  lookup_device_key : (vec nat8) -> (opt DeviceKeyWithAnchor) query;
   openid_credential_add : (IdentityNumber, JWT, Salt) -> (
       variant { Ok; Err : OpenIdCredentialAddError },
     );

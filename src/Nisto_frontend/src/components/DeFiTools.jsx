@@ -115,7 +115,7 @@ const DeFiTools = () => {
   return (
     <section className="dashboard-section" style={{ padding: 0, margin: 0, background: 'transparent', boxShadow: 'none', border: 'none' }}>
       {/* Blue header bar */}
-      <div style={{ background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)', borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem', padding: '1.2rem 2rem', color: '#fff', display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ background: 'linear-gradient(90deg, #075B5E 0%, #1C352D 100%)', borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem', padding: '1.2rem 2rem', color: '#fff', display: 'flex', alignItems: 'center', gap: 16 }}>
         <FiBarChart2 size={28} style={{ marginRight: 12 }} />
         <div>
           <div style={{ fontWeight: 700, fontSize: 20 }}>DeFi Tools</div>
@@ -158,7 +158,7 @@ const DeFiTools = () => {
         {/* DeFi Tabs and Products */}
         <div style={{ marginTop: 32 }}>
           {/* Tab Bar */}
-          <div style={{ display: 'flex', gap: 0, borderBottom: '2px solid var(--primary-100)', marginBottom: 18 }}>
+          <div style={{ display: 'flex', gap: 0, borderBottom: '2px solid #ccfbf1', marginBottom: 18 }}>
             {['overview', 'swap', 'lending', 'yield'].map(tab => (
               <button
                 key={tab}
@@ -166,10 +166,10 @@ const DeFiTools = () => {
                 style={{
                   borderRadius: 0,
                   border: 'none',
-                  background: activeTab === tab ? 'var(--primary-50)' : 'transparent',
-                  color: activeTab === tab ? 'var(--primary-700)' : 'var(--neutral-500)',
+                  background: activeTab === tab ? '#f0fdfa' : 'transparent',
+                  color: activeTab === tab ? '#075B5E' : 'var(--neutral-500)',
                   fontWeight: activeTab === tab ? 700 : 500,
-                  borderBottom: activeTab === tab ? '2.5px solid var(--primary-500)' : '2.5px solid transparent',
+                  borderBottom: activeTab === tab ? '2.5px solid #075B5E' : '2.5px solid transparent',
                   boxShadow: 'none',
                   fontSize: 16,
                   padding: '0.7rem 2.2rem',

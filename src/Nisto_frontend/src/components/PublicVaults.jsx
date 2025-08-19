@@ -84,10 +84,10 @@ export default function PublicVaults() {
 
   const getVaultTypeColor = (type) => {
     switch (type.toLowerCase()) {
-      case 'savings': return 'var(--success-500)';
-      case 'investment': return 'var(--primary-500)';
-      case 'emergency': return 'var(--warning-500)';
-      default: return 'var(--neutral-500)';
+      case 'savings': return '#10b981';
+      case 'investment': return '#075B5E';
+      case 'emergency': return '#f59e0b';
+      default: return '#6b7280';
     }
   };
 
@@ -163,7 +163,7 @@ export default function PublicVaults() {
               outline: 'none',
               transition: 'all 0.2s'
             }}
-            onFocus={(e) => e.target.style.borderColor = 'var(--primary-500)'}
+            onFocus={(e) => e.target.style.borderColor = '#075B5E'}
             onBlur={(e) => e.target.style.borderColor = 'var(--neutral-200)'}
           />
         </div>
@@ -201,7 +201,7 @@ export default function PublicVaults() {
             width: 40,
             height: 40,
             border: '4px solid var(--neutral-200)',
-            borderTop: '4px solid var(--primary-500)',
+            borderTop: '4px solid #075B5E',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite'
           }} />

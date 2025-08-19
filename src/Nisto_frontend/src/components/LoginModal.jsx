@@ -1,7 +1,7 @@
 import React,{ useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import AccountRecovery from './AccountRecovery';
+import EnhancedAccountRecovery from './EnhancedAccountRecovery';
 
 function LoginModal({ isOpen, onClose }) {
   const { login, isLoading } = useAuth();
@@ -90,7 +90,7 @@ function LoginModal({ isOpen, onClose }) {
         </div>
       </div>
       
-      <AccountRecovery 
+              <EnhancedAccountRecovery 
         isOpen={showRecovery}
         onClose={() => setShowRecovery(false)}
         onRecoveryComplete={handleRecoveryComplete}

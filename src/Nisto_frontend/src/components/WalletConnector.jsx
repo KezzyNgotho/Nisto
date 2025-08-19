@@ -1,4 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { 
+  FiWifi, 
+  FiWifiOff, 
+  FiAlertCircle, 
+  FiCheckCircle, 
+  FiRefreshCw, 
+  FiExternalLink,
+  FiShield,
+  FiClock,
+  FiAlertTriangle,
+  FiZap,
+  FiX
+} from 'react-icons/fi';
 import walletService from '../services/WalletService';
 
 function WalletConnector({ onWalletConnect, onWalletDisconnect }) {
@@ -6,12 +19,21 @@ function WalletConnector({ onWalletConnect, onWalletDisconnect }) {
   const [connectedWallets, setConnectedWallets] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [connectingWallet, setConnectingWallet] = useState(null);
+  const [disconnectingWallet, setDisconnectingWallet] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
+  const [connectionHealth, setConnectionHealth] = useState({});
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const retryTimeoutRef = useRef(null);
 
   useEffect(() => {
     detectWallets();
   }, []);
 
-  const detectWallets = async () => {
+  const detectWallets = useCallback(async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
+    setError(null);
+
     try {
       const wallets = await walletService.detectWallets();
       setAvailableWallets(wallets);
@@ -19,14 +41,60 @@ function WalletConnector({ onWalletConnect, onWalletDisconnect }) {
       // Set connected wallets
       const connected = wallets.filter(w => w.connected);
       setConnectedWallets(connected);
+      
+      // Update connection health for each wallet
+      const health = {};
+      for (const wallet of wallets) {
+        if (wallet.connected) {
+          health[wallet.type] = await checkWalletHealth(wallet.type);
+        }
+      }
+      setConnectionHealth(health);
+      setLastUpdated(new Date());
+      setRetryCount(0);
+      
     } catch (error) {
       console.error('Failed to detect wallets:', error);
-      setError('Failed to detect wallets');
+      setError({
+        message: 'Failed to detect wallets',
+        details: error.message,
+        canRetry: true,
+        timestamp: new Date()
+      });
+    } finally {
+      if (showLoading) setIsLoading(false);
+    }
+  }, []);
+
+  const checkWalletHealth = async (walletType) => {
+    try {
+      switch (walletType) {
+        case 'plug':
+          // Check if plug is responsive
+          const isConnected = await walletService.isPlugConnected();
+          return {
+            status: isConnected ? 'healthy' : 'disconnected',
+            latency: Math.random() * 100 + 50, // Mock latency
+            lastCheck: new Date()
+          };
+        default:
+          return {
+            status: 'healthy',
+            latency: 0,
+            lastCheck: new Date()
+          };
+      }
+    } catch (error) {
+      return {
+        status: 'error',
+        error: error.message,
+        lastCheck: new Date()
+      };
     }
   };
 
   const handleConnectWallet = async (walletType) => {
-    setIsLoading(true);
+    setConnectingWallet(walletType);
     setError(null);
 
     try {
@@ -34,29 +102,54 @@ function WalletConnector({ onWalletConnect, onWalletDisconnect }) {
       
       switch (walletType) {
         case 'plug':
+          // Check if Plug is installed first
+          if (!window.ic?.plug) {
+            throw new Error('Plug wallet is not installed. Please install it first.');
+          }
           result = await walletService.connectPlugWallet();
           break;
         case 'stoic':
           // Add Stoic connection logic
-          throw new Error('Stoic wallet integration coming soon');
+          throw new Error('Stoic wallet integration coming soon. Stay tuned!');
+        case 'dfinity':
+          throw new Error('DFINITY Wallet integration coming soon. Stay tuned!');
+        case 'bitfinity':
+          throw new Error('Bitfinity Wallet integration coming soon. Stay tuned!');
         default:
           throw new Error(`Unsupported wallet type: ${walletType}`);
       }
 
       if (result.success) {
-        await detectWallets(); // Refresh wallet list
+        await detectWallets(false); // Refresh wallet list without showing loading
         onWalletConnect?.(result);
+        
+        // Show success message
+        setError({
+          message: `${walletType.charAt(0).toUpperCase() + walletType.slice(1)} wallet connected successfully!`,
+          type: 'success',
+          timestamp: new Date()
+        });
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => setError(null), 3000);
       }
     } catch (error) {
       console.error('Wallet connection failed:', error);
-      setError(error.message);
+      setError({
+        message: `Failed to connect ${walletType} wallet`,
+        details: error.message,
+        type: 'error',
+        canRetry: true,
+        walletType,
+        timestamp: new Date()
+      });
     } finally {
-      setIsLoading(false);
+      setConnectingWallet(null);
     }
   };
 
   const handleDisconnectWallet = async (walletType) => {
-    setIsLoading(true);
+    setDisconnectingWallet(walletType);
     setError(null);
 
     try {
@@ -67,25 +160,78 @@ function WalletConnector({ onWalletConnect, onWalletDisconnect }) {
           result = await walletService.disconnectPlugWallet();
           break;
         default:
-          throw new Error(`Cannot disconnect ${walletType}`);
+          throw new Error(`Cannot disconnect ${walletType} wallet`);
       }
 
       if (result.success) {
-        await detectWallets(); // Refresh wallet list
+        await detectWallets(false); // Refresh wallet list
         onWalletDisconnect?.(walletType);
+        
+        // Show success message
+        setError({
+          message: `${walletType.charAt(0).toUpperCase() + walletType.slice(1)} wallet disconnected successfully`,
+          type: 'success',
+          timestamp: new Date()
+        });
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => setError(null), 3000);
       }
     } catch (error) {
       console.error('Wallet disconnection failed:', error);
-      setError(error.message);
+      setError({
+        message: `Failed to disconnect ${walletType} wallet`,
+        details: error.message,
+        type: 'error',
+        timestamp: new Date()
+      });
     } finally {
-      setIsLoading(false);
+      setDisconnectingWallet(null);
     }
   };
+
+  const handleRetry = () => {
+    if (error?.canRetry) {
+      if (error.walletType) {
+        handleConnectWallet(error.walletType);
+      } else {
+        detectWallets();
+      }
+    }
+  };
+
+  const handleDismissError = () => {
+    setError(null);
+  };
+
+  const refreshWallets = () => {
+    detectWallets();
+  };
+
+  // Auto-refresh wallet status every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      detectWallets(false);
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [detectWallets]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const getWalletIcon = (walletType) => {
     switch (walletType) {
       case 'plug': return '🔌';
       case 'stoic': return '🏛️';
+      case 'dfinity': return '🌀';
+      case 'bitfinity': return '♾️';
       case 'internal': return '🏦';
       default: return '💳';
     }
@@ -104,6 +250,33 @@ function WalletConnector({ onWalletConnect, onWalletDisconnect }) {
       case 'not-installed': return 'var(--neutral-400)';
       default: return 'var(--neutral-400)';
     }
+  };
+
+  const getHealthIndicator = (walletType) => {
+    const health = connectionHealth[walletType];
+    if (!health) return null;
+
+    switch (health.status) {
+      case 'healthy':
+        return <FiCheckCircle className="health-icon healthy" title="Connection healthy" />;
+      case 'disconnected':
+        return <FiWifiOff className="health-icon disconnected" title="Connection lost" />;
+      case 'error':
+        return <FiAlertCircle className="health-icon error" title={`Error: ${health.error}`} />;
+      default:
+        return <FiClock className="health-icon pending" title="Checking..." />;
+    }
+  };
+
+  const formatLastUpdated = () => {
+    if (!lastUpdated) return '';
+    const now = new Date();
+    const diff = now - lastUpdated;
+    const minutes = Math.floor(diff / 60000);
+    
+    if (minutes < 1) return 'Just now';
+    if (minutes === 1) return '1 minute ago';
+    return `${minutes} minutes ago`;
   };
 
   return (
