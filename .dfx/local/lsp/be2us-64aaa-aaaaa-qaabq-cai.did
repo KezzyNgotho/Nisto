@@ -1,50 +1,202 @@
-type AssetCanisterArgs = variant { Upgrade : UpgradeArgs; Init : InitArgs };
-type BatchId = nat;
-type BatchOperationKind = variant {
-  SetAssetProperties : SetAssetPropertiesArguments;
-  CreateAsset : CreateAssetArguments;
-  UnsetAssetContent : UnsetAssetContentArguments;
-  DeleteAsset : DeleteAssetArguments;
-  SetAssetContent : SetAssetContentArguments;
-  Clear : ClearArguments;
+type AccountDelegationError = variant {
+  NoSuchDelegation;
+  InternalCanisterError : text;
+  Unauthorized : principal;
 };
-type ChunkId = nat;
-type ClearArguments = record {};
-type CommitBatchArguments = record {
-  batch_id : BatchId;
-  operations : vec BatchOperationKind;
+type AccountInfo = record {
+  name : opt text;
+  origin : text;
+  account_number : opt AccountNumber;
+  last_used : opt Timestamp;
 };
-type CommitProposedBatchArguments = record {
-  batch_id : BatchId;
-  evidence : vec nat8;
+type AccountNumber = nat64;
+type AccountUpdate = record { name : opt text };
+type AddTentativeDeviceResponse = variant {
+  device_registration_mode_off;
+  another_device_tentatively_added;
+  added_tentatively : record {
+    verification_code : text;
+    device_registration_timeout : Timestamp;
+  };
 };
-type ComputeEvidenceArguments = record {
-  batch_id : BatchId;
-  max_iterations : opt nat16;
+type AnalyticsConfig = variant {
+  Plausible : record {
+    domain : opt text;
+    track_localhost : opt bool;
+    hash_mode : opt bool;
+    api_host : opt text;
+  };
 };
-type ConfigurationResponse = record {
-  max_batches : opt nat64;
-  max_bytes : opt nat64;
-  max_chunks : opt nat64;
+type AnchorCredentials = record {
+  recovery_phrases : vec PublicKey;
+  credentials : vec WebAuthnCredential;
+  recovery_credentials : vec WebAuthnCredential;
 };
-type ConfigureArguments = record {
-  max_batches : opt opt nat64;
-  max_bytes : opt opt nat64;
-  max_chunks : opt opt nat64;
+type ArchiveConfig = record {
+  polling_interval_ns : nat64;
+  entries_buffer_limit : nat64;
+  module_hash : vec nat8;
+  entries_fetch_limit : nat16;
 };
-type CreateAssetArguments = record {
-  key : Key;
-  content_type : text;
-  headers : opt vec HeaderField;
-  allow_raw_access : opt bool;
-  max_age : opt nat64;
-  enable_aliasing : opt bool;
+type ArchiveInfo = record {
+  archive_config : opt ArchiveConfig;
+  archive_canister : opt principal;
 };
-type DeleteAssetArguments = record { key : Key };
-type DeleteBatchArguments = record { batch_id : BatchId };
-type GrantPermission = record {
-  permission : Permission;
-  to_principal : principal;
+type Aud = text;
+type AuthnMethod = variant { PubKey : PublicKeyAuthn; WebAuthn : WebAuthn };
+type AuthnMethodAddError = variant { InvalidMetadata : text };
+type AuthnMethodConfirmationCode = record {
+  confirmation_code : text;
+  expiration : Timestamp;
+};
+type AuthnMethodConfirmationError = variant {
+  InternalCanisterError : text;
+  RegistrationModeOff;
+  Unauthorized : principal;
+  NoAuthnMethodToConfirm;
+  WrongCode : record { retries_left : nat8 };
+};
+type AuthnMethodData = record {
+  security_settings : AuthnMethodSecuritySettings;
+  metadata : MetadataMapV2;
+  last_authentication : opt Timestamp;
+  authn_method : AuthnMethod;
+};
+type AuthnMethodMetadataReplaceError = variant {
+  AuthnMethodNotFound;
+  InvalidMetadata : text;
+};
+type AuthnMethodProtection = variant { Protected; Unprotected };
+type AuthnMethodPurpose = variant { Recovery; Authentication };
+type AuthnMethodRegisterError = variant {
+  RegistrationModeOff;
+  RegistrationAlreadyInProgress;
+  InvalidMetadata : text;
+};
+type AuthnMethodRegistrationInfo = record {
+  expiration : Timestamp;
+  session : opt principal;
+  authn_method : opt AuthnMethodData;
+};
+type AuthnMethodRegistrationModeEnterError = variant {
+  InvalidRegistrationId : text;
+  InternalCanisterError : text;
+  AlreadyInProgress;
+  Unauthorized : principal;
+};
+type AuthnMethodRegistrationModeExitError = variant {
+  InternalCanisterError : text;
+  RegistrationModeOff;
+  Unauthorized : principal;
+  InvalidMetadata : text;
+};
+type AuthnMethodReplaceError = variant {
+  AuthnMethodNotFound;
+  InvalidMetadata : text;
+};
+type AuthnMethodSecuritySettings = record {
+  protection : AuthnMethodProtection;
+  purpose : AuthnMethodPurpose;
+};
+type AuthnMethodSecuritySettingsReplaceError = variant { AuthnMethodNotFound };
+type AuthnMethodSessionInfo = record { name : opt text };
+type BufferedArchiveEntry = record {
+  sequence_number : nat64;
+  entry : vec nat8;
+  anchor_number : UserNumber;
+  timestamp : Timestamp;
+};
+type CaptchaConfig = record {
+  max_unsolved_captchas : nat64;
+  captcha_trigger : variant {
+    Dynamic : record {
+      reference_rate_sampling_interval_s : nat64;
+      threshold_pct : nat16;
+      current_rate_sampling_interval_s : nat64;
+    };
+    Static : variant { CaptchaDisabled; CaptchaEnabled };
+  };
+};
+type CaptchaResult = ChallengeResult;
+type Challenge = record { png_base64 : text; challenge_key : ChallengeKey };
+type ChallengeKey = text;
+type ChallengeResult = record { key : ChallengeKey; chars : text };
+type CheckCaptchaArg = record { solution : text };
+type CheckCaptchaError = variant {
+  NoRegistrationFlow;
+  UnexpectedCall : record { next_step : RegistrationFlowNextStep };
+  WrongSolution : record { new_captcha_png_base64 : text };
+};
+type CreateAccountError = variant {
+  AccountLimitReached;
+  InternalCanisterError : text;
+  Unauthorized : principal;
+  NameTooLong;
+};
+type CredentialId = vec nat8;
+type Delegation = record {
+  pubkey : PublicKey;
+  targets : opt vec principal;
+  expiration : Timestamp;
+};
+type DeployArchiveResult = variant {
+  creation_in_progress;
+  success : principal;
+  failed : text;
+};
+type DeviceData = record {
+  alias : text;
+  metadata : opt MetadataMap;
+  origin : opt text;
+  protection : DeviceProtection;
+  pubkey : DeviceKey;
+  key_type : KeyType;
+  purpose : Purpose;
+  credential_id : opt CredentialId;
+};
+type DeviceKey = PublicKey;
+type DeviceKeyWithAnchor = record {
+  pubkey : DeviceKey;
+  anchor_number : UserNumber;
+};
+type DeviceProtection = variant { unprotected; protected };
+type DeviceRegistrationInfo = record {
+  tentative_device : opt DeviceData;
+  expiration : Timestamp;
+  tentative_session : opt principal;
+};
+type DeviceWithUsage = record {
+  alias : text;
+  last_usage : opt Timestamp;
+  metadata : opt MetadataMap;
+  origin : opt text;
+  protection : DeviceProtection;
+  pubkey : DeviceKey;
+  key_type : KeyType;
+  purpose : Purpose;
+  credential_id : opt CredentialId;
+};
+type DummyAuthConfig = record { prompt_for_index : bool };
+type FrontendHostname = text;
+type GetAccountsError = variant {
+  InternalCanisterError : text;
+  Unauthorized : principal;
+};
+type GetDelegationResponse = variant {
+  no_such_delegation;
+  signed_delegation : SignedDelegation;
+};
+type GetIdAliasError = variant {
+  InternalCanisterError : text;
+  Unauthorized : principal;
+  NoSuchCredentials : text;
+};
+type GetIdAliasRequest = record {
+  rp_id_alias_jwt : text;
+  issuer : FrontendHostname;
+  issuer_id_alias_jwt : text;
+  relying_party : FrontendHostname;
+  identity_number : IdentityNumber;
 };
 type HeaderField = record { text; text };
 type HttpRequest = record {
@@ -57,141 +209,383 @@ type HttpRequest = record {
 type HttpResponse = record {
   body : vec nat8;
   headers : vec HeaderField;
+  upgrade : opt bool;
   streaming_strategy : opt StreamingStrategy;
   status_code : nat16;
 };
-type InitArgs = record {};
-type Key = text;
-type ListPermitted = record { permission : Permission };
-type Permission = variant { Prepare; ManagePermissions; Commit };
-type RevokePermission = record {
-  permission : Permission;
-  of_principal : principal;
+type IdAliasCredentials = record {
+  rp_id_alias_credential : SignedIdAlias;
+  issuer_id_alias_credential : SignedIdAlias;
 };
-type SetAssetContentArguments = record {
-  key : Key;
-  sha256 : opt vec nat8;
-  chunk_ids : vec ChunkId;
-  content_encoding : text;
+type IdRegFinishArg = record {
+  name : opt text;
+  authn_method : AuthnMethodData;
 };
-type SetAssetPropertiesArguments = record {
-  key : Key;
-  headers : opt opt vec HeaderField;
-  is_aliased : opt opt bool;
-  allow_raw_access : opt opt bool;
-  max_age : opt opt nat64;
+type IdRegFinishError = variant {
+  NoRegistrationFlow;
+  UnexpectedCall : record { next_step : RegistrationFlowNextStep };
+  InvalidAuthnMethod : text;
+  IdentityLimitReached;
+  StorageError : text;
 };
-type SetPermissions = record {
-  prepare : vec principal;
-  commit : vec principal;
-  manage_permissions : vec principal;
+type IdRegFinishResult = record { identity_number : nat64 };
+type IdRegNextStepResult = record { next_step : RegistrationFlowNextStep };
+type IdRegStartError = variant {
+  InvalidCaller;
+  AlreadyInProgress;
+  RateLimitExceeded;
+};
+type IdentityAnchorInfo = record {
+  name : opt text;
+  devices : vec DeviceWithUsage;
+  openid_credentials : opt vec OpenIdCredential;
+  device_registration : opt DeviceRegistrationInfo;
+};
+type IdentityAuthnInfo = record {
+  authn_methods : vec AuthnMethod;
+  recovery_authn_methods : vec AuthnMethod;
+};
+type IdentityInfo = record {
+  authn_methods : vec AuthnMethodData;
+  metadata : MetadataMapV2;
+  name : opt text;
+  authn_method_registration : opt AuthnMethodRegistrationInfo;
+  openid_credentials : opt vec OpenIdCredential;
+};
+type IdentityInfoError = variant {
+  InternalCanisterError : text;
+  Unauthorized : principal;
+};
+type IdentityMetadataReplaceError = variant {
+  InternalCanisterError : text;
+  Unauthorized : principal;
+  StorageSpaceExceeded : record {
+    space_required : nat64;
+    space_available : nat64;
+  };
+};
+type IdentityNumber = nat64;
+type IdentityPropertiesReplace = record { name : opt text };
+type IdentityPropertiesReplaceError = variant {
+  InternalCanisterError : text;
+  Unauthorized : principal;
+  NameTooLong : record { limit : nat64 };
+  StorageSpaceExceeded : record {
+    space_required : nat64;
+    space_available : nat64;
+  };
+};
+type InternetIdentityInit = record {
+  fetch_root_key : opt bool;
+  openid_google : opt opt OpenIdConfig;
+  is_production : opt bool;
+  enable_dapps_explorer : opt bool;
+  assigned_user_number_range : opt record { nat64; nat64 };
+  new_flow_origins : opt vec text;
+  archive_config : opt ArchiveConfig;
+  canister_creation_cycles_cost : opt nat64;
+  analytics_config : opt opt AnalyticsConfig;
+  related_origins : opt vec text;
+  feature_flag_continue_from_another_device : opt bool;
+  captcha_config : opt CaptchaConfig;
+  dummy_auth : opt opt DummyAuthConfig;
+  register_rate_limit : opt RateLimitConfig;
+};
+type InternetIdentityStats = record {
+  storage_layout_version : nat8;
+  users_registered : nat64;
+  assigned_user_number_range : record { nat64; nat64 };
+  archive_info : ArchiveInfo;
+  canister_creation_cycles_cost : nat64;
+  event_aggregations : vec record { text; vec record { text; nat64 } };
+};
+type Iss = text;
+type JWT = text;
+type KeyType = variant {
+  platform;
+  seed_phrase;
+  cross_platform;
+  unknown;
+  browser_storage_key;
+};
+type LookupByRegistrationIdError = variant { InvalidRegistrationId : text };
+type MetadataMap = vec record {
+  text;
+  variant { map : MetadataMap; string : text; bytes : vec nat8 };
+};
+type MetadataMapV2 = vec record {
+  text;
+  variant { Map : MetadataMapV2; String : text; Bytes : vec nat8 };
+};
+type OpenIDRegFinishArg = record { jwt : JWT; salt : Salt };
+type OpenIdConfig = record { client_id : text };
+type OpenIdCredential = record {
+  aud : Aud;
+  iss : Iss;
+  sub : Sub;
+  metadata : MetadataMapV2;
+  last_usage_timestamp : opt Timestamp;
+};
+type OpenIdCredentialAddError = variant {
+  OpenIdCredentialAlreadyRegistered;
+  InternalCanisterError : text;
+  JwtExpired;
+  Unauthorized : principal;
+  JwtVerificationFailed;
+};
+type OpenIdCredentialKey = record { Iss; Sub };
+type OpenIdCredentialRemoveError = variant {
+  InternalCanisterError : text;
+  OpenIdCredentialNotFound;
+  Unauthorized : principal;
+};
+type OpenIdDelegationError = variant {
+  NoSuchDelegation;
+  NoSuchAnchor;
+  JwtExpired;
+  JwtVerificationFailed;
+};
+type OpenIdPrepareDelegationResponse = record {
+  user_key : UserKey;
+  expiration : Timestamp;
+  anchor_number : UserNumber;
+};
+type PrepareAccountDelegation = record {
+  user_key : UserKey;
+  expiration : Timestamp;
+};
+type PrepareIdAliasError = variant {
+  InternalCanisterError : text;
+  Unauthorized : principal;
+};
+type PrepareIdAliasRequest = record {
+  issuer : FrontendHostname;
+  relying_party : FrontendHostname;
+  identity_number : IdentityNumber;
+};
+type PreparedIdAlias = record {
+  rp_id_alias_jwt : text;
+  issuer_id_alias_jwt : text;
+  canister_sig_pk_der : PublicKey;
+};
+type PublicKey = vec nat8;
+type PublicKeyAuthn = record { pubkey : PublicKey };
+type Purpose = variant { authentication; recovery };
+type RateLimitConfig = record { max_tokens : nat64; time_per_token_ns : nat64 };
+type RegisterResponse = variant {
+  bad_challenge;
+  canister_full;
+  registered : record { user_number : UserNumber };
+};
+type RegistrationFlowNextStep = variant {
+  CheckCaptcha : record { captcha_png_base64 : text };
+  Finish;
+};
+type RegistrationId = text;
+type Salt = vec nat8;
+type SessionKey = PublicKey;
+type SignedDelegation = record {
+  signature : vec nat8;
+  delegation : Delegation;
+};
+type SignedIdAlias = record {
+  credential_jws : text;
+  id_alias : principal;
+  id_dapp : principal;
 };
 type StreamingCallbackHttpResponse = record {
-  token : opt StreamingCallbackToken;
+  token : opt Token;
   body : vec nat8;
-};
-type StreamingCallbackToken = record {
-  key : Key;
-  sha256 : opt vec nat8;
-  index : nat;
-  content_encoding : text;
 };
 type StreamingStrategy = variant {
   Callback : record {
-    token : StreamingCallbackToken;
-    callback : func (StreamingCallbackToken) -> (
-        opt StreamingCallbackHttpResponse,
-      ) query;
+    token : Token;
+    callback : func (Token) -> (StreamingCallbackHttpResponse) query;
   };
 };
-type Time = int;
-type UnsetAssetContentArguments = record { key : Key; content_encoding : text };
-type UpgradeArgs = record { set_permissions : opt SetPermissions };
-type ValidationResult = variant { Ok : text; Err : text };
+type Sub = text;
+type Timestamp = nat64;
+type Token = record {};
+type UpdateAccountError = variant {
+  AccountLimitReached;
+  InternalCanisterError : text;
+  Unauthorized : principal;
+  NameTooLong;
+};
+type UserKey = PublicKey;
+type UserNumber = nat64;
+type VerifyTentativeDeviceResponse = variant {
+  device_registration_mode_off;
+  verified;
+  wrong_code : record { retries_left : nat8 };
+  no_device_to_verify;
+};
+type WebAuthn = record { pubkey : PublicKey; credential_id : CredentialId };
+type WebAuthnCredential = record {
+  pubkey : PublicKey;
+  credential_id : CredentialId;
+};
 service : {
-  api_version : () -> (nat16) query;
-  authorize : (principal) -> ();
-  certified_tree : (record {}) -> (
-      record { certificate : vec nat8; tree : vec nat8 },
-    ) query;
-  clear : (ClearArguments) -> ();
-  commit_batch : (CommitBatchArguments) -> ();
-  commit_proposed_batch : (CommitProposedBatchArguments) -> ();
-  compute_evidence : (ComputeEvidenceArguments) -> (opt vec nat8);
-  configure : (ConfigureArguments) -> ();
-  create_asset : (CreateAssetArguments) -> ();
-  create_batch : (record {}) -> (record { batch_id : BatchId });
-  create_chunk : (record { content : vec nat8; batch_id : BatchId }) -> (
-      record { chunk_id : ChunkId },
+  acknowledge_entries : (nat64) -> ();
+  add : (UserNumber, DeviceData) -> ();
+  add_tentative_device : (UserNumber, DeviceData) -> (
+      AddTentativeDeviceResponse,
     );
-  deauthorize : (principal) -> ();
-  delete_asset : (DeleteAssetArguments) -> ();
-  delete_batch : (DeleteBatchArguments) -> ();
-  get : (record { key : Key; accept_encodings : vec text }) -> (
-      record {
-        content : vec nat8;
-        sha256 : opt vec nat8;
-        content_type : text;
-        content_encoding : text;
-        total_length : nat;
+  authn_method_add : (IdentityNumber, AuthnMethodData) -> (
+      variant { Ok; Err : AuthnMethodAddError },
+    );
+  authn_method_confirm : (IdentityNumber, text) -> (
+      variant { Ok; Err : AuthnMethodConfirmationError },
+    );
+  authn_method_metadata_replace : (
+      IdentityNumber,
+      PublicKey,
+      MetadataMapV2,
+    ) -> (variant { Ok; Err : AuthnMethodMetadataReplaceError });
+  authn_method_register : (IdentityNumber, AuthnMethodData) -> (
+      variant {
+        Ok : AuthnMethodConfirmationCode;
+        Err : AuthnMethodRegisterError;
       },
+    );
+  authn_method_registration_mode_enter : (
+      IdentityNumber,
+      opt RegistrationId,
+    ) -> (
+      variant {
+        Ok : record { expiration : Timestamp };
+        Err : AuthnMethodRegistrationModeEnterError;
+      },
+    );
+  authn_method_registration_mode_exit : (
+      IdentityNumber,
+      opt AuthnMethodData,
+    ) -> (variant { Ok; Err : AuthnMethodRegistrationModeExitError });
+  authn_method_remove : (IdentityNumber, PublicKey) -> (variant { Ok; Err });
+  authn_method_replace : (IdentityNumber, PublicKey, AuthnMethodData) -> (
+      variant { Ok; Err : AuthnMethodReplaceError },
+    );
+  authn_method_security_settings_replace : (
+      IdentityNumber,
+      PublicKey,
+      AuthnMethodSecuritySettings,
+    ) -> (variant { Ok; Err : AuthnMethodSecuritySettingsReplaceError });
+  authn_method_session_info : (IdentityNumber) -> (
+      opt AuthnMethodSessionInfo,
     ) query;
-  get_asset_properties : (Key) -> (
-      record {
-        headers : opt vec HeaderField;
-        is_aliased : opt bool;
-        allow_raw_access : opt bool;
-        max_age : opt nat64;
+  authn_method_session_register : (IdentityNumber) -> (
+      variant {
+        Ok : AuthnMethodConfirmationCode;
+        Err : AuthnMethodRegisterError;
       },
+    );
+  check_captcha : (CheckCaptchaArg) -> (
+      variant { Ok : IdRegNextStepResult; Err : CheckCaptchaError },
+    );
+  config : () -> (InternetIdentityInit) query;
+  create_account : (UserNumber, FrontendHostname, text) -> (
+      variant { Ok : AccountInfo; Err : CreateAccountError },
+    );
+  create_challenge : () -> (Challenge);
+  deploy_archive : (vec nat8) -> (DeployArchiveResult);
+  enter_device_registration_mode : (UserNumber) -> (Timestamp);
+  exit_device_registration_mode : (UserNumber) -> ();
+  fetch_entries : () -> (vec BufferedArchiveEntry);
+  get_account_delegation : (
+      UserNumber,
+      FrontendHostname,
+      opt AccountNumber,
+      SessionKey,
+      Timestamp,
+    ) -> (
+      variant { Ok : SignedDelegation; Err : AccountDelegationError },
     ) query;
-  get_chunk : (
-      record {
-        key : Key;
-        sha256 : opt vec nat8;
-        index : nat;
-        content_encoding : text;
-      },
-    ) -> (record { content : vec nat8 }) query;
-  get_configuration : () -> (ConfigurationResponse);
-  grant_permission : (GrantPermission) -> ();
+  get_accounts : (UserNumber, FrontendHostname) -> (
+      variant { Ok : vec AccountInfo; Err : GetAccountsError },
+    ) query;
+  get_anchor_credentials : (UserNumber) -> (AnchorCredentials) query;
+  get_anchor_info : (UserNumber) -> (IdentityAnchorInfo);
+  get_delegation : (UserNumber, FrontendHostname, SessionKey, Timestamp) -> (
+      GetDelegationResponse,
+    ) query;
+  get_id_alias : (GetIdAliasRequest) -> (
+      variant { Ok : IdAliasCredentials; Err : GetIdAliasError },
+    ) query;
+  get_principal : (UserNumber, FrontendHostname) -> (principal) query;
   http_request : (HttpRequest) -> (HttpResponse) query;
-  http_request_streaming_callback : (StreamingCallbackToken) -> (
-      opt StreamingCallbackHttpResponse,
+  http_request_update : (HttpRequest) -> (HttpResponse);
+  identity_authn_info : (IdentityNumber) -> (
+      variant { Ok : IdentityAuthnInfo; Err },
     ) query;
-  list : (record {}) -> (
-      vec record {
-        key : Key;
-        encodings : vec record {
-          modified : Time;
-          sha256 : opt vec nat8;
-          length : nat;
-          content_encoding : text;
-        };
-        content_type : text;
-      },
-    ) query;
-  list_authorized : () -> (vec principal);
-  list_permitted : (ListPermitted) -> (vec principal);
-  propose_commit_batch : (CommitBatchArguments) -> ();
-  revoke_permission : (RevokePermission) -> ();
-  set_asset_content : (SetAssetContentArguments) -> ();
-  set_asset_properties : (SetAssetPropertiesArguments) -> ();
-  store : (
-      record {
-        key : Key;
-        content : vec nat8;
-        sha256 : opt vec nat8;
-        content_type : text;
-        content_encoding : text;
-      },
-    ) -> ();
-  take_ownership : () -> ();
-  unset_asset_content : (UnsetAssetContentArguments) -> ();
-  validate_commit_proposed_batch : (CommitProposedBatchArguments) -> (
-      ValidationResult,
+  identity_info : (IdentityNumber) -> (
+      variant { Ok : IdentityInfo; Err : IdentityInfoError },
     );
-  validate_configure : (ConfigureArguments) -> (ValidationResult);
-  validate_grant_permission : (GrantPermission) -> (ValidationResult);
-  validate_revoke_permission : (RevokePermission) -> (ValidationResult);
-  validate_take_ownership : () -> (ValidationResult);
+  identity_metadata_replace : (IdentityNumber, MetadataMapV2) -> (
+      variant { Ok; Err : IdentityMetadataReplaceError },
+    );
+  identity_properties_replace : (IdentityNumber, IdentityPropertiesReplace) -> (
+      variant { Ok; Err : IdentityPropertiesReplaceError },
+    );
+  identity_registration_finish : (IdRegFinishArg) -> (
+      variant { Ok : IdRegFinishResult; Err : IdRegFinishError },
+    );
+  identity_registration_start : () -> (
+      variant { Ok : IdRegNextStepResult; Err : IdRegStartError },
+    );
+  init_salt : () -> ();
+  lookup : (UserNumber) -> (vec DeviceData) query;
+  lookup_by_registration_mode_id : (RegistrationId) -> (
+      opt IdentityNumber,
+    ) query;
+  lookup_device_key : (vec nat8) -> (opt DeviceKeyWithAnchor) query;
+  openid_credential_add : (IdentityNumber, JWT, Salt) -> (
+      variant { Ok; Err : OpenIdCredentialAddError },
+    );
+  openid_credential_remove : (IdentityNumber, OpenIdCredentialKey) -> (
+      variant { Ok; Err : OpenIdCredentialRemoveError },
+    );
+  openid_get_delegation : (JWT, Salt, SessionKey, Timestamp) -> (
+      variant { Ok : SignedDelegation; Err : OpenIdDelegationError },
+    ) query;
+  openid_identity_registration_finish : (OpenIDRegFinishArg) -> (
+      variant { Ok : IdRegFinishResult; Err : IdRegFinishError },
+    );
+  openid_prepare_delegation : (JWT, Salt, SessionKey) -> (
+      variant {
+        Ok : OpenIdPrepareDelegationResponse;
+        Err : OpenIdDelegationError;
+      },
+    );
+  prepare_account_delegation : (
+      UserNumber,
+      FrontendHostname,
+      opt AccountNumber,
+      SessionKey,
+      opt nat64,
+    ) -> (
+      variant { Ok : PrepareAccountDelegation; Err : AccountDelegationError },
+    );
+  prepare_delegation : (
+      UserNumber,
+      FrontendHostname,
+      SessionKey,
+      opt nat64,
+    ) -> (UserKey, Timestamp);
+  prepare_id_alias : (PrepareIdAliasRequest) -> (
+      variant { Ok : PreparedIdAlias; Err : PrepareIdAliasError },
+    );
+  register : (DeviceData, ChallengeResult, opt principal) -> (RegisterResponse);
+  remove : (UserNumber, DeviceKey) -> ();
+  replace : (UserNumber, DeviceKey, DeviceData) -> ();
+  stats : () -> (InternetIdentityStats) query;
+  update : (UserNumber, DeviceKey, DeviceData) -> ();
+  update_account : (
+      UserNumber,
+      FrontendHostname,
+      opt AccountNumber,
+      AccountUpdate,
+    ) -> (variant { Ok : AccountInfo; Err : UpdateAccountError });
+  verify_tentative_device : (UserNumber, text) -> (
+      VerifyTentativeDeviceResponse,
+    );
 }

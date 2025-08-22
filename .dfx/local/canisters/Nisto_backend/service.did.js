@@ -10,7 +10,7 @@ export const idlFactory = ({ IDL }) => {
     'isVerified' : IDL.Bool,
     'verifiedAt' : IDL.Opt(IDL.Int),
   });
-  const Result_74 = IDL.Variant({ 'ok' : EmergencyContact, 'err' : IDL.Text });
+  const Result_75 = IDL.Variant({ 'ok' : EmergencyContact, 'err' : IDL.Text });
   const PaymentProvider = IDL.Variant({
     'Equitel' : IDL.Null,
     'PayPal' : IDL.Null,
@@ -82,7 +82,7 @@ export const idlFactory = ({ IDL }) => {
     'category' : PluginCategory,
     'rating' : IDL.Float64,
   });
-  const Result_73 = IDL.Variant({ 'ok' : Plugin, 'err' : IDL.Text });
+  const Result_74 = IDL.Variant({ 'ok' : Plugin, 'err' : IDL.Text });
   const RecoveryMethod = IDL.Record({
     'id' : IDL.Text,
     'methodType' : IDL.Text,
@@ -103,7 +103,7 @@ export const idlFactory = ({ IDL }) => {
     'isActive' : IDL.Bool,
     'answerHash' : IDL.Text,
   });
-  const Result_72 = IDL.Variant({
+  const Result_73 = IDL.Variant({
     'ok' : IDL.Vec(SecurityQuestion),
     'err' : IDL.Text,
   });
@@ -120,7 +120,7 @@ export const idlFactory = ({ IDL }) => {
     'currency' : IDL.Opt(IDL.Text),
     'amount' : IDL.Float64,
   });
-  const Result_71 = IDL.Variant({ 'ok' : GameReward, 'err' : IDL.Text });
+  const Result_72 = IDL.Variant({ 'ok' : GameReward, 'err' : IDL.Text });
   const Result_49 = IDL.Variant({ 'ok' : IDL.Float64, 'err' : IDL.Text });
   const PaymentStatus = IDL.Variant({
     'Failed' : IDL.Null,
@@ -147,7 +147,7 @@ export const idlFactory = ({ IDL }) => {
     'recipientName' : IDL.Opt(IDL.Text),
   });
   const Result_17 = IDL.Variant({ 'ok' : LocalPayment, 'err' : IDL.Text });
-  const Result_70 = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
+  const Result_71 = IDL.Variant({ 'ok' : IDL.Nat, 'err' : IDL.Text });
   const DeFiProtocol = IDL.Variant({
     'Sonic' : IDL.Null,
     'Neutrinite' : IDL.Null,
@@ -182,7 +182,7 @@ export const idlFactory = ({ IDL }) => {
     'amount' : IDL.Float64,
   });
   const Result_10 = IDL.Variant({ 'ok' : DeFiPosition, 'err' : IDL.Text });
-  const Result_69 = IDL.Variant({
+  const Result_70 = IDL.Variant({
     'ok' : IDL.Record({ 'userId' : IDL.Principal, 'instructions' : IDL.Text }),
     'err' : IDL.Text,
   });
@@ -239,7 +239,7 @@ export const idlFactory = ({ IDL }) => {
     'address' : IDL.Opt(IDL.Text),
     'principalId' : IDL.Opt(IDL.Text),
   });
-  const Result_68 = IDL.Variant({
+  const Result_69 = IDL.Variant({
     'ok' : ExternalWalletConnection,
     'err' : IDL.Text,
   });
@@ -255,7 +255,7 @@ export const idlFactory = ({ IDL }) => {
     'amount' : IDL.Float64,
     'startDate' : IDL.Int,
   });
-  const Result_67 = IDL.Variant({ 'ok' : Budget, 'err' : IDL.Text });
+  const Result_68 = IDL.Variant({ 'ok' : Budget, 'err' : IDL.Text });
   const CryptoTransaction = IDL.Record({
     'id' : IDL.Text,
     'fee' : IDL.Float64,
@@ -373,7 +373,7 @@ export const idlFactory = ({ IDL }) => {
     'totalBalance' : IDL.Float64,
     'rules' : IDL.Opt(IDL.Text),
   });
-  const Result_66 = IDL.Variant({ 'ok' : GroupVault, 'err' : IDL.Text });
+  const Result_67 = IDL.Variant({ 'ok' : GroupVault, 'err' : IDL.Text });
   const GameStatus = IDL.Variant({
     'Paused' : IDL.Null,
     'Active' : IDL.Null,
@@ -409,7 +409,7 @@ export const idlFactory = ({ IDL }) => {
     'rules' : IDL.Opt(IDL.Text),
     'prizePool' : IDL.Float64,
   });
-  const Result_63 = IDL.Variant({ 'ok' : SocialGame, 'err' : IDL.Text });
+  const Result_64 = IDL.Variant({ 'ok' : SocialGame, 'err' : IDL.Text });
   const Transaction = IDL.Record({
     'id' : IDL.Text,
     'status' : IDL.Text,
@@ -423,7 +423,7 @@ export const idlFactory = ({ IDL }) => {
     'amount' : IDL.Float64,
     'walletId' : IDL.Text,
   });
-  const Result_65 = IDL.Variant({ 'ok' : Transaction, 'err' : IDL.Text });
+  const Result_66 = IDL.Variant({ 'ok' : Transaction, 'err' : IDL.Text });
   const VaultChatRoom = IDL.Record({
     'id' : IDL.Text,
     'lastMessageAt' : IDL.Opt(IDL.Int),
@@ -436,7 +436,7 @@ export const idlFactory = ({ IDL }) => {
     'updatedAt' : IDL.Int,
     'vaultId' : IDL.Text,
   });
-  const Result_64 = IDL.Variant({ 'ok' : VaultChatRoom, 'err' : IDL.Text });
+  const Result_65 = IDL.Variant({ 'ok' : VaultChatRoom, 'err' : IDL.Text });
   const Wallet = IDL.Record({
     'id' : IDL.Text,
     'balance' : IDL.Float64,
@@ -494,7 +494,7 @@ export const idlFactory = ({ IDL }) => {
     'err' : IDL.Text,
   });
   const Result_2 = IDL.Variant({ 'ok' : IDL.Text, 'err' : IDL.Text });
-  const Result_62 = IDL.Variant({
+  const Result_63 = IDL.Variant({
     'ok' : IDL.Record({
       'implementedRecommendations' : IDL.Nat,
       'totalRecommendations' : IDL.Nat,
@@ -518,7 +518,7 @@ export const idlFactory = ({ IDL }) => {
     'type' : AIMessageType,
     'timestamp' : IDL.Int,
   });
-  const Result_61 = IDL.Variant({
+  const Result_62 = IDL.Variant({
     'ok' : IDL.Vec(AIMessage),
     'err' : IDL.Text,
   });
@@ -532,7 +532,7 @@ export const idlFactory = ({ IDL }) => {
     'accountType' : IDL.Text,
     'paybillNumber' : IDL.Text,
   });
-  const Result_60 = IDL.Variant({
+  const Result_61 = IDL.Variant({
     'ok' : IDL.Vec(PaybillBill),
     'err' : IDL.Text,
   });
@@ -548,7 +548,7 @@ export const idlFactory = ({ IDL }) => {
     'amount' : IDL.Nat,
     'reason' : IDL.Text,
   });
-  const Result_59 = IDL.Variant({
+  const Result_60 = IDL.Variant({
     'ok' : IDL.Record({
       'activeWallets' : IDL.Nat,
       'monthlySpent' : IDL.Float64,
@@ -557,7 +557,7 @@ export const idlFactory = ({ IDL }) => {
     }),
     'err' : IDL.Text,
   });
-  const Result_58 = IDL.Variant({
+  const Result_59 = IDL.Variant({
     'ok' : IDL.Record({
       'totalValue' : IDL.Float64,
       'totalRewards' : IDL.Float64,
@@ -571,7 +571,7 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(DeFiPosition),
     'err' : IDL.Text,
   });
-  const Result_57 = IDL.Variant({
+  const Result_58 = IDL.Variant({
     'ok' : IDL.Record({
       'totalVolume' : IDL.Float64,
       'averageApy' : IDL.Float64,
@@ -599,7 +599,7 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(DeFiTransaction),
     'err' : IDL.Text,
   });
-  const Result_56 = IDL.Variant({
+  const Result_57 = IDL.Variant({
     'ok' : IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text)),
     'err' : IDL.Text,
   });
@@ -617,7 +617,7 @@ export const idlFactory = ({ IDL }) => {
     'phoneNumber' : IDL.Text,
     'usdtAmount' : IDL.Float64,
   });
-  const Result_55 = IDL.Variant({
+  const Result_56 = IDL.Variant({
     'ok' : IDL.Vec(DepositTransaction),
     'err' : IDL.Text,
   });
@@ -635,7 +635,7 @@ export const idlFactory = ({ IDL }) => {
     'fiatWallets' : IDL.Vec(Wallet),
     'defiPositions' : IDL.Vec(DeFiPosition),
   });
-  const Result_54 = IDL.Variant({ 'ok' : WalletPortfolio, 'err' : IDL.Text });
+  const Result_55 = IDL.Variant({ 'ok' : WalletPortfolio, 'err' : IDL.Text });
   const GameParticipant = IDL.Record({
     'id' : IDL.Text,
     'metadata' : IDL.Opt(IDL.Text),
@@ -646,7 +646,7 @@ export const idlFactory = ({ IDL }) => {
     'isActive' : IDL.Bool,
     'score' : IDL.Float64,
   });
-  const Result_53 = IDL.Variant({
+  const Result_54 = IDL.Variant({
     'ok' : IDL.Vec(GameParticipant),
     'err' : IDL.Text,
   });
@@ -678,7 +678,7 @@ export const idlFactory = ({ IDL }) => {
     'ok' : PaybillTransaction,
     'err' : IDL.Text,
   });
-  const Result_52 = IDL.Variant({
+  const Result_53 = IDL.Variant({
     'ok' : IDL.Vec(PaybillTransaction),
     'err' : IDL.Text,
   });
@@ -696,6 +696,21 @@ export const idlFactory = ({ IDL }) => {
     'location' : IDL.Opt(IDL.Text),
   });
   const Result_16 = IDL.Variant({ 'ok' : SimplePayment, 'err' : IDL.Text });
+  const PaymentService = IDL.Record({
+    'id' : IDL.Text,
+    'status' : IDL.Text,
+    'requiresPaybill' : IDL.Bool,
+    'icon' : IDL.Text,
+    'name' : IDL.Text,
+    'color' : IDL.Text,
+    'description' : IDL.Text,
+    'accountType' : IDL.Text,
+    'paybillNumber' : IDL.Text,
+  });
+  const Result_52 = IDL.Variant({
+    'ok' : IDL.Vec(PaymentService),
+    'err' : IDL.Text,
+  });
   const Result_51 = IDL.Variant({
     'ok' : IDL.Record({
       'topProvider' : IDL.Opt(IDL.Text),
@@ -984,7 +999,7 @@ export const idlFactory = ({ IDL }) => {
   return IDL.Service({
     'addEmergencyContact' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text],
-        [Result_74],
+        [Result_75],
         [],
       ),
     'addPaymentMethod' : IDL.Func(
@@ -992,7 +1007,7 @@ export const idlFactory = ({ IDL }) => {
         [Result_7],
         [],
       ),
-    'addPlugin' : IDL.Func([Plugin], [Result_73], []),
+    'addPlugin' : IDL.Func([Plugin], [Result_74], []),
     'addRecoveryMethod' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
         [Result_1],
@@ -1000,37 +1015,37 @@ export const idlFactory = ({ IDL }) => {
       ),
     'addSecurityQuestions' : IDL.Func(
         [IDL.Vec(IDL.Tuple(IDL.Text, IDL.Text))],
-        [Result_72],
+        [Result_73],
         [],
       ),
     'allowance' : IDL.Func([UserId, UserId], [IDL.Nat], ['query']),
     'approve' : IDL.Func([UserId, IDL.Nat], [Result_5], []),
     'awardGameReward' : IDL.Func(
         [IDL.Text, UserId, IDL.Text, IDL.Float64, IDL.Opt(IDL.Text), IDL.Text],
-        [Result_71],
+        [Result_72],
         [],
       ),
     'balanceOf' : IDL.Func([UserId], [IDL.Nat], ['query']),
     'burn' : IDL.Func([IDL.Nat, IDL.Text], [Result_5], []),
     'calculateDefiRewards' : IDL.Func([IDL.Text], [Result_49], []),
     'cancelPayment' : IDL.Func([IDL.Text], [Result_17], []),
-    'claimGameReward' : IDL.Func([IDL.Text], [Result_71], []),
-    'claimRewards' : IDL.Func([], [Result_70], []),
+    'claimGameReward' : IDL.Func([IDL.Text], [Result_72], []),
+    'claimRewards' : IDL.Func([], [Result_71], []),
     'closeDefiPosition' : IDL.Func([IDL.Text], [Result_10], []),
     'completeRecovery' : IDL.Func(
         [IDL.Text, IDL.Opt(IDL.Text)],
-        [Result_69],
+        [Result_70],
         [],
       ),
     'completeRecoverySetup' : IDL.Func([], [Result_4], []),
     'connectExternalWallet' : IDL.Func(
         [IDL.Text, IDL.Opt(IDL.Text), IDL.Opt(IDL.Text), IDL.Vec(IDL.Text)],
-        [Result_68],
+        [Result_69],
         [],
       ),
     'createBudget' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Float64, IDL.Text, IDL.Int, IDL.Int],
-        [Result_67],
+        [Result_68],
         [],
       ),
     'createCryptoTransaction' : IDL.Func(
@@ -1090,7 +1105,7 @@ export const idlFactory = ({ IDL }) => {
           IDL.Bool,
           IDL.Opt(IDL.Text),
         ],
-        [Result_66],
+        [Result_67],
         [],
       ),
     'createSocialGame' : IDL.Func(
@@ -1107,12 +1122,12 @@ export const idlFactory = ({ IDL }) => {
           IDL.Opt(IDL.Text),
           IDL.Bool,
         ],
-        [Result_63],
+        [Result_64],
         [],
       ),
     'createTransaction' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Float64, IDL.Text, IDL.Text],
-        [Result_65],
+        [Result_66],
         [],
       ),
     'createUser' : IDL.Func(
@@ -1122,7 +1137,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'createVaultChatRoom' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
-        [Result_64],
+        [Result_65],
         [],
       ),
     'createWallet' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [Result_24], []),
@@ -1131,31 +1146,31 @@ export const idlFactory = ({ IDL }) => {
         [Result],
         [],
       ),
-    'endGame' : IDL.Func([IDL.Text], [Result_63], []),
+    'endGame' : IDL.Func([IDL.Text], [Result_64], []),
     'generateAIInsights' : IDL.Func([], [Result_48], []),
     'generateAIRecommendations' : IDL.Func([], [Result_47], []),
     'generateDepositAddress' : IDL.Func([IDL.Text], [Result_2], []),
-    'getAIAnalytics' : IDL.Func([], [Result_62], []),
-    'getAIConversationHistory' : IDL.Func([], [Result_61], []),
-    'getAvailableBills' : IDL.Func([], [Result_60], []),
+    'getAIAnalytics' : IDL.Func([], [Result_63], []),
+    'getAIConversationHistory' : IDL.Func([], [Result_62], []),
+    'getAvailableBills' : IDL.Func([], [Result_61], []),
     'getAvailableGames' : IDL.Func([], [Result_38], []),
     'getBurnHistory' : IDL.Func(
         [IDL.Nat, IDL.Nat],
         [IDL.Vec(TokenBurn)],
         ['query'],
       ),
-    'getDashboardStats' : IDL.Func([], [Result_59], ['query']),
-    'getDefiAnalytics' : IDL.Func([], [Result_58], []),
+    'getDashboardStats' : IDL.Func([], [Result_60], ['query']),
+    'getDefiAnalytics' : IDL.Func([], [Result_59], []),
     'getDefiPositionsByProductType' : IDL.Func([IDL.Text], [Result_42], []),
     'getDefiPositionsByProtocol' : IDL.Func([IDL.Text], [Result_42], []),
-    'getDefiProtocolStats' : IDL.Func([IDL.Text], [Result_57], []),
+    'getDefiProtocolStats' : IDL.Func([IDL.Text], [Result_58], []),
     'getDefiTransactionsByProtocol' : IDL.Func([IDL.Text], [Result_41], []),
     'getDepositAddress' : IDL.Func([IDL.Text], [Result_2], []),
-    'getDepositAddresses' : IDL.Func([], [Result_56], []),
-    'getDepositHistory' : IDL.Func([], [Result_55], []),
+    'getDepositAddresses' : IDL.Func([], [Result_57], []),
+    'getDepositHistory' : IDL.Func([], [Result_56], []),
     'getDepositTransactionById' : IDL.Func([IDL.Text], [Result_19], []),
-    'getFullWalletPortfolio' : IDL.Func([], [Result_54], []),
-    'getGameLeaderboard' : IDL.Func([IDL.Text], [Result_53], []),
+    'getFullWalletPortfolio' : IDL.Func([], [Result_55], []),
+    'getGameLeaderboard' : IDL.Func([IDL.Text], [Result_54], []),
     'getGamesByType' : IDL.Func([IDL.Text], [Result_38], []),
     'getMintHistory' : IDL.Func(
         [IDL.Nat, IDL.Nat],
@@ -1163,8 +1178,9 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getPaybillTransactionById' : IDL.Func([IDL.Text], [Result_18], []),
-    'getPaybillTransactionHistory' : IDL.Func([], [Result_52], []),
+    'getPaybillTransactionHistory' : IDL.Func([], [Result_53], []),
     'getPaymentById' : IDL.Func([IDL.Text], [Result_16], []),
+    'getPaymentServices' : IDL.Func([], [Result_52], []),
     'getPaymentStats' : IDL.Func([], [Result_51], []),
     'getPaymentsByProvider' : IDL.Func([IDL.Text], [Result_35], []),
     'getPrincipalId' : IDL.Func([], [IDL.Text], ['query']),

@@ -252,30 +252,38 @@ type Result_8 =
    err: text;
    ok: Goal;
  };
-type Result_74 = 
+type Result_75 = 
  variant {
    err: text;
    ok: EmergencyContact;
  };
-type Result_73 = 
+type Result_74 = 
  variant {
    err: text;
    ok: Plugin;
  };
-type Result_72 = 
+type Result_73 = 
  variant {
    err: text;
    ok: vec SecurityQuestion;
  };
-type Result_71 = 
+type Result_72 = 
  variant {
    err: text;
    ok: GameReward;
  };
-type Result_70 = 
+type Result_71 = 
  variant {
    err: text;
    ok: nat;
+ };
+type Result_70 = 
+ variant {
+   err: text;
+   ok: record {
+         instructions: text;
+         userId: principal;
+       };
  };
 type Result_7 = 
  variant {
@@ -285,42 +293,34 @@ type Result_7 =
 type Result_69 = 
  variant {
    err: text;
-   ok: record {
-         instructions: text;
-         userId: principal;
-       };
+   ok: ExternalWalletConnection;
  };
 type Result_68 = 
  variant {
    err: text;
-   ok: ExternalWalletConnection;
+   ok: Budget;
  };
 type Result_67 = 
  variant {
    err: text;
-   ok: Budget;
+   ok: GroupVault;
  };
 type Result_66 = 
  variant {
    err: text;
-   ok: GroupVault;
+   ok: Transaction;
  };
 type Result_65 = 
  variant {
    err: text;
-   ok: Transaction;
+   ok: VaultChatRoom;
  };
 type Result_64 = 
  variant {
    err: text;
-   ok: VaultChatRoom;
- };
-type Result_63 = 
- variant {
-   err: text;
    ok: SocialGame;
  };
-type Result_62 = 
+type Result_63 = 
  variant {
    err: text;
    ok:
@@ -332,15 +332,26 @@ type Result_62 =
       totalRecommendations: nat;
     };
  };
-type Result_61 = 
+type Result_62 = 
  variant {
    err: text;
    ok: vec AIMessage;
  };
-type Result_60 = 
+type Result_61 = 
  variant {
    err: text;
    ok: vec PaybillBill;
+ };
+type Result_60 = 
+ variant {
+   err: text;
+   ok:
+    record {
+      activeWallets: nat;
+      goalsProgress: float64;
+      monthlySpent: float64;
+      totalBalance: float64;
+    };
  };
 type Result_6 = 
  variant {
@@ -352,17 +363,6 @@ type Result_59 =
    err: text;
    ok:
     record {
-      activeWallets: nat;
-      goalsProgress: float64;
-      monthlySpent: float64;
-      totalBalance: float64;
-    };
- };
-type Result_58 = 
- variant {
-   err: text;
-   ok:
-    record {
       activeProtocols: vec text;
       averageApy: float64;
       totalPositions: nat;
@@ -370,7 +370,7 @@ type Result_58 =
       totalValue: float64;
     };
  };
-type Result_57 = 
+type Result_58 = 
  variant {
    err: text;
    ok:
@@ -381,7 +381,7 @@ type Result_57 =
       totalVolume: float64;
     };
  };
-type Result_56 = 
+type Result_57 = 
  variant {
    err: text;
    ok: vec record {
@@ -389,25 +389,30 @@ type Result_56 =
              text;
            };
  };
-type Result_55 = 
+type Result_56 = 
  variant {
    err: text;
    ok: vec DepositTransaction;
  };
-type Result_54 = 
+type Result_55 = 
  variant {
    err: text;
    ok: WalletPortfolio;
  };
-type Result_53 = 
+type Result_54 = 
  variant {
    err: text;
    ok: vec GameParticipant;
  };
-type Result_52 = 
+type Result_53 = 
  variant {
    err: text;
    ok: vec PaybillTransaction;
+ };
+type Result_52 = 
+ variant {
+   err: text;
+   ok: vec PaymentService;
  };
 type Result_51 = 
  variant {
@@ -780,6 +785,18 @@ type PaymentStatus =
    Pending;
    Processing;
    Refunded;
+ };
+type PaymentService = 
+ record {
+   accountType: text;
+   color: text;
+   description: text;
+   icon: text;
+   id: text;
+   name: text;
+   paybillNumber: text;
+   requiresPaybill: bool;
+   status: text;
  };
 type PaymentProvider = 
  variant {
@@ -1243,29 +1260,29 @@ type AIInsight =
    userId: UserId;
  };
 service : {
-  addEmergencyContact: (text, text, text) -> (Result_74);
+  addEmergencyContact: (text, text, text) -> (Result_75);
   addPaymentMethod: (text, opt text, opt text, text, bool) -> (Result_7);
-  addPlugin: (Plugin) -> (Result_73);
+  addPlugin: (Plugin) -> (Result_74);
   addRecoveryMethod: (text, text, opt text) -> (Result_1);
   addSecurityQuestions: (vec record {
                                text;
                                text;
-                             }) -> (Result_72);
+                             }) -> (Result_73);
   allowance: (UserId, UserId) -> (nat) query;
   approve: (UserId, nat) -> (Result_5);
   awardGameReward: (text, UserId, text, float64, opt text, text) ->
-   (Result_71);
+   (Result_72);
   balanceOf: (UserId) -> (nat) query;
   burn: (nat, text) -> (Result_5);
   calculateDefiRewards: (text) -> (Result_49);
   cancelPayment: (text) -> (Result_17);
-  claimGameReward: (text) -> (Result_71);
-  claimRewards: () -> (Result_70);
+  claimGameReward: (text) -> (Result_72);
+  claimRewards: () -> (Result_71);
   closeDefiPosition: (text) -> (Result_10);
-  completeRecovery: (text, opt text) -> (Result_69);
+  completeRecovery: (text, opt text) -> (Result_70);
   completeRecoverySetup: () -> (Result_4);
-  connectExternalWallet: (text, opt text, opt text, vec text) -> (Result_68);
-  createBudget: (text, text, float64, text, int, int) -> (Result_67);
+  connectExternalWallet: (text, opt text, opt text, vec text) -> (Result_69);
+  createBudget: (text, text, float64, text, int, int) -> (Result_68);
   createCryptoTransaction: (text, text, float64, opt text, opt text,
    opt text, float64) -> (Result_6);
   createCryptoWallet: (text, text, bool, opt text, opt text) -> (Result_11);
@@ -1275,40 +1292,41 @@ service : {
    (Result_10);
   createGoal: (text, text, float64, text, opt int, text) -> (Result_8);
   createGroupVault: (text, opt text, text, text, opt float64, bool,
-   opt text) -> (Result_66);
+   opt text) -> (Result_67);
   createSocialGame: (text, text, text, int, opt int, opt nat, opt float64,
-   float64, text, opt text, bool) -> (Result_63);
-  createTransaction: (text, text, float64, text, text) -> (Result_65);
+   float64, text, opt text, bool) -> (Result_64);
+  createTransaction: (text, text, float64, text, text) -> (Result_66);
   createUser: (text, text, opt text) -> (Result_4);
-  createVaultChatRoom: (text, text, opt text) -> (Result_64);
+  createVaultChatRoom: (text, text, opt text) -> (Result_65);
   createWallet: (text, text, text) -> (Result_24);
   depositToVault: (text, float64, opt text) -> (Result);
-  endGame: (text) -> (Result_63);
+  endGame: (text) -> (Result_64);
   generateAIInsights: () -> (Result_48);
   generateAIRecommendations: () -> (Result_47);
   generateDepositAddress: (text) -> (Result_2);
-  getAIAnalytics: () -> (Result_62);
-  getAIConversationHistory: () -> (Result_61);
-  getAvailableBills: () -> (Result_60);
+  getAIAnalytics: () -> (Result_63);
+  getAIConversationHistory: () -> (Result_62);
+  getAvailableBills: () -> (Result_61);
   getAvailableGames: () -> (Result_38);
   getBurnHistory: (nat, nat) -> (vec TokenBurn) query;
-  getDashboardStats: () -> (Result_59) query;
-  getDefiAnalytics: () -> (Result_58);
+  getDashboardStats: () -> (Result_60) query;
+  getDefiAnalytics: () -> (Result_59);
   getDefiPositionsByProductType: (text) -> (Result_42);
   getDefiPositionsByProtocol: (text) -> (Result_42);
-  getDefiProtocolStats: (text) -> (Result_57);
+  getDefiProtocolStats: (text) -> (Result_58);
   getDefiTransactionsByProtocol: (text) -> (Result_41);
   getDepositAddress: (text) -> (Result_2);
-  getDepositAddresses: () -> (Result_56);
-  getDepositHistory: () -> (Result_55);
+  getDepositAddresses: () -> (Result_57);
+  getDepositHistory: () -> (Result_56);
   getDepositTransactionById: (text) -> (Result_19);
-  getFullWalletPortfolio: () -> (Result_54);
-  getGameLeaderboard: (text) -> (Result_53);
+  getFullWalletPortfolio: () -> (Result_55);
+  getGameLeaderboard: (text) -> (Result_54);
   getGamesByType: (text) -> (Result_38);
   getMintHistory: (nat, nat) -> (vec TokenMint) query;
   getPaybillTransactionById: (text) -> (Result_18);
-  getPaybillTransactionHistory: () -> (Result_52);
+  getPaybillTransactionHistory: () -> (Result_53);
   getPaymentById: (text) -> (Result_16);
+  getPaymentServices: () -> (Result_52);
   getPaymentStats: () -> (Result_51);
   getPaymentsByProvider: (text) -> (Result_35);
   getPrincipalId: () -> (text) query;
