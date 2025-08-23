@@ -1,7 +1,7 @@
 export const idlFactory = ({ IDL }) => {
   const MetadataMap = IDL.Rec();
   const MetadataMapV2 = IDL.Rec();
-  const OpenIdConfig = IDL.Record({ 'client_id' : IDL.Text });
+  const GoogleOpenIdConfig = IDL.Record({ 'client_id' : IDL.Text });
   const ArchiveConfig = IDL.Record({
     'polling_interval_ns' : IDL.Nat64,
     'entries_buffer_limit' : IDL.Nat64,
@@ -15,6 +15,16 @@ export const idlFactory = ({ IDL }) => {
       'hash_mode' : IDL.Opt(IDL.Bool),
       'api_host' : IDL.Opt(IDL.Text),
     }),
+  });
+  const OpenIdConfig = IDL.Record({
+    'auth_uri' : IDL.Text,
+    'jwks_uri' : IDL.Text,
+    'logo' : IDL.Text,
+    'name' : IDL.Text,
+    'fedcm_uri' : IDL.Opt(IDL.Text),
+    'issuer' : IDL.Text,
+    'auth_scope' : IDL.Vec(IDL.Text),
+    'client_id' : IDL.Text,
   });
   const CaptchaConfig = IDL.Record({
     'max_unsolved_captchas' : IDL.Nat64,
@@ -37,7 +47,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const InternetIdentityInit = IDL.Record({
     'fetch_root_key' : IDL.Opt(IDL.Bool),
-    'openid_google' : IDL.Opt(IDL.Opt(OpenIdConfig)),
+    'openid_google' : IDL.Opt(IDL.Opt(GoogleOpenIdConfig)),
     'is_production' : IDL.Opt(IDL.Bool),
     'enable_dapps_explorer' : IDL.Opt(IDL.Bool),
     'assigned_user_number_range' : IDL.Opt(IDL.Tuple(IDL.Nat64, IDL.Nat64)),
@@ -45,8 +55,10 @@ export const idlFactory = ({ IDL }) => {
     'archive_config' : IDL.Opt(ArchiveConfig),
     'canister_creation_cycles_cost' : IDL.Opt(IDL.Nat64),
     'analytics_config' : IDL.Opt(IDL.Opt(AnalyticsConfig)),
+    'feature_flag_enable_generic_open_id_fe' : IDL.Opt(IDL.Bool),
     'related_origins' : IDL.Opt(IDL.Vec(IDL.Text)),
     'feature_flag_continue_from_another_device' : IDL.Opt(IDL.Bool),
+    'openid_configs' : IDL.Opt(IDL.Vec(OpenIdConfig)),
     'captcha_config' : IDL.Opt(CaptchaConfig),
     'dummy_auth' : IDL.Opt(IDL.Opt(DummyAuthConfig)),
     'register_rate_limit' : IDL.Opt(RateLimitConfig),
@@ -785,7 +797,7 @@ export const idlFactory = ({ IDL }) => {
   });
 };
 export const init = ({ IDL }) => {
-  const OpenIdConfig = IDL.Record({ 'client_id' : IDL.Text });
+  const GoogleOpenIdConfig = IDL.Record({ 'client_id' : IDL.Text });
   const ArchiveConfig = IDL.Record({
     'polling_interval_ns' : IDL.Nat64,
     'entries_buffer_limit' : IDL.Nat64,
@@ -799,6 +811,16 @@ export const init = ({ IDL }) => {
       'hash_mode' : IDL.Opt(IDL.Bool),
       'api_host' : IDL.Opt(IDL.Text),
     }),
+  });
+  const OpenIdConfig = IDL.Record({
+    'auth_uri' : IDL.Text,
+    'jwks_uri' : IDL.Text,
+    'logo' : IDL.Text,
+    'name' : IDL.Text,
+    'fedcm_uri' : IDL.Opt(IDL.Text),
+    'issuer' : IDL.Text,
+    'auth_scope' : IDL.Vec(IDL.Text),
+    'client_id' : IDL.Text,
   });
   const CaptchaConfig = IDL.Record({
     'max_unsolved_captchas' : IDL.Nat64,
@@ -821,7 +843,7 @@ export const init = ({ IDL }) => {
   });
   const InternetIdentityInit = IDL.Record({
     'fetch_root_key' : IDL.Opt(IDL.Bool),
-    'openid_google' : IDL.Opt(IDL.Opt(OpenIdConfig)),
+    'openid_google' : IDL.Opt(IDL.Opt(GoogleOpenIdConfig)),
     'is_production' : IDL.Opt(IDL.Bool),
     'enable_dapps_explorer' : IDL.Opt(IDL.Bool),
     'assigned_user_number_range' : IDL.Opt(IDL.Tuple(IDL.Nat64, IDL.Nat64)),
@@ -829,8 +851,10 @@ export const init = ({ IDL }) => {
     'archive_config' : IDL.Opt(ArchiveConfig),
     'canister_creation_cycles_cost' : IDL.Opt(IDL.Nat64),
     'analytics_config' : IDL.Opt(IDL.Opt(AnalyticsConfig)),
+    'feature_flag_enable_generic_open_id_fe' : IDL.Opt(IDL.Bool),
     'related_origins' : IDL.Opt(IDL.Vec(IDL.Text)),
     'feature_flag_continue_from_another_device' : IDL.Opt(IDL.Bool),
+    'openid_configs' : IDL.Opt(IDL.Vec(OpenIdConfig)),
     'captcha_config' : IDL.Opt(CaptchaConfig),
     'dummy_auth' : IDL.Opt(IDL.Opt(DummyAuthConfig)),
     'register_rate_limit' : IDL.Opt(RateLimitConfig),

@@ -245,45 +245,60 @@ type SecurityQuestion =
 type Result_9 = 
  variant {
    err: text;
-   ok: GameParticipant;
+   ok: Goal;
  };
 type Result_8 = 
  variant {
    err: text;
-   ok: Goal;
+   ok: NotificationPreferences;
  };
-type Result_75 = 
+type Result_78 = 
  variant {
    err: text;
    ok: EmergencyContact;
  };
-type Result_74 = 
+type Result_77 = 
  variant {
    err: text;
    ok: Plugin;
  };
-type Result_73 = 
+type Result_76 = 
+ variant {
+   err: text;
+   ok: PushSubscription;
+ };
+type Result_75 = 
  variant {
    err: text;
    ok: vec SecurityQuestion;
  };
-type Result_72 = 
+type Result_74 = 
  variant {
    err: text;
    ok: GameReward;
  };
-type Result_71 = 
- variant {
-   err: text;
-   ok: nat;
- };
-type Result_70 = 
+type Result_73 = 
  variant {
    err: text;
    ok: record {
          instructions: text;
          userId: principal;
        };
+ };
+type Result_72 = 
+ variant {
+   err: text;
+   ok: ExternalWalletConnection;
+ };
+type Result_71 = 
+ variant {
+   err: text;
+   ok: Budget;
+ };
+type Result_70 = 
+ variant {
+   err: text;
+   ok: GroupVault;
  };
 type Result_7 = 
  variant {
@@ -293,34 +308,19 @@ type Result_7 =
 type Result_69 = 
  variant {
    err: text;
-   ok: ExternalWalletConnection;
+   ok: Transaction;
  };
 type Result_68 = 
  variant {
    err: text;
-   ok: Budget;
+   ok: VaultChatRoom;
  };
 type Result_67 = 
  variant {
    err: text;
-   ok: GroupVault;
- };
-type Result_66 = 
- variant {
-   err: text;
-   ok: Transaction;
- };
-type Result_65 = 
- variant {
-   err: text;
-   ok: VaultChatRoom;
- };
-type Result_64 = 
- variant {
-   err: text;
    ok: SocialGame;
  };
-type Result_63 = 
+type Result_66 = 
  variant {
    err: text;
    ok:
@@ -332,17 +332,17 @@ type Result_63 =
       totalRecommendations: nat;
     };
  };
-type Result_62 = 
+type Result_65 = 
  variant {
    err: text;
    ok: vec AIMessage;
  };
-type Result_61 = 
+type Result_64 = 
  variant {
    err: text;
    ok: vec PaybillBill;
  };
-type Result_60 = 
+type Result_63 = 
  variant {
    err: text;
    ok:
@@ -353,12 +353,7 @@ type Result_60 =
       totalBalance: float64;
     };
  };
-type Result_6 = 
- variant {
-   err: text;
-   ok: CryptoTransaction;
- };
-type Result_59 = 
+type Result_62 = 
  variant {
    err: text;
    ok:
@@ -370,7 +365,7 @@ type Result_59 =
       totalValue: float64;
     };
  };
-type Result_58 = 
+type Result_61 = 
  variant {
    err: text;
    ok:
@@ -381,7 +376,7 @@ type Result_58 =
       totalVolume: float64;
     };
  };
-type Result_57 = 
+type Result_60 = 
  variant {
    err: text;
    ok: vec record {
@@ -389,32 +384,32 @@ type Result_57 =
              text;
            };
  };
-type Result_56 = 
+type Result_6 = 
+ variant {
+   err: text;
+   ok: CryptoTransaction;
+ };
+type Result_59 = 
  variant {
    err: text;
    ok: vec DepositTransaction;
  };
-type Result_55 = 
+type Result_58 = 
  variant {
    err: text;
    ok: WalletPortfolio;
  };
-type Result_54 = 
+type Result_57 = 
  variant {
    err: text;
    ok: vec GameParticipant;
  };
-type Result_53 = 
+type Result_56 = 
  variant {
    err: text;
    ok: vec PaybillTransaction;
  };
-type Result_52 = 
- variant {
-   err: text;
-   ok: vec PaymentService;
- };
-type Result_51 = 
+type Result_55 = 
  variant {
    err: text;
    ok:
@@ -426,10 +421,30 @@ type Result_51 =
       totalPayments: nat;
     };
  };
-type Result_50 = 
+type Result_54 = 
  variant {
    err: text;
    ok: vec TypingIndicator;
+ };
+type Result_53 = 
+ variant {
+   err: text;
+   ok: float64;
+ };
+type Result_52 = 
+ variant {
+   err: text;
+   ok: vec AIInsight;
+ };
+type Result_51 = 
+ variant {
+   err: text;
+   ok: vec AIRecommendation;
+ };
+type Result_50 = 
+ variant {
+   err: text;
+   ok: vec AuditLog;
  };
 type Result_5 = 
  variant {
@@ -439,52 +454,52 @@ type Result_5 =
 type Result_49 = 
  variant {
    err: text;
-   ok: float64;
+   ok: vec Budget;
  };
 type Result_48 = 
  variant {
    err: text;
-   ok: vec AIInsight;
+   ok: vec ChatNotification;
  };
 type Result_47 = 
  variant {
    err: text;
-   ok: vec AIRecommendation;
+   ok: vec CryptoWallet;
  };
 type Result_46 = 
  variant {
    err: text;
-   ok: vec AuditLog;
+   ok: vec DeFiPosition;
  };
 type Result_45 = 
  variant {
    err: text;
-   ok: vec Budget;
+   ok: vec DeFiTransaction;
  };
 type Result_44 = 
  variant {
    err: text;
-   ok: vec ChatNotification;
+   ok: vec ExternalWalletConnection;
  };
 type Result_43 = 
  variant {
    err: text;
-   ok: vec CryptoWallet;
+   ok: vec GameReward;
  };
 type Result_42 = 
  variant {
    err: text;
-   ok: vec DeFiPosition;
+   ok: vec SocialGame;
  };
 type Result_41 = 
  variant {
    err: text;
-   ok: vec DeFiTransaction;
+   ok: vec Goal;
  };
 type Result_40 = 
  variant {
    err: text;
-   ok: vec ExternalWalletConnection;
+   ok: vec GroupVault;
  };
 type Result_4 = 
  variant {
@@ -494,52 +509,61 @@ type Result_4 =
 type Result_39 = 
  variant {
    err: text;
-   ok: vec GameReward;
+   ok: vec LocalPayment;
  };
 type Result_38 = 
  variant {
    err: text;
-   ok: vec SocialGame;
+   ok: vec Notification;
  };
 type Result_37 = 
  variant {
    err: text;
-   ok: vec Goal;
+   ok: vec OTPRequest;
  };
 type Result_36 = 
  variant {
    err: text;
-   ok: vec GroupVault;
+   ok: vec PaymentMethod;
  };
 type Result_35 = 
  variant {
    err: text;
-   ok: vec LocalPayment;
+   ok: vec RecoveryMethod;
  };
 type Result_34 = 
  variant {
    err: text;
-   ok: vec OTPRequest;
+   ok: vec SimplePayment;
  };
 type Result_33 = 
  variant {
    err: text;
-   ok: vec PaymentMethod;
+   ok: vec Transaction;
  };
 type Result_32 = 
  variant {
    err: text;
-   ok: vec RecoveryMethod;
+   ok:
+    record {
+      accountIdentifier: text;
+      allAddresses: vec text;
+      cryptoAddresses: vec record {
+                             text;
+                             text;
+                           };
+      principalId: text;
+    };
  };
 type Result_31 = 
  variant {
    err: text;
-   ok: vec SimplePayment;
+   ok: vec Wallet;
  };
 type Result_30 = 
  variant {
    err: text;
-   ok: vec Transaction;
+   ok: vec ChatMember;
  };
 type Result_3 = 
  variant {
@@ -555,51 +579,27 @@ type Result_29 =
    err: text;
    ok:
     record {
-      accountIdentifier: text;
-      allAddresses: vec text;
-      cryptoAddresses: vec record {
-                             text;
-                             text;
-                           };
-      principalId: text;
-    };
- };
-type Result_28 = 
- variant {
-   err: text;
-   ok: vec Wallet;
- };
-type Result_27 = 
- variant {
-   err: text;
-   ok: vec ChatMember;
- };
-type Result_26 = 
- variant {
-   err: text;
-   ok:
-    record {
       members: vec VaultMember;
       transactions: vec VaultTransaction;
       vault: GroupVault;
     };
  };
-type Result_25 = 
+type Result_28 = 
  variant {
    err: text;
    ok: vec VaultMessage;
  };
-type Result_24 = 
+type Result_27 = 
  variant {
    err: text;
    ok: Wallet;
  };
-type Result_23 = 
+type Result_26 = 
  variant {
    err: text;
    ok: vec CryptoTransaction;
  };
-type Result_22 = 
+type Result_25 = 
  variant {
    err: text;
    ok:
@@ -612,15 +612,30 @@ type Result_22 =
                                  };
     };
  };
-type Result_21 = 
+type Result_24 = 
  variant {
    err: text;
    ok: VaultMember;
  };
-type Result_20 = 
+type Result_23 = 
+ variant {
+   err: text;
+   ok: nat;
+ };
+type Result_22 = 
+ variant {
+   err: text;
+   ok: Notification;
+ };
+type Result_21 = 
  variant {
    err: text;
    ok: AIRecommendation;
+ };
+type Result_20 = 
+ variant {
+   err: text;
+   ok: DepositTransaction;
  };
 type Result_2 = 
  variant {
@@ -630,34 +645,29 @@ type Result_2 =
 type Result_19 = 
  variant {
    err: text;
-   ok: DepositTransaction;
+   ok: PaybillTransaction;
  };
 type Result_18 = 
  variant {
    err: text;
-   ok: PaybillTransaction;
+   ok: LocalPayment;
  };
 type Result_17 = 
  variant {
    err: text;
-   ok: LocalPayment;
+   ok: SimplePayment;
  };
 type Result_16 = 
  variant {
    err: text;
-   ok: SimplePayment;
+   ok: DeFiTransaction;
  };
 type Result_15 = 
  variant {
    err: text;
-   ok: DeFiTransaction;
- };
-type Result_14 = 
- variant {
-   err: text;
    ok: AIMessage;
  };
-type Result_13 = 
+type Result_14 = 
  variant {
    err: text;
    ok: record {
@@ -666,20 +676,25 @@ type Result_13 =
          otpId: text;
        };
  };
-type Result_12 = 
+type Result_13 = 
  variant {
    err: text;
    ok: VaultMessage;
  };
-type Result_11 = 
+type Result_12 = 
  variant {
    err: text;
    ok: CryptoWallet;
  };
-type Result_10 = 
+type Result_11 = 
  variant {
    err: text;
    ok: DeFiPosition;
+ };
+type Result_10 = 
+ variant {
+   err: text;
+   ok: GameParticipant;
  };
 type Result_1 = 
  variant {
@@ -717,6 +732,18 @@ type RecoveryMethod =
    userId: UserId;
    value: text;
    verifiedAt: opt int;
+ };
+type PushSubscription = 
+ record {
+   auth: text;
+   createdAt: int;
+   deviceInfo: opt text;
+   endpoint: text;
+   id: text;
+   isActive: bool;
+   lastUsed: int;
+   p256dh: text;
+   userId: UserId;
  };
 type PrivacySettings = 
  record {
@@ -785,18 +812,6 @@ type PaymentStatus =
    Pending;
    Processing;
    Refunded;
- };
-type PaymentService = 
- record {
-   accountType: text;
-   color: text;
-   description: text;
-   icon: text;
-   id: text;
-   name: text;
-   paybillNumber: text;
-   requiresPaybill: bool;
-   status: text;
  };
 type PaymentProvider = 
  variant {
@@ -875,6 +890,42 @@ type OTPRequest =
    status: text;
    userId: opt UserId;
  };
+type NotificationType = 
+ variant {
+   Payment: record {
+              amount: float64;
+              provider: text;
+              status: text;
+            };
+   Recovery: record {
+               method: text;
+               status: text;
+             };
+   Security: record {
+               action: opt text;
+               event: text;
+               severity: text;
+             };
+   Social: record {
+             event: text;
+             metadata: opt text;
+             userId: text;
+           };
+   System: record {
+             message: text;
+             priority: text;
+           };
+   Transaction: record {
+                  amount: float64;
+                  currency: text;
+                  status: text;
+                };
+   Vault: record {
+            action: text;
+            amount: opt float64;
+            vaultId: text;
+          };
+ };
 type NotificationSettings = 
  record {
    email: bool;
@@ -883,6 +934,42 @@ type NotificationSettings =
    security: bool;
    social: bool;
    transactions: bool;
+ };
+type NotificationPreferences = 
+ record {
+   email: bool;
+   inApp: bool;
+   paymentNotifications: bool;
+   push: bool;
+   quietHours: opt record {
+                     end: text;
+                     start: text;
+                   };
+   recoveryNotifications: bool;
+   securityNotifications: bool;
+   socialNotifications: bool;
+   systemNotifications: bool;
+   timezone: text;
+   transactionNotifications: bool;
+   updatedAt: int;
+   userId: UserId;
+   vaultNotifications: bool;
+ };
+type Notification = 
+ record {
+   actionUrl: opt text;
+   createdAt: int;
+   expiresAt: opt int;
+   id: text;
+   isArchived: bool;
+   isRead: bool;
+   message: text;
+   metadata: opt text;
+   notificationType: NotificationType;
+   priority: text;
+   readAt: opt int;
+   title: text;
+   userId: UserId;
  };
 type MessageType = 
  variant {
@@ -1158,7 +1245,7 @@ type CryptoTransaction =
    amount: float64;
    blockHeight: opt nat;
    currency: text;
-   fee: float64;
+   fees: opt float64;
    fromAddress: opt text;
    id: text;
    metadata: opt text;
@@ -1260,78 +1347,100 @@ type AIInsight =
    userId: UserId;
  };
 service : {
-  addEmergencyContact: (text, text, text) -> (Result_75);
-  addPaymentMethod: (text, opt text, opt text, text, bool) -> (Result_7);
-  addPlugin: (Plugin) -> (Result_74);
-  addRecoveryMethod: (text, text, opt text) -> (Result_1);
-  addSecurityQuestions: (vec record {
-                               text;
-                               text;
-                             }) -> (Result_73);
-  allowance: (UserId, UserId) -> (nat) query;
-  approve: (UserId, nat) -> (Result_5);
-  awardGameReward: (text, UserId, text, float64, opt text, text) ->
-   (Result_72);
-  balanceOf: (UserId) -> (nat) query;
-  burn: (nat, text) -> (Result_5);
-  calculateDefiRewards: (text) -> (Result_49);
-  cancelPayment: (text) -> (Result_17);
-  claimGameReward: (text) -> (Result_72);
-  claimRewards: () -> (Result_71);
-  closeDefiPosition: (text) -> (Result_10);
-  completeRecovery: (text, opt text) -> (Result_70);
+  addEmergencyContact: (name: text, email: text, relationship: text) ->
+   (Result_78);
+  addPaymentMethod: (provider: text, accountNumber: opt text, phoneNumber:
+   opt text, accountName: text, isDefault: bool) -> (Result_7);
+  addPlugin: (plugin: Plugin) -> (Result_77);
+  addPushSubscription: (endpoint: text, p256dh: text, auth: text, deviceInfo:
+   opt text) -> (Result_76);
+  addRecoveryMethod: (methodType: text, value: text, metadata: opt text) ->
+   (Result_1);
+  addSecurityQuestions: (questions: vec record {
+                                          text;
+                                          text;
+                                        }) -> (Result_75);
+  allowance: (owner: UserId, spender: UserId) -> (nat) query;
+  approve: (spender: UserId, amount: nat) -> (Result_5);
+  awardGameReward: (gameId: text, userId: UserId, rewardType: text, amount:
+   float64, currency: opt text, description: text) -> (Result_74);
+  balanceOf: (owner: UserId) -> (nat) query;
+  burn: (amount: nat, reason: text) -> (Result_5);
+  calculateDefiRewards: (positionId: text) -> (Result_53);
+  cancelPayment: (paymentId: text) -> (Result_18);
+  claimGameReward: (rewardId: text) -> (Result_74);
+  claimRewards: () -> (Result_23);
+  closeDefiPosition: (positionId: text) -> (Result_11);
+  completeRecovery: (recoveryToken: text, newDeviceInfo: opt text) ->
+   (Result_73);
   completeRecoverySetup: () -> (Result_4);
-  connectExternalWallet: (text, opt text, opt text, vec text) -> (Result_69);
-  createBudget: (text, text, float64, text, int, int) -> (Result_68);
-  createCryptoTransaction: (text, text, float64, opt text, opt text,
-   opt text, float64) -> (Result_6);
-  createCryptoWallet: (text, text, bool, opt text, opt text) -> (Result_11);
-  createDeFiPosition: (text, text, text, opt text, float64, float64) ->
-   (Result_10);
-  createDefiPosition: (text, text, text, opt text, float64, float64) ->
-   (Result_10);
-  createGoal: (text, text, float64, text, opt int, text) -> (Result_8);
-  createGroupVault: (text, opt text, text, text, opt float64, bool,
-   opt text) -> (Result_67);
-  createSocialGame: (text, text, text, int, opt int, opt nat, opt float64,
-   float64, text, opt text, bool) -> (Result_64);
-  createTransaction: (text, text, float64, text, text) -> (Result_66);
-  createUser: (text, text, opt text) -> (Result_4);
-  createVaultChatRoom: (text, text, opt text) -> (Result_65);
-  createWallet: (text, text, text) -> (Result_24);
-  depositToVault: (text, float64, opt text) -> (Result);
-  endGame: (text) -> (Result_64);
-  generateAIInsights: () -> (Result_48);
-  generateAIRecommendations: () -> (Result_47);
-  generateDepositAddress: (text) -> (Result_2);
-  getAIAnalytics: () -> (Result_63);
-  getAIConversationHistory: () -> (Result_62);
-  getAvailableBills: () -> (Result_61);
-  getAvailableGames: () -> (Result_38);
-  getBurnHistory: (nat, nat) -> (vec TokenBurn) query;
-  getDashboardStats: () -> (Result_60) query;
-  getDefiAnalytics: () -> (Result_59);
-  getDefiPositionsByProductType: (text) -> (Result_42);
-  getDefiPositionsByProtocol: (text) -> (Result_42);
-  getDefiProtocolStats: (text) -> (Result_58);
-  getDefiTransactionsByProtocol: (text) -> (Result_41);
-  getDepositAddress: (text) -> (Result_2);
-  getDepositAddresses: () -> (Result_57);
-  getDepositHistory: () -> (Result_56);
-  getDepositTransactionById: (text) -> (Result_19);
-  getFullWalletPortfolio: () -> (Result_55);
-  getGameLeaderboard: (text) -> (Result_54);
-  getGamesByType: (text) -> (Result_38);
-  getMintHistory: (nat, nat) -> (vec TokenMint) query;
-  getPaybillTransactionById: (text) -> (Result_18);
-  getPaybillTransactionHistory: () -> (Result_53);
-  getPaymentById: (text) -> (Result_16);
-  getPaymentServices: () -> (Result_52);
-  getPaymentStats: () -> (Result_51);
-  getPaymentsByProvider: (text) -> (Result_35);
+  connectExternalWallet: (walletType: text, principalId: opt text, address:
+   opt text, permissions: vec text) -> (Result_72);
+  createBudget: (name: text, category: text, amount: float64, period: 
+   text, startDate: int, endDate: int) -> (Result_71);
+  createCryptoTransaction: (walletId: text, "type": text, amount: float64,
+   toAddress: opt text, fromAddress: opt text, txHash: opt text, fee:
+   float64) -> (Result_6);
+  createCryptoWallet: (name: text, walletType: text, isExternal: bool,
+   externalWalletType: opt text, address: opt text) -> (Result_12);
+  createDeFiPosition: (protocol: text, positionType: text, tokenA: text,
+   tokenB: opt text, amount: float64, apy: float64) -> (Result_11);
+  createDefiPosition: (protocol: text, productType: text, tokenA: text,
+   tokenB: opt text, amount: float64, apy: float64) -> (Result_11);
+  createGoal: (title: text, description: text, targetAmount: float64,
+   currency: text, targetDate: opt int, category: text) -> (Result_9);
+  createGroupVault: (name: text, description: opt text, vaultType: text,
+   currency: text, targetAmount: opt float64, isPublic: bool, rules:
+   opt text) -> (Result_70);
+  createNotification: (notificationType: NotificationType, title: text,
+   message: text, priority: text, actionUrl: opt text, expiresAt: opt int) ->
+   (Result_22);
+  createSocialGame: (name: text, description: text, gameType: text,
+   startTime: int, endTime: opt int, maxParticipants: opt nat, entryFee:
+   opt float64, prizePool: float64, currency: text, rules: opt text,
+   isPublic: bool) -> (Result_67);
+  createTransaction: (walletId: text, "type": text, amount: float64,
+   category: text, description: text) -> (Result_69);
+  createUser: (username: text, displayName: text, email: opt text) ->
+   (Result_4);
+  createVaultChatRoom: (vaultId: text, name: text, description: opt text) ->
+   (Result_68);
+  createWallet: (name: text, "type": text, currency: text) -> (Result_27);
+  deleteNotification: (notificationId: text) -> (Result_5);
+  depositToVault: (vaultId: text, amount: float64, description: opt text) ->
+   (Result);
+  endGame: (gameId: text) -> (Result_67);
+  generateAIInsights: () -> (Result_52);
+  generateAIRecommendations: () -> (Result_51);
+  generateDepositAddress: (walletType: text) -> (Result_2);
+  getAIAnalytics: () -> (Result_66);
+  getAIConversationHistory: () -> (Result_65);
+  getAvailableBills: () -> (Result_64);
+  getAvailableGames: () -> (Result_42);
+  getBurnHistory: (limit: nat, offset: nat) -> (vec TokenBurn) query;
+  getDashboardStats: () -> (Result_63) query;
+  getDefiAnalytics: () -> (Result_62);
+  getDefiPositionsByProductType: (productType: text) -> (Result_46);
+  getDefiPositionsByProtocol: (protocol: text) -> (Result_46);
+  getDefiProtocolStats: (protocol: text) -> (Result_61);
+  getDefiTransactionsByProtocol: (protocol: text) -> (Result_45);
+  getDepositAddress: (walletType: text) -> (Result_2);
+  getDepositAddresses: () -> (Result_60);
+  getDepositHistory: () -> (Result_59);
+  getDepositTransactionById: (transactionId: text) -> (Result_20);
+  getFullWalletPortfolio: () -> (Result_58);
+  getGameLeaderboard: (gameId: text) -> (Result_57);
+  getGamesByType: (gameType: text) -> (Result_42);
+  getMintHistory: (limit: nat, offset: nat) -> (vec TokenMint) query;
+  getNotificationPreferences: () -> (Result_8);
+  getPaybillTransactionById: (transactionId: text) -> (Result_19);
+  getPaybillTransactionHistory: () -> (Result_56);
+  getPaymentById: (paymentId: text) -> (Result_17);
+  getPaymentStats: () -> (Result_55);
+  getPaymentsByProvider: (provider: text) -> (Result_39);
   getPrincipalId: () -> (text) query;
-  getRecoveryRequestStatus: (text) -> (opt RecoveryRequest) query;
-  getStakingInfo: (UserId) -> (opt StakingInfo) query;
+  getRecoveryRequestStatus: (requestId: text) -> (opt RecoveryRequest) query;
+  getStakingInfo: (userId: UserId) -> (opt StakingInfo) query;
   getSystemStats: () ->
    (record {
       totalCryptoTransactions: nat;
@@ -1346,96 +1455,128 @@ service : {
       totalWallets: nat;
     }) query;
   getTokenMetadata: () -> (TokenMetadata) query;
-  getTotalBalance: (UserId) -> (TokenBalance) query;
+  getTotalBalance: (owner: UserId) -> (TokenBalance) query;
   getTotalStaked: () -> (nat) query;
-  getTransferHistory: (nat, nat) -> (vec TokenTransfer) query;
-  getTypingIndicators: (text) -> (Result_50);
-  getUSDTtoKESRate: () -> (Result_49);
+  getTransferHistory: (limit: nat, offset: nat) -> (vec TokenTransfer) query;
+  getTypingIndicators: (vaultId: text) -> (Result_54);
+  getUSDTtoKESRate: () -> (Result_53);
+  getUnreadNotificationCount: () -> (Result_23);
   getUser: () -> (Result_4) query;
-  getUserAIInsights: () -> (Result_48);
-  getUserAIRecommendations: () -> (Result_47);
-  getUserAuditLogs: () -> (Result_46);
-  getUserBudgets: () -> (Result_45) query;
-  getUserByEmail: (text) -> (opt UserId) query;
-  getUserByPhone: (text) -> (opt UserId) query;
-  getUserChatNotifications: (nat, nat) -> (Result_44);
-  getUserCryptoTransactions: () -> (Result_23);
-  getUserCryptoWallets: () -> (Result_43) query;
-  getUserDeFiPositions: () -> (Result_42);
-  getUserDefiPositions: () -> (Result_42);
-  getUserDefiTransactions: () -> (Result_41);
-  getUserExternalConnections: () -> (Result_40);
-  getUserGameRewards: () -> (Result_39);
-  getUserGames: () -> (Result_38);
-  getUserGoals: () -> (Result_37) query;
-  getUserGroupVaults: () -> (Result_36);
-  getUserLocalPaymentHistory: () -> (Result_35);
-  getUserOTPRequests: () -> (Result_34);
-  getUserPaymentMethods: () -> (Result_33);
-  getUserRecoveryMethods: () -> (Result_32) query;
-  getUserSimplePaymentHistory: () -> (Result_31);
-  getUserTransactions: () -> (Result_30) query;
-  getUserWalletAddresses: () -> (Result_29);
-  getUserWallets: () -> (Result_28) query;
-  getVaultChatMembers: (text) -> (Result_27);
-  getVaultDetails: (text) -> (Result_26);
-  getVaultMessages: (text, nat, nat) -> (Result_25);
-  getWallet: (text) -> (Result_24);
-  getWalletByAddress: (text) -> (opt text) query;
-  getWalletTransactionHistory: (text, nat, nat) -> (Result_23);
-  greet: (text) -> (text) query;
-  initiateLocalPayment: (text, text, float64, text, opt text, opt text,
-   opt text) -> (Result_17);
-  initiateRecovery: (text, text) -> (Result_22);
-  inviteToVault: (text, UserId, text) -> (Result_21);
-  joinGame: (text) -> (Result_9);
-  joinVault: (text) -> (Result_21);
-  joinVaultChat: (text, text) -> (Result_5);
-  leaveVaultChat: (text) -> (Result_5);
-  linkRecoveredAccount: (text, principal) -> (Result_4);
+  getUserAIInsights: () -> (Result_52);
+  getUserAIRecommendations: () -> (Result_51);
+  getUserAuditLogs: () -> (Result_50);
+  getUserBudgets: () -> (Result_49) query;
+  getUserByEmail: (email: text) -> (opt UserId) query;
+  getUserByPhone: (phone: text) -> (opt UserId) query;
+  getUserChatNotifications: (limit: nat, offset: nat) -> (Result_48);
+  getUserCryptoTransactions: () -> (Result_26);
+  getUserCryptoWallets: () -> (Result_47) query;
+  getUserDeFiPositions: () -> (Result_46);
+  getUserDefiPositions: () -> (Result_46);
+  getUserDefiTransactions: () -> (Result_45);
+  getUserExternalConnections: () -> (Result_44);
+  getUserGameRewards: () -> (Result_43);
+  getUserGames: () -> (Result_42);
+  getUserGoals: () -> (Result_41) query;
+  getUserGroupVaults: () -> (Result_40);
+  getUserLocalPaymentHistory: () -> (Result_39);
+  getUserNotifications: (limit: nat, offset: nat) -> (Result_38);
+  getUserOTPRequests: () -> (Result_37);
+  getUserPaymentMethods: () -> (Result_36);
+  getUserRecoveryMethods: () -> (Result_35) query;
+  getUserSimplePaymentHistory: () -> (Result_34);
+  getUserTransactions: () -> (Result_33) query;
+  getUserWalletAddresses: () -> (Result_32);
+  getUserWallets: () -> (Result_31) query;
+  getVaultChatMembers: (vaultId: text) -> (Result_30);
+  getVaultDetails: (vaultId: text) -> (Result_29);
+  getVaultMessages: (vaultId: text, limit: nat, offset: nat) -> (Result_28);
+  getWallet: (walletId: text) -> (Result_27);
+  getWalletByAddress: (address: text) -> (opt text) query;
+  getWalletTransactionHistory: (walletId: text, limit: nat, offset: nat) ->
+   (Result_26);
+  greet: (name: text) -> (text) query;
+  initiateLocalPayment: (provider: text, "type": text, amount: float64,
+   currency: text, recipientPhone: opt text, recipientName: opt text,
+   reference: opt text) -> (Result_18);
+  initiateRecovery: (identifier: text, recoveryMethod: text) -> (Result_25);
+  inviteToVault: (vaultId: text, userId: UserId, role: text) -> (Result_24);
+  joinGame: (gameId: text) -> (Result_10);
+  joinVault: (vaultId: text) -> (Result_24);
+  joinVaultChat: (vaultId: text, userName: text) -> (Result_5);
+  leaveVaultChat: (vaultId: text) -> (Result_5);
+  linkRecoveredAccount: (recoveryToken: text, newPrincipalId: principal) ->
+   (Result_4);
   loginOrCreateUser: () -> (Result_4);
-  markMessagesAsRead: (text, vec text) -> (Result_5);
-  markRecommendationImplemented: (text) -> (Result_20);
-  mint: (UserId, nat, text) -> (Result_5);
-  processDeposit: (DepositRequest) -> (Result_19);
-  processPaybillPayment: (PaybillPaymentRequest) -> (Result_18);
-  processPayment: (text) -> (Result_17);
-  processSimplePayment: (text, float64, text, float64, float64, opt text) ->
-   (Result_16);
-  recordDefiTransaction: (text, text, text, opt text, float64, opt float64,
-   float64, opt text) -> (Result_15);
-  regenerateWalletAddress: (text) -> (Result_2);
-  removePaymentMethod: (text) -> (Result_5);
-  sendAIMessage: (text) -> (Result_14);
-  sendCrypto: (text, text, float64, opt text) -> (Result_6);
-  sendOTP: (text, text, text, text) -> (Result_13);
-  sendVaultMessage: (text, text, MessageType, opt text) -> (Result_12);
-  sendVerificationCode: (text, text) -> (Result_2);
-  setPaused: (bool) -> (Result_5);
-  setStakingRewardRate: (float64) -> (Result_5);
-  setTransactionLimits: (nat, nat) -> (Result_5);
-  setTreasuryAddress: (UserId) -> (Result_5);
-  stake: (nat) -> (Result_5);
-  transfer: (UserId, nat) -> (Result_5);
-  transferBetweenWallets: (text, text, float64, opt text) -> (Result_6);
-  transferFrom: (UserId, UserId, nat) -> (Result_5);
-  unstake: (nat) -> (Result_5);
-  updateCryptoWalletBalance: (text, float64) -> (Result_11);
-  updateDefiPosition: (text, float64, float64, float64) -> (Result_10);
-  updateGameScore: (text, float64) -> (Result_9);
-  updateGoalProgress: (text, float64) -> (Result_8);
-  updatePaymentMethod: (text, opt text, opt text, text, bool) -> (Result_7);
-  updateTransactionStatus: (text, text, opt text, opt nat) -> (Result_6);
-  updateTypingStatus: (text, bool) -> (Result_5);
-  updateUser: (opt text, opt text) -> (Result_4);
+  markAllNotificationsAsRead: () -> (Result_23);
+  markMessagesAsRead: (vaultId: text, messageIds: vec text) -> (Result_5);
+  markNotificationAsRead: (notificationId: text) -> (Result_22);
+  markRecommendationImplemented: (recommendationId: text) -> (Result_21);
+  mint: (to: UserId, amount: nat, reason: text) -> (Result_5);
+  processDeposit: (depositRequest: DepositRequest) -> (Result_20);
+  processPaybillPayment: (paymentRequest: PaybillPaymentRequest) ->
+   (Result_19);
+  processPayment: (paymentId: text) -> (Result_18);
+  processSimplePayment: (paymentType: text, localAmount: float64,
+   localCurrency: text, usdAmount: float64, exchangeRate: float64, location:
+   opt text) -> (Result_17);
+  recordDefiTransaction: (protocol: text, "type": text, tokenA: text, tokenB:
+   opt text, amountA: float64, amountB: opt float64, fee: float64, txHash:
+   opt text) -> (Result_16);
+  regenerateWalletAddress: (walletId: text) -> (Result_2);
+  removePaymentMethod: (methodId: text) -> (Result_5);
+  removePushSubscription: (subscriptionId: text) -> (Result_5);
+  sendAIMessage: (content: text) -> (Result_15);
+  sendCrossCanisterNotification: (targetCanisterId: text, notificationData:
+   text) -> (Result_2);
+  sendCrypto: (walletId: text, toAddress: text, amount: float64, memo:
+   opt text) -> (Result_6);
+  sendOTP: (recipient: text, "service": text, provider: text, purpose:
+   text) -> (Result_14);
+  sendVaultMessage: (vaultId: text, content: text, messageType: MessageType,
+   replyTo: opt text) -> (Result_13);
+  sendVerificationCode: (identifier: text, codeType: text) -> (Result_2);
+  setPaused: (paused: bool) -> (Result_5);
+  setStakingRewardRate: (rate: float64) -> (Result_5);
+  setTransactionLimits: (maxTransaction: nat, maxWallet: nat) -> (Result_5);
+  setTreasuryAddress: (newTreasury: UserId) -> (Result_5);
+  stake: (amount: nat) -> (Result_5);
+  transfer: (to: UserId, amount: nat) -> (Result_5);
+  transferBetweenWallets: (fromWalletId: text, toWalletId: text, amount:
+   float64, memo: opt text) -> (Result_6);
+  transferFrom: (from: UserId, to: UserId, amount: nat) -> (Result_5);
+  unstake: (amount: nat) -> (Result_5);
+  updateCryptoWalletBalance: (walletId: text, newBalance: float64) ->
+   (Result_12);
+  updateDefiPosition: (positionId: text, amount: float64, apy: float64,
+   rewards: float64) -> (Result_11);
+  updateGameScore: (gameId: text, score: float64) -> (Result_10);
+  updateGoalProgress: (goalId: text, amount: float64) -> (Result_9);
+  updateNotificationPreferences: (email: bool, push: bool, inApp: bool,
+   transactionNotifications: bool, securityNotifications: bool,
+   vaultNotifications: bool, socialNotifications: bool, systemNotifications:
+   bool, paymentNotifications: bool, recoveryNotifications: bool, quietHours:
+   opt record {
+         end: text;
+         start: text;
+       }, timezone: text) -> (Result_8);
+  updatePaymentMethod: (methodId: text, accountNumber: opt text, phoneNumber:
+   opt text, accountName: text, isDefault: bool) -> (Result_7);
+  updateTransactionStatus: (transactionId: text, status: text, txHash:
+   opt text, blockHeight: opt nat) -> (Result_6);
+  updateTypingStatus: (vaultId: text, isTyping: bool) -> (Result_5);
+  updateUser: (displayName: opt text, avatar: opt text) -> (Result_4);
   userExists: () -> (bool);
-  validateAddress: (text, text) -> (bool) query;
-  verifyCode: (text, text, text) -> (Result_2);
-  verifyOTP: (text, text) -> (Result_3);
-  verifyRecovery: (text, opt text, opt vec record {
-                                             text;
-                                             text;
-                                           }) -> (Result_2);
-  verifyRecoveryMethod: (text, text, text) -> (Result_1);
-  withdrawFromVault: (text, float64, opt text) -> (Result);
+  validateAddress: (address: text, walletType: text) -> (bool) query;
+  verifyCode: (identifier: text, code: text, codeType: text) -> (Result_2);
+  verifyOTP: (otpId: text, code: text) -> (Result_3);
+  verifyRecovery: (recoveryRequestId: text, verificationCode: opt text,
+   securityAnswers: opt vec record {
+                              text;
+                              text;
+                            }) -> (Result_2);
+  verifyRecoveryMethod: (recoveryMethodId: text, otpId: text, otpCode:
+   text) -> (Result_1);
+  withdrawFromVault: (vaultId: text, amount: float64, description:
+   opt text) -> (Result);
 }

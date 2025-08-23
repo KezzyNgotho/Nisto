@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Nesto - IC Wallet & Finance",
+  "version": "1.0.0",
+  "description": "AI-Powered Social Finance Platform for the Internet Computer - Manage your IC identity, sign transactions, and access DeFi tools",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "notifications"
+  ],
+  "host_permissions": [
+    "https://*.ic0.app/*",
+    "https://*.localhost/*",
+    "http://localhost/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://*.ic0.app/*",
+        "https://*.localhost/*",
+        "http://localhost/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Nesto - IC Wallet",
+    "default_icon": {
+      "16": "icons/placeholder.svg",
+      "32": "icons/placeholder.svg",
+      "48": "icons/placeholder.svg",
+      "128": "icons/placeholder.svg"
+    }
+  },
+  "icons": {
+    "16": "icons/placeholder.svg",
+    "32": "icons/placeholder.svg",
+    "48": "icons/placeholder.svg",
+    "128": "icons/placeholder.svg"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["injected.js"],
+      "matches": [
+        "https://*.ic0.app/*",
+        "https://*.localhost/*",
+        "http://localhost/*"
+      ]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

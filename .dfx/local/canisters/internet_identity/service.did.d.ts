@@ -193,6 +193,7 @@ export interface GetIdAliasRequest {
   'relying_party' : FrontendHostname,
   'identity_number' : IdentityNumber,
 }
+export interface GoogleOpenIdConfig { 'client_id' : string }
 export type HeaderField = [string, string];
 export interface HttpRequest {
   'url' : string,
@@ -270,7 +271,7 @@ export type IdentityPropertiesReplaceError = {
   };
 export interface InternetIdentityInit {
   'fetch_root_key' : [] | [boolean],
-  'openid_google' : [] | [[] | [OpenIdConfig]],
+  'openid_google' : [] | [[] | [GoogleOpenIdConfig]],
   'is_production' : [] | [boolean],
   'enable_dapps_explorer' : [] | [boolean],
   'assigned_user_number_range' : [] | [[bigint, bigint]],
@@ -278,8 +279,10 @@ export interface InternetIdentityInit {
   'archive_config' : [] | [ArchiveConfig],
   'canister_creation_cycles_cost' : [] | [bigint],
   'analytics_config' : [] | [[] | [AnalyticsConfig]],
+  'feature_flag_enable_generic_open_id_fe' : [] | [boolean],
   'related_origins' : [] | [Array<string>],
   'feature_flag_continue_from_another_device' : [] | [boolean],
+  'openid_configs' : [] | [Array<OpenIdConfig>],
   'captcha_config' : [] | [CaptchaConfig],
   'dummy_auth' : [] | [[] | [DummyAuthConfig]],
   'register_rate_limit' : [] | [RateLimitConfig],
@@ -317,7 +320,16 @@ export type MetadataMapV2 = Array<
   ]
 >;
 export interface OpenIDRegFinishArg { 'jwt' : JWT, 'salt' : Salt }
-export interface OpenIdConfig { 'client_id' : string }
+export interface OpenIdConfig {
+  'auth_uri' : string,
+  'jwks_uri' : string,
+  'logo' : string,
+  'name' : string,
+  'fedcm_uri' : [] | [string],
+  'issuer' : string,
+  'auth_scope' : Array<string>,
+  'client_id' : string,
+}
 export interface OpenIdCredential {
   'aud' : Aud,
   'iss' : Iss,

@@ -1,0 +1,67 @@
+{
+  "name": "Nisto",
+  "short_name": "Nisto",
+  "description": "AI-Powered Social Finance Platform for the Internet Computer",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#075B5E",
+  "theme_color": "#075B5E",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["finance", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/icons/icon-16x16.svg",
+      "sizes": "16x16",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-32x32.svg",
+      "sizes": "32x32",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-48x48.svg",
+      "sizes": "48x48",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.svg",
+      "sizes": "128x128",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your financial dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icons/icon-48x48.svg",
+          "sizes": "48x48",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "Vault",
+      "short_name": "Vault",
+      "description": "Access your vault",
+      "url": "/vault",
+      "icons": [
+        {
+          "src": "/icons/icon-48x48.svg",
+          "sizes": "48x48",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ]
+}
