@@ -1,19 +1,25 @@
 {
-  "name": "Nesto - AI-Powered Social Finance",
-  "short_name": "Nesto",
-  "description": "Manage your finances, automate goals, and participate in social finance with AI-powered tools on the Internet Computer",
+  "name": "Nisto - Internet Computer Wallet",
+  "short_name": "Nisto",
+  "description": "Your secure Internet Computer wallet for managing crypto assets and vaults",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#075B5E",
-  "theme_color": "#075B5E",
+  "background_color": "#ffffff",
+  "theme_color": "#113F67",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "en",
-  "categories": ["finance", "productivity", "social"],
+  "categories": ["finance", "productivity", "utilities"],
   "icons": [
     {
-      "src": "/icons/placeholder.svg",
-      "sizes": "any",
+      "src": "/icons/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icons/icon-512x512.svg",
+      "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "maskable any"
     }
@@ -22,42 +28,40 @@
     {
       "name": "Dashboard",
       "short_name": "Dashboard",
-      "description": "View your financial dashboard",
+      "description": "Go to your dashboard",
       "url": "/dashboard",
       "icons": [
         {
-          "src": "/icons/dashboard-96x96.png",
-          "sizes": "96x96"
+          "src": "/icons/icon-192x192.svg",
+          "sizes": "192x192"
         }
       ]
     },
     {
-      "name": "Vault",
-      "short_name": "Vault",
-      "description": "Access your vault",
-      "url": "/vault",
+      "name": "Create Vault",
+      "short_name": "Create Vault",
+      "description": "Create a new vault",
+      "url": "/dashboard?action=create-vault",
       "icons": [
         {
-          "src": "/icons/vault-96x96.png",
-          "sizes": "96x96"
+          "src": "/icons/icon-192x192.svg",
+          "sizes": "192x192"
         }
       ]
     }
   ],
   "screenshots": [
     {
-      "src": "/screenshots/desktop-dashboard.png",
+      "src": "/screenshots/desktop.png",
       "sizes": "1280x720",
       "type": "image/png",
-      "form_factor": "wide",
-      "label": "Nesto Dashboard - Desktop View"
+      "form_factor": "wide"
     },
     {
-      "src": "/screenshots/mobile-dashboard.png",
+      "src": "/screenshots/mobile.png",
       "sizes": "390x844",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Nesto Dashboard - Mobile View"
+      "form_factor": "narrow"
     }
   ]
 }

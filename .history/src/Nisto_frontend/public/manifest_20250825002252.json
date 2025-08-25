@@ -1,0 +1,63 @@
+{
+  "name": "Nesto - AI-Powered Social Finance",
+  "short_name": "Nesto",
+  "description": "Manage your finances, automate goals, and participate in social finance on the Internet Computer",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#075B5E",
+  "theme_color": "#075B5E",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["finance", "productivity", "social"],
+  "icons": [
+    {
+      "src": "/icons/placeholder.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your financial dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/icons/dashboard-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Vault",
+      "short_name": "Vault",
+      "description": "Access your vault",
+      "url": "/vault",
+      "icons": [
+        {
+          "src": "/icons/vault-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Nesto Dashboard - Desktop View"
+    },
+    {
+      "src": "/screenshots/mobile-dashboard.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Nesto Dashboard - Mobile View"
+    }
+  ]
+}

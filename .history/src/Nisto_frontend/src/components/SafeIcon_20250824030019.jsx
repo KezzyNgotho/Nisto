@@ -1,0 +1,88 @@
+import React from 'react';
+import IconFallback from './IconFallback';
+
+// Import all icons we might use
+import {
+  FiUsers,
+  FiPlus,
+  FiDollarSign,
+  FiTarget,
+  FiTrendingUp,
+  FiCheck,
+  FiX,
+  FiLock,
+  FiUnlock,
+  FiEdit2,
+  FiTrash2,
+  FiUserPlus,
+  FiEye,
+  FiChevronDown,
+  FiChevronUp,
+  FiShield,
+  FiArrowDownCircle,
+  FiArrowUpCircle,
+  FiList,
+  FiSend,
+  FiChevronLeft,
+  FiGlobe,
+  FiMessageCircle,
+  FiMoreVertical,
+  FiSmile,
+  FiPaperclip,
+  FiSearch,
+  FiBell,
+  FiSettings,
+} from "react-icons/fi";
+
+const SafeIcon = ({ iconName, size = 20, color = "currentColor", ...props }) => {
+  // Get the icon component
+  const IconComponent = (() => {
+    try {
+      switch (iconName) {
+        case 'FiUserPlus': return FiUserPlus;
+        case 'FiUsers': return FiUsers;
+        case 'FiPlus': return FiPlus;
+        case 'FiDollarSign': return FiDollarSign;
+        case 'FiTarget': return FiTarget;
+        case 'FiTrendingUp': return FiTrendingUp;
+        case 'FiCheck': return FiCheck;
+        case 'FiX': return FiX;
+        case 'FiLock': return FiLock;
+        case 'FiUnlock': return FiUnlock;
+        case 'FiEdit2': return FiEdit2;
+        case 'FiTrash2': return FiTrash2;
+        case 'FiEye': return FiEye;
+        case 'FiChevronDown': return FiChevronDown;
+        case 'FiChevronUp': return FiChevronUp;
+        case 'FiShield': return FiShield;
+        case 'FiArrowDownCircle': return FiArrowDownCircle;
+        case 'FiArrowUpCircle': return FiArrowUpCircle;
+        case 'FiList': return FiList;
+        case 'FiSend': return FiSend;
+        case 'FiChevronLeft': return FiChevronLeft;
+        case 'FiGlobe': return FiGlobe;
+        case 'FiMessageCircle': return FiMessageCircle;
+        case 'FiMoreVertical': return FiMoreVertical;
+        case 'FiSmile': return FiSmile;
+        case 'FiPaperclip': return FiPaperclip;
+        case 'FiSearch': return FiSearch;
+        case 'FiBell': return FiBell;
+        case 'FiSettings': return FiSettings;
+        default: return null;
+      }
+    } catch (error) {
+      console.warn(`Icon ${iconName} not found, using fallback`);
+      return null;
+    }
+  })();
+
+  // If icon component exists, render it
+  if (IconComponent) {
+    return <IconComponent size={size} color={color} {...props} />;
+  }
+
+  // Otherwise, render fallback
+  return <IconFallback iconName={iconName} size={size} color={color} {...props} />;
+};
+
+export default SafeIcon;

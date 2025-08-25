@@ -1183,7 +1183,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'createNotification' : IDL.Func(
         [
-          NotificationType,
+          IDL.Text,
           IDL.Text,
           IDL.Text,
           IDL.Text,
@@ -1304,7 +1304,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getTypingIndicators' : IDL.Func([IDL.Text], [Result_54], []),
     'getUSDTtoKESRate' : IDL.Func([], [Result_53], []),
-    'getUnreadNotificationCount' : IDL.Func([], [Result_23], []),
+    'getUnreadNotificationCount' : IDL.Func([], [IDL.Nat], ['query']),
     'getUser' : IDL.Func([], [Result_4], ['query']),
     'getUserAIInsights' : IDL.Func([], [Result_52], []),
     'getUserAIRecommendations' : IDL.Func([], [Result_51], []),
@@ -1417,6 +1417,7 @@ export const idlFactory = ({ IDL }) => {
     'regenerateWalletAddress' : IDL.Func([IDL.Text], [Result_2], []),
     'removePaymentMethod' : IDL.Func([IDL.Text], [Result_5], []),
     'removePushSubscription' : IDL.Func([IDL.Text], [Result_5], []),
+    'respondToVaultInvitation' : IDL.Func([IDL.Text, IDL.Text], [Result_5], []),
     'sendAIMessage' : IDL.Func([IDL.Text], [Result_15], []),
     'sendCrossCanisterNotification' : IDL.Func(
         [IDL.Text, IDL.Text],

@@ -1,0 +1,66 @@
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { NotificationProvider } from './contexts/NotificationContext';
+import Landing from './pages/Landing.jsx';
+import Dashboard from './pages/Dashboard';
+import ErrorBoundary from './components/ErrorBoundary';
+import PWAServiceWorker from './components/PWAServiceWorker';
+import PWAStatus from './components/PWAStatus';
+
+import './App.scss';
+
+// Global error handler for BigInt serialization issues
+const handleGlobalError = (event) => {
+  if (event.error && event.error.message && event.error.message.includes('serialize')) {
+    console.warn('Serialization error caught and handled:', event.error);
+    event.preventDefault();
+    return false;
+  }
+};
+
+// Global unhandled promise rejection handler
+const handleUnhandledRejection = (event) => {
+  if (event.reason && event.reason.message && event.reason.message.includes('serialize')) {
+    console.warn('Unhandled promise rejection (serialization) caught and handled:', event.reason);
+    event.preventDefault();
+    return false;
+  }
+};
+
+function App() {
+  React.useEffect(() => {
+    // Add global error handlers
+    window.addEventListener('error', handleGlobalError);
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('error', handleGlobalError);
+      window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+    };
+  }, []);
+
+  return (
+    <ErrorBoundary>
+      <ThemeProvider>
+        <NotificationProvider>
+          <AuthProvider>
+            <Router>
+              <div className="App">
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                </Routes>
+                <PWAInstallPrompt />
+              </div>
+            </Router>
+          </AuthProvider>
+        </NotificationProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
+  );
+}
+
+export default App; 

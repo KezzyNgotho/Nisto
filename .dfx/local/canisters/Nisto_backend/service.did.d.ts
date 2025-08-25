@@ -1084,7 +1084,7 @@ export interface _SERVICE {
     Result_70
   >,
   'createNotification' : ActorMethod<
-    [NotificationType, string, string, string, [] | [string], [] | [bigint]],
+    [string, string, string, string, [] | [string], [] | [bigint]],
     Result_22
   >,
   'createSocialGame' : ActorMethod<
@@ -1168,7 +1168,7 @@ export interface _SERVICE {
   'getTransferHistory' : ActorMethod<[bigint, bigint], Array<TokenTransfer>>,
   'getTypingIndicators' : ActorMethod<[string], Result_54>,
   'getUSDTtoKESRate' : ActorMethod<[], Result_53>,
-  'getUnreadNotificationCount' : ActorMethod<[], Result_23>,
+  'getUnreadNotificationCount' : ActorMethod<[], bigint>,
   'getUser' : ActorMethod<[], Result_4>,
   'getUserAIInsights' : ActorMethod<[], Result_52>,
   'getUserAIRecommendations' : ActorMethod<[], Result_51>,
@@ -1254,6 +1254,7 @@ export interface _SERVICE {
   'regenerateWalletAddress' : ActorMethod<[string], Result_2>,
   'removePaymentMethod' : ActorMethod<[string], Result_5>,
   'removePushSubscription' : ActorMethod<[string], Result_5>,
+  'respondToVaultInvitation' : ActorMethod<[string, string], Result_5>,
   'sendAIMessage' : ActorMethod<[string], Result_15>,
   'sendCrossCanisterNotification' : ActorMethod<[string, string], Result_2>,
   'sendCrypto' : ActorMethod<[string, string, number, [] | [string]], Result_6>,

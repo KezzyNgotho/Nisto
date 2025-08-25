@@ -1392,8 +1392,8 @@ service : {
   createGroupVault: (name: text, description: opt text, vaultType: text,
    currency: text, targetAmount: opt float64, isPublic: bool, rules:
    opt text) -> (Result_70);
-  createNotification: (notificationType: NotificationType, title: text,
-   message: text, priority: text, actionUrl: opt text, expiresAt: opt int) ->
+  createNotification: (notificationTypeText: text, title: text, message:
+   text, priority: text, actionUrl: opt text, expiresAt: opt int) ->
    (Result_22);
   createSocialGame: (name: text, description: text, gameType: text,
    startTime: int, endTime: opt int, maxParticipants: opt nat, entryFee:
@@ -1460,7 +1460,7 @@ service : {
   getTransferHistory: (limit: nat, offset: nat) -> (vec TokenTransfer) query;
   getTypingIndicators: (vaultId: text) -> (Result_54);
   getUSDTtoKESRate: () -> (Result_53);
-  getUnreadNotificationCount: () -> (Result_23);
+  getUnreadNotificationCount: () -> (nat) query;
   getUser: () -> (Result_4) query;
   getUserAIInsights: () -> (Result_52);
   getUserAIRecommendations: () -> (Result_51);
@@ -1526,6 +1526,7 @@ service : {
   regenerateWalletAddress: (walletId: text) -> (Result_2);
   removePaymentMethod: (methodId: text) -> (Result_5);
   removePushSubscription: (subscriptionId: text) -> (Result_5);
+  respondToVaultInvitation: (vaultId: text, response: text) -> (Result_5);
   sendAIMessage: (content: text) -> (Result_15);
   sendCrossCanisterNotification: (targetCanisterId: text, notificationData:
    text) -> (Result_2);
