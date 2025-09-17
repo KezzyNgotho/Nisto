@@ -109,7 +109,7 @@ class ICNotificationService {
       }
 
       // Generate VAPID keys (in production, these should be from your backend)
-      const vapidPublicKey = this.urlBase64ToUint8Array(process.env.VITE_VAPID_PUBLIC_KEY || 'your-vapid-public-key');
+      const vapidPublicKey = this.urlBase64ToUint8Array(import.meta.env.VITE_VAPID_PUBLIC_KEY || 'your-vapid-public-key');
 
       // Subscribe to push notifications
       this.subscription = await this.pushManager.subscribe({

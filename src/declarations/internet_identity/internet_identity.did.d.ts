@@ -319,7 +319,11 @@ export type MetadataMapV2 = Array<
       { 'Bytes' : Uint8Array | number[] },
   ]
 >;
-export interface OpenIDRegFinishArg { 'jwt' : JWT, 'salt' : Salt }
+export interface OpenIDRegFinishArg {
+  'jwt' : JWT,
+  'name' : string,
+  'salt' : Salt,
+}
 export interface OpenIdConfig {
   'auth_uri' : string,
   'jwks_uri' : string,
@@ -530,7 +534,6 @@ export interface _SERVICE {
   >,
   'get_principal' : ActorMethod<[UserNumber, FrontendHostname], Principal>,
   'http_request' : ActorMethod<[HttpRequest], HttpResponse>,
-  'http_request_update' : ActorMethod<[HttpRequest], HttpResponse>,
   'identity_authn_info' : ActorMethod<
     [IdentityNumber],
     { 'Ok' : IdentityAuthnInfo } |

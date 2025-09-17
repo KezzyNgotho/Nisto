@@ -1,3 +1,14 @@
+type http_request_result = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type http_header = 
+ record {
+   name: text;
+   value: text;
+ };
 type WalletPortfolio = 
  record {
    cryptoWallets: vec CryptoWallet;
@@ -118,6 +129,17 @@ type TypingIndicator =
    userId: UserId;
    userName: text;
  };
+type TransformationOutput = 
+ record {
+   body: blob;
+   headers: vec http_header;
+   status: nat;
+ };
+type TransformationInput = 
+ record {
+   context: blob;
+   response: http_request_result;
+ };
 type Transaction = 
  record {
    amount: float64;
@@ -183,6 +205,45 @@ type TokenBalance =
    owner: UserId;
    stakedBalance: nat;
  };
+type SwapResult = 
+ record {
+   fromAmount: float64;
+   gasFee: float64;
+   minimumReceived: float64;
+   priceImpact: float64;
+   rate: float64;
+   success: bool;
+   timestamp: int;
+   toAmount: float64;
+   transactionId: opt text;
+ };
+type SwapRequest = 
+ record {
+   fromAmount: float64;
+   fromCurrency: text;
+   slippage: float64;
+   toCurrency: text;
+   userPrincipal: principal;
+ };
+type SwapRecord = 
+ record {
+   amount: nat;
+   errorMessage: opt text;
+   estimatedCompletionTime: opt int;
+   fromToken: text;
+   gasCost: opt nat;
+   id: nat;
+   intermediarySteps: vec text;
+   price: nat;
+   reason: text;
+   retryCount: nat;
+   status: text;
+   swapProvider: text;
+   swapType: text;
+   timestamp: int;
+   toToken: text;
+   userId: text;
+ };
 type StakingInfo = 
  record {
    isStaking: bool;
@@ -212,6 +273,16 @@ type SocialGame =
    startTime: int;
    status: GameStatus;
    updatedAt: int;
+ };
+type SmartWalletPreferences = 
+ record {
+   allocationLimit: nat;
+   autoHedgingEnabled: bool;
+   intermediaryTokenPreference: opt text;
+   preferredSwapProvider: opt text;
+   stablecoinPreference: text;
+   thresholdPercentage: nat;
+   timeWindowMinutes: nat;
  };
 type SimplePayment = 
  record {
@@ -252,32 +323,32 @@ type Result_8 =
    err: text;
    ok: NotificationPreferences;
  };
-type Result_78 = 
+type Result_79 = 
  variant {
    err: text;
    ok: EmergencyContact;
  };
-type Result_77 = 
+type Result_78 = 
  variant {
    err: text;
    ok: Plugin;
  };
-type Result_76 = 
+type Result_77 = 
  variant {
    err: text;
    ok: PushSubscription;
  };
-type Result_75 = 
+type Result_76 = 
  variant {
    err: text;
    ok: vec SecurityQuestion;
  };
-type Result_74 = 
+type Result_75 = 
  variant {
    err: text;
    ok: GameReward;
  };
-type Result_73 = 
+type Result_74 = 
  variant {
    err: text;
    ok: record {
@@ -285,20 +356,25 @@ type Result_73 =
          userId: principal;
        };
  };
-type Result_72 = 
+type Result_73 = 
  variant {
    err: text;
    ok: ExternalWalletConnection;
  };
-type Result_71 = 
+type Result_72 = 
  variant {
    err: text;
    ok: Budget;
  };
-type Result_70 = 
+type Result_71 = 
  variant {
    err: text;
    ok: GroupVault;
+ };
+type Result_70 = 
+ variant {
+   err: text;
+   ok: Transaction;
  };
 type Result_7 = 
  variant {
@@ -308,17 +384,17 @@ type Result_7 =
 type Result_69 = 
  variant {
    err: text;
-   ok: Transaction;
+   ok: VaultChatRoom;
  };
 type Result_68 = 
  variant {
    err: text;
-   ok: VaultChatRoom;
+   ok: SocialGame;
  };
 type Result_67 = 
  variant {
    err: text;
-   ok: SocialGame;
+   ok: vec Currency;
  };
 type Result_66 = 
  variant {
@@ -751,6 +827,15 @@ type PrivacySettings =
    profileVisibility: text;
    transactionVisibility: text;
  };
+type PortfolioAsset = 
+ record {
+   amount: float64;
+   change24h: float64;
+   percentage: float64;
+   riskLevel: text;
+   symbol: text;
+   value: float64;
+ };
 type PluginStatus = 
  variant {
    Active;
@@ -1085,6 +1170,11 @@ type GameParticipant =
    score: float64;
    userId: UserId;
  };
+type FileReference = 
+ record {
+   hash: text;
+   path: text;
+ };
 type ExternalWalletConnection = 
  record {
    address: opt text;
@@ -1107,6 +1197,16 @@ type EmergencyContact =
    relationship: text;
    userId: UserId;
    verifiedAt: opt int;
+ };
+type DocumentationSection = 
+ record {
+   content: text;
+   diagramUrl: opt text;
+   id: nat;
+   lastUpdated: int;
+   sectionType: text;
+   title: text;
+   version: text;
  };
 type DepositTransaction = 
  record {
@@ -1181,6 +1281,19 @@ type DeFiPosition =
    tokenB: opt text;
    updatedAt: int;
    userId: UserId;
+ };
+type Currency = 
+ record {
+   change24h: float64;
+   color: text;
+   icon: text;
+   id: text;
+   image: text;
+   marketCap: opt float64;
+   name: text;
+   price: float64;
+   symbol: text;
+   volume: opt float64;
  };
 type CryptoWalletType = 
  variant {
@@ -1305,6 +1418,35 @@ type AuditLog =
    userAgent: opt text;
    userId: opt UserId;
  };
+type AISwapRecord = 
+ record {
+   amount: float64;
+   errorMessage: opt text;
+   estimatedCompletionTime: opt int;
+   fromToken: text;
+   gasCost: opt float64;
+   id: nat;
+   intermediarySteps: vec text;
+   price: float64;
+   reason: text;
+   retryCount: nat;
+   status: text;
+   swapProvider: text;
+   swapType: text;
+   timestamp: int;
+   toToken: text;
+   userId: text;
+ };
+type AISwapPreferences = 
+ record {
+   allocationLimit: nat;
+   autoHedgingEnabled: bool;
+   intermediaryTokenPreference: opt text;
+   preferredSwapProvider: opt text;
+   stablecoinPreference: text;
+   thresholdPercentage: nat;
+   timeWindowMinutes: nat;
+ };
 type AIRecommendation = 
  record {
    category: text;
@@ -1346,38 +1488,63 @@ type AIInsight =
    "type": text;
    userId: UserId;
  };
+type AIAnalysisResult = 
+ record {
+   confidenceLevel: nat;
+   marketConditions: text;
+   portfolioHealth: text;
+   reason: text;
+   recommendedAction: text;
+   riskScore: nat;
+   shouldSwap: bool;
+   suggestedTokens: vec text;
+ };
 service : {
+  addAISwapRecord: (userId: text, fromToken: text, toToken: text, amount:
+   float64, price: float64, reason: text, status: text, errorMessage:
+   opt text, intermediarySteps: vec text, retryCount: nat,
+   estimatedCompletionTime: opt int, gasCost: opt float64, swapType: 
+   text, swapProvider: text) -> ();
+  addDocumentationSection: (title: text, content: text, sectionType: 
+   text, diagramUrl: opt text, version: text) -> ();
   addEmergencyContact: (name: text, email: text, relationship: text) ->
-   (Result_78);
+   (Result_79);
   addPaymentMethod: (provider: text, accountNumber: opt text, phoneNumber:
    opt text, accountName: text, isDefault: bool) -> (Result_7);
-  addPlugin: (plugin: Plugin) -> (Result_77);
+  addPlugin: (plugin: Plugin) -> (Result_78);
   addPushSubscription: (endpoint: text, p256dh: text, auth: text, deviceInfo:
-   opt text) -> (Result_76);
+   opt text) -> (Result_77);
   addRecoveryMethod: (methodType: text, value: text, metadata: opt text) ->
    (Result_1);
   addSecurityQuestions: (questions: vec record {
                                           text;
                                           text;
-                                        }) -> (Result_75);
+                                        }) -> (Result_76);
+  addSwapRecord: (userId: text, fromToken: text, toToken: text, amount: 
+   nat, price: nat, reason: text, status: text, errorMessage: opt text,
+   intermediarySteps: vec text, retryCount: nat, estimatedCompletionTime:
+   opt int, gasCost: opt nat, swapType: text, swapProvider: text) -> ();
   allowance: (owner: UserId, spender: UserId) -> (nat) query;
+  analyzePortfolioAndSwap: (userId: text, currentPortfolio:
+   vec PortfolioAsset, marketData: vec Currency) -> (AIAnalysisResult);
   approve: (spender: UserId, amount: nat) -> (Result_5);
   awardGameReward: (gameId: text, userId: UserId, rewardType: text, amount:
-   float64, currency: opt text, description: text) -> (Result_74);
+   float64, currency: opt text, description: text) -> (Result_75);
   balanceOf: (owner: UserId) -> (nat) query;
   burn: (amount: nat, reason: text) -> (Result_5);
   calculateDefiRewards: (positionId: text) -> (Result_53);
+  calculateExchangeRate: (fromCurrency: text, toCurrency: text) -> (float64);
   cancelPayment: (paymentId: text) -> (Result_18);
-  claimGameReward: (rewardId: text) -> (Result_74);
+  claimGameReward: (rewardId: text) -> (Result_75);
   claimRewards: () -> (Result_23);
   closeDefiPosition: (positionId: text) -> (Result_11);
   completeRecovery: (recoveryToken: text, newDeviceInfo: opt text) ->
-   (Result_73);
+   (Result_74);
   completeRecoverySetup: () -> (Result_4);
   connectExternalWallet: (walletType: text, principalId: opt text, address:
-   opt text, permissions: vec text) -> (Result_72);
+   opt text, permissions: vec text) -> (Result_73);
   createBudget: (name: text, category: text, amount: float64, period: 
-   text, startDate: int, endDate: int) -> (Result_71);
+   text, startDate: int, endDate: int) -> (Result_72);
   createCryptoTransaction: (walletId: text, "type": text, amount: float64,
    toAddress: opt text, fromAddress: opt text, txHash: opt text, fee:
    float64) -> (Result_6);
@@ -1391,33 +1558,46 @@ service : {
    currency: text, targetDate: opt int, category: text) -> (Result_9);
   createGroupVault: (name: text, description: opt text, vaultType: text,
    currency: text, targetAmount: opt float64, isPublic: bool, rules:
-   opt text) -> (Result_70);
+   opt text) -> (Result_71);
   createNotification: (notificationTypeText: text, title: text, message:
    text, priority: text, actionUrl: opt text, expiresAt: opt int) ->
    (Result_22);
   createSocialGame: (name: text, description: text, gameType: text,
    startTime: int, endTime: opt int, maxParticipants: opt nat, entryFee:
    opt float64, prizePool: float64, currency: text, rules: opt text,
-   isPublic: bool) -> (Result_67);
+   isPublic: bool) -> (Result_68);
   createTransaction: (walletId: text, "type": text, amount: float64,
-   category: text, description: text) -> (Result_69);
+   category: text, description: text) -> (Result_70);
   createUser: (username: text, displayName: text, email: opt text) ->
    (Result_4);
   createVaultChatRoom: (vaultId: text, name: text, description: opt text) ->
-   (Result_68);
+   (Result_69);
   createWallet: (name: text, "type": text, currency: text) -> (Result_27);
+  deleteDocumentationSection: (id: nat) -> ();
   deleteNotification: (notificationId: text) -> (Result_5);
   depositToVault: (vaultId: text, amount: float64, description: opt text) ->
    (Result);
-  endGame: (gameId: text) -> (Result_67);
+  dropFileReference: (path: text) -> ();
+  endGame: (gameId: text) -> (Result_68);
+  executeSwap: (request: SwapRequest) -> (SwapResult);
+  fetchCryptocurrencies: () -> (Result_67);
   generateAIInsights: () -> (Result_52);
   generateAIRecommendations: () -> (Result_51);
   generateDepositAddress: (walletType: text) -> (Result_2);
   getAIAnalytics: () -> (Result_66);
   getAIConversationHistory: () -> (Result_65);
+  getAISwapHistory: (userId: text) -> (vec AISwapRecord) query;
+  getAIUserPreferences: (userId: text) -> (opt AISwapPreferences) query;
+  getAllAIUserIds: () -> (vec text) query;
+  getAllCurrencies: () -> (vec Currency);
+  getAllDocumentationSections: () -> (vec DocumentationSection) query;
+  getAllSwapHistory: () -> (vec SwapResult);
+  getAllUserIds: () -> (vec text) query;
   getAvailableBills: () -> (Result_64);
   getAvailableGames: () -> (Result_42);
+  getBitcoinPrice: () -> (float64);
   getBurnHistory: (limit: nat, offset: nat) -> (vec TokenBurn) query;
+  getCachedAIAnalysis: (userId: text) -> (opt AIAnalysisResult) query;
   getDashboardStats: () -> (Result_63) query;
   getDefiAnalytics: () -> (Result_62);
   getDefiPositionsByProductType: (productType: text) -> (Result_46);
@@ -1428,9 +1608,15 @@ service : {
   getDepositAddresses: () -> (Result_60);
   getDepositHistory: () -> (Result_59);
   getDepositTransactionById: (transactionId: text) -> (Result_20);
+  getDocumentationByType: (sectionType: text) ->
+   (vec DocumentationSection) query;
+  getDocumentationSection: (id: nat) -> (opt DocumentationSection) query;
+  getEthereumPrice: () -> (float64);
+  getFileReference: (path: text) -> (FileReference) query;
   getFullWalletPortfolio: () -> (Result_58);
   getGameLeaderboard: (gameId: text) -> (Result_57);
   getGamesByType: (gameType: text) -> (Result_42);
+  getICPNativeRate: () -> (float64);
   getMintHistory: (limit: nat, offset: nat) -> (vec TokenMint) query;
   getNotificationPreferences: () -> (Result_8);
   getPaybillTransactionById: (transactionId: text) -> (Result_19);
@@ -1440,7 +1626,15 @@ service : {
   getPaymentsByProvider: (provider: text) -> (Result_39);
   getPrincipalId: () -> (text) query;
   getRecoveryRequestStatus: (requestId: text) -> (opt RecoveryRequest) query;
+  getSolanaPrice: () -> (float64);
   getStakingInfo: (userId: UserId) -> (opt StakingInfo) query;
+  getSwapHistory: (userId: text) -> (vec SwapRecord) query;
+  getSwapStats: () ->
+   (record {
+      totalCurrencies: nat;
+      totalSwaps: nat;
+      totalUsers: nat;
+    }) query;
   getSystemStats: () ->
    (record {
       totalCryptoTransactions: nat;
@@ -1483,8 +1677,10 @@ service : {
   getUserNotifications: (limit: nat, offset: nat) -> (Result_38);
   getUserOTPRequests: () -> (Result_37);
   getUserPaymentMethods: () -> (Result_36);
+  getUserPreferences: (userId: text) -> (opt SmartWalletPreferences) query;
   getUserRecoveryMethods: () -> (Result_35) query;
   getUserSimplePaymentHistory: () -> (Result_34);
+  getUserSwapHistory: (user: principal) -> (vec SwapResult);
   getUserTransactions: () -> (Result_33) query;
   getUserWalletAddresses: () -> (Result_32);
   getUserWallets: () -> (Result_31) query;
@@ -1507,7 +1703,10 @@ service : {
   leaveVaultChat: (vaultId: text) -> (Result_5);
   linkRecoveredAccount: (recoveryToken: text, newPrincipalId: principal) ->
    (Result_4);
+  listFileReferences: () -> (vec FileReference) query;
   loginOrCreateUser: () -> (Result_4);
+  makeGetOutcall: (url: text) -> (text);
+  makeHttpRequest: (url: text) -> (Result_2);
   markAllNotificationsAsRead: () -> (Result_23);
   markMessagesAsRead: (vaultId: text, messageIds: vec text) -> (Result_5);
   markNotificationAsRead: (notificationId: text) -> (Result_22);
@@ -1524,9 +1723,14 @@ service : {
    opt text, amountA: float64, amountB: opt float64, fee: float64, txHash:
    opt text) -> (Result_16);
   regenerateWalletAddress: (walletId: text) -> (Result_2);
+  registerFileReference: (path: text, hash: text) -> ();
   removePaymentMethod: (methodId: text) -> (Result_5);
   removePushSubscription: (subscriptionId: text) -> (Result_5);
   respondToVaultInvitation: (vaultId: text, response: text) -> (Result_5);
+  saveAIUserPreferences: (userId: text, preferences: AISwapPreferences) -> ();
+  saveUserPreferences: (userId: text, preferences: SmartWalletPreferences) ->
+   ();
+  searchCurrencies: (searchQuery: text) -> (vec Currency);
   sendAIMessage: (content: text) -> (Result_15);
   sendCrossCanisterNotification: (targetCanisterId: text, notificationData:
    text) -> (Result_2);
@@ -1546,11 +1750,16 @@ service : {
   transferBetweenWallets: (fromWalletId: text, toWalletId: text, amount:
    float64, memo: opt text) -> (Result_6);
   transferFrom: (from: UserId, to: UserId, amount: nat) -> (Result_5);
+  transform: (input: TransformationInput) -> (TransformationOutput) query;
   unstake: (amount: nat) -> (Result_5);
+  updateAIUserPreferences: (userId: text, preferences: AISwapPreferences) ->
+   ();
   updateCryptoWalletBalance: (walletId: text, newBalance: float64) ->
    (Result_12);
   updateDefiPosition: (positionId: text, amount: float64, apy: float64,
    rewards: float64) -> (Result_11);
+  updateDocumentationSection: (id: nat, title: text, content: text,
+   sectionType: text, diagramUrl: opt text, version: text) -> ();
   updateGameScore: (gameId: text, score: float64) -> (Result_10);
   updateGoalProgress: (goalId: text, amount: float64) -> (Result_9);
   updateNotificationPreferences: (email: bool, push: bool, inApp: bool,
@@ -1567,6 +1776,8 @@ service : {
    opt text, blockHeight: opt nat) -> (Result_6);
   updateTypingStatus: (vaultId: text, isTyping: bool) -> (Result_5);
   updateUser: (displayName: opt text, avatar: opt text) -> (Result_4);
+  updateUserPreferences: (userId: text, preferences:
+   SmartWalletPreferences) -> ();
   userExists: () -> (bool);
   validateAddress: (address: text, walletType: text) -> (bool) query;
   verifyCode: (identifier: text, code: text, codeType: text) -> (Result_2);

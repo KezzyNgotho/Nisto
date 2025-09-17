@@ -1,0 +1,189 @@
+import React, { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
+import { useTheme } from '../contexts/ThemeContext';
+import SwapInterface from './SwapInterface';
+import SwapHistory from './SwapHistory';
+import MarketInterface from './MarketInterface';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Badge } from './ui/badge';
+import { 
+  FiArrowLeft,
+  FiSettings,
+  FiRefreshCw,
+  FiClock,
+  FiTrendingUp,
+  FiZap,
+  FiShield,
+  FiActivity
+} from 'react-icons/fi';
+import './SwapModule.scss';
+
+const SwapModule = ({ onBack }) => {
+  const { user, isAuthenticated, backendService } = useAuth();
+  const { showToast } = useNotification();
+  const { theme } = useTheme();
+  const [activeTab, setActiveTab] = useState('swap');
+  const [swapHistory, setSwapHistory] = useState([]);
+
+  // Function to add swap to history (called from SwapInterface)
+  const addToHistory = (swapData) => {
+    setSwapHistory(prev => [swapData, ...prev]);
+  };
+
+  return (
+    <div className={`swap-module ${theme}`}>
+      {/* Modern Header */}
+      <div className="swap-header">
+        <div className="swap-header-content">
+          <button 
+            className="back-button"
+            onClick={onBack}
+            aria-label="Go back"
+          >
+            <FiArrowLeft className="icon" />
+            <span>Back</span>
+          </button>
+          
+          <div className="swap-title-section">
+            <div className="title-wrapper">
+              <h1 className="swap-title">
+                <FiZap className="title-icon" />
+                Nisto Swap
+              </h1>
+              <Badge variant="secondary" className="status-badge">
+                <FiShield className="badge-icon" />
+                Secure
+              </Badge>
+            </div>
+            <p className="swap-subtitle">
+              {isAuthenticated 
+                ? `Welcome back, ${user?.name || 'User'}! Ready to swap?` 
+                : 'Connect your wallet to start swapping tokens'
+              }
+            </p>
+          </div>
+
+          <div className="swap-actions">
+            <button 
+              className="action-button"
+              aria-label="Refresh"
+            >
+              <FiRefreshCw className="icon" />
+            </button>
+            <button 
+              className="action-button"
+              aria-label="Settings"
+            >
+              <FiSettings className="icon" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="swap-stats-grid">
+        <Card className="stat-card">
+          <CardContent className="stat-content">
+            <div className="stat-icon">
+              <FiActivity />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Total Volume</span>
+              <span className="stat-value">$2.4M</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="stat-card">
+          <CardContent className="stat-content">
+            <div className="stat-icon">
+              <FiTrendingUp />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">24h Change</span>
+              <span className="stat-value positive">+12.5%</span>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="stat-card">
+          <CardContent className="stat-content">
+            <div className="stat-icon">
+              <FiShield />
+            </div>
+            <div className="stat-info">
+              <span className="stat-label">Security Score</span>
+              <span className="stat-value">99.9%</span>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content with Enhanced Tabs */}
+      <div className="swap-content">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="swap-tabs">
+          <TabsList className="swap-tabs-list">
+            <TabsTrigger value="swap" className="tab-trigger">
+              <FiRefreshCw className="tab-icon" />
+              <span>Swap</span>
+            </TabsTrigger>
+            <TabsTrigger value="market" className="tab-trigger">
+              <FiTrendingUp className="tab-icon" />
+              <span>Market</span>
+            </TabsTrigger>
+            <TabsTrigger value="history" className="tab-trigger">
+              <FiClock className="tab-icon" />
+              <span>History</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="swap" className="tab-content">
+            <Card className="swap-interface-card">
+              <CardHeader>
+                <CardTitle className="card-title">
+                  <FiZap className="title-icon" />
+                  Token Swap
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SwapInterface onSwapComplete={addToHistory} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="market" className="tab-content">
+            <Card className="market-interface-card">
+              <CardHeader>
+                <CardTitle className="card-title">
+                  <FiTrendingUp className="title-icon" />
+                  Market Data
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <MarketInterface />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="history" className="tab-content">
+            <Card className="history-interface-card">
+              <CardHeader>
+                <CardTitle className="card-title">
+                  <FiClock className="title-icon" />
+                  Swap History
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SwapHistory swapHistory={swapHistory} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+};
+
+export default SwapModule;

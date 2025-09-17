@@ -1,4 +1,56 @@
 // Version: 1.0.0
+type AIAnalysisResult__1023745527 =
+  {
+    confidenceLevel : Nat;
+    marketConditions : Text;
+    portfolioHealth : Text;
+    reason : Text;
+    recommendedAction : Text;
+    riskScore : Nat;
+    shouldSwap : Bool;
+    suggestedTokens : [Text]
+  };
+type AISwapPreferences__601450429 =
+  {
+    allocationLimit : Nat;
+    autoHedgingEnabled : Bool;
+    intermediaryTokenPreference : ?Text;
+    preferredSwapProvider : ?Text;
+    stablecoinPreference : Text;
+    thresholdPercentage : Nat;
+    timeWindowMinutes : Nat
+  };
+type AISwapRecord__489995876 =
+  {
+    amount : Float;
+    errorMessage : ?Text;
+    estimatedCompletionTime : ?Int;
+    fromToken : Text;
+    gasCost : ?Float;
+    id : Nat;
+    intermediarySteps : [Text];
+    price : Float;
+    reason : Text;
+    retryCount : Nat;
+    status : Text;
+    swapProvider : Text;
+    swapType : Text;
+    timestamp : Int;
+    toToken : Text;
+    userId : Text
+  };
+type DocumentationSection__189788937 =
+  {
+    content : Text;
+    diagramUrl : ?Text;
+    id : Nat;
+    lastUpdated : Int;
+    sectionType : Text;
+    title : Text;
+    version : Text
+  };
+type FileReference__50971749 = {hash : Text; path : Text};
+type Map__741697726<K, V> = {root : Tree__861953300<K, V>; size : Nat};
 type SimplePayment__224570554 =
   {
     createdAt : Int;
@@ -13,11 +65,58 @@ type SimplePayment__224570554 =
     usdAmount : Float;
     userId : UserId__247009195
   };
+type SmartWalletPreferences__367478199 =
+  {
+    allocationLimit : Nat;
+    autoHedgingEnabled : Bool;
+    intermediaryTokenPreference : ?Text;
+    preferredSwapProvider : ?Text;
+    stablecoinPreference : Text;
+    thresholdPercentage : Nat;
+    timeWindowMinutes : Nat
+  };
+type SwapRecord__823476122 =
+  {
+    amount : Nat;
+    errorMessage : ?Text;
+    estimatedCompletionTime : ?Int;
+    fromToken : Text;
+    gasCost : ?Nat;
+    id : Nat;
+    intermediarySteps : [Text];
+    price : Nat;
+    reason : Text;
+    retryCount : Nat;
+    status : Text;
+    swapProvider : Text;
+    swapType : Text;
+    timestamp : Int;
+    toToken : Text;
+    userId : Text
+  };
+type Tree__861953300<K, V> =
+  {
+    #black : (Tree__861953300<K, V>, K, V, Tree__861953300<K, V>);
+    #leaf;
+    #red : (Tree__861953300<K, V>, K, V, Tree__861953300<K, V>)
+  };
 type UserId__247009195 = Principal;
 actor {
+  stable var aiAnalysisCache :
+    {root : Tree__861953300<Text, AIAnalysisResult__1023745527>; size : Nat};
+  stable var aiSwapHistory :
+    {root : Tree__861953300<Text, [AISwapRecord__489995876]>; size : Nat};
+  stable var aiUserPreferences :
+    {root : Tree__861953300<Text, AISwapPreferences__601450429>; size : Nat};
+  stable var documentation :
+    {
+      root : Tree__861953300<Text, DocumentationSection__189788937>;
+      size : Nat
+    };
   stable var nextAIInsightId : Nat;
   stable var nextAIMessageId : Nat;
   stable var nextAIRecommendationId : Nat;
+  stable var nextAISwapId : Nat;
   stable var nextAuditLogId : Nat;
   stable var nextBudgetId : Nat;
   stable var nextChatNotificationId : Nat;
@@ -26,6 +125,7 @@ actor {
   stable var nextDeFiPositionId : Nat;
   stable var nextDefiTransactionId : Nat;
   stable var nextDepositTransactionId : Nat;
+  stable var nextDocId : Nat;
   stable var nextEmergencyContactId : Nat;
   stable var nextExternalConnectionId : Nat;
   stable var nextGameId : Nat;
@@ -44,6 +144,7 @@ actor {
   stable var nextSecurityQuestionId : Nat;
   stable var nextSessionId : Nat;
   stable var nextSimplePaymentId : Nat;
+  stable var nextSwapId : Nat;
   stable var nextTransactionId : Nat;
   stable var nextUserId : Nat;
   stable var nextUserPluginId : Nat;
@@ -54,5 +155,14 @@ actor {
   stable var nextVaultTransactionId : Nat;
   stable var nextVerificationCodeId : Nat;
   stable var nextWalletId : Nat;
-  stable var simplePayments : [(Text, SimplePayment__224570554)]
+  stable registry :
+    {var references : Map__741697726<Text, FileReference__50971749>};
+  stable var simplePayments : [(Text, SimplePayment__224570554)];
+  stable var swapHistory :
+    {root : Tree__861953300<Text, [SwapRecord__823476122]>; size : Nat};
+  stable var userPreferences :
+    {
+      root : Tree__861953300<Text, SmartWalletPreferences__367478199>;
+      size : Nat
+    }
 };

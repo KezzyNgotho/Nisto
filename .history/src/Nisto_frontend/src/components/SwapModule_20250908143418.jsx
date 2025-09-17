@@ -1,0 +1,900 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { useNotification } from '../contexts/NotificationContext';
+import { useTheme } from '../contexts/ThemeContext';
+import { 
+  FiRotateCcw,
+  FiRefreshCw,
+  FiTrendingUp,
+  FiTrendingDown,
+  FiArrowLeft,
+  FiInfo,
+  FiShield,
+  FiClock,
+  FiCheck,
+  FiDollarSign,
+  FiActivity,
+  FiEye,
+  FiEyeOff,
+  FiZap,
+  FiStar,
+  FiGlobe,
+  FiTarget,
+  FiSettings,
+  FiAlertTriangle,
+  FiMinus,
+  FiPlus
+} from 'react-icons/fi';
+import './SwapModule.scss';
+
+const SwapModule = ({ onBack }) => {
+  const { user, isAuthenticated, backendService } = useAuth();
+  const { showToast } = useNotification();
+  const { theme } = useTheme();
+  
+  // Multi-currency support
+  const [currencies] = useState([
+    { 
+      id: 'USDT', 
+      name: 'Tether USD', 
+      symbol: 'USDT', 
+      icon: FiDollarSign,
+      price: 1.00,
+      balance: 1250.50,
+      color: theme.colors.success || '#26a17b',
+      change: 0.00
+    },
+    { 
+      id: 'USDC', 
+      name: 'USD Coin', 
+      symbol: 'USDC', 
+      icon: FiZap,
+      price: 1.00,
+      balance: 850.25,
+      color: theme.colors.info || '#2775ca',
+      change: 0.00
+    },
+    { 
+      id: 'DAI', 
+      name: 'Dai Stablecoin', 
+      symbol: 'DAI', 
+      icon: FiTarget,
+      price: 1.00,
+      balance: 420.75,
+      color: theme.colors.warning || '#f5ac37',
+      change: 0.01
+    },
+    { 
+      id: 'NST', 
+      name: 'Nisto Token', 
+      symbol: 'NST', 
+      icon: FiStar,
+      price: 0.85,
+      balance: 1500.00,
+      color: theme.colors.primary || '#8b5cf6',
+      change: 5.25
+    },
+    { 
+      id: 'KES', 
+      name: 'Kenyan Shilling', 
+      symbol: 'KES', 
+      icon: FiGlobe,
+      price: 0.0065,
+      balance: 50000.00,
+      color: theme.colors.success || '#10b981',
+      change: -0.5
+    }
+  ]);
+
+  const [swapForm, setSwapForm] = useState({
+    fromCurrency: 'USDT',
+    toCurrency: 'NST',
+    fromAmount: '',
+    toAmount: '',
+    rate: 0.85,
+    slippage: 0.5,
+    estimatedTime: '2-5 minutes',
+    gasFee: 0.001,
+    priceImpact: 0.1,
+    gasFeeCurrency: 'ICP',
+    gasFeeUSD: 0.001
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [showSlippageSettings, setShowSlippageSettings] = useState(false);
+  const [swapHistory, setSwapHistory] = useState([]);
+  const [showBalances, setShowBalances] = useState(true);
+  const [swapStatus, setSwapStatus] = useState('idle'); // 'idle', 'loading', 'success', 'error'
+  const [showSwapPreview, setShowSwapPreview] = useState(false);
+  
+  const slippagePresets = [0.1, 0.5, 1.0, 2.0];
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadSwapData();
+    }
+  }, [isAuthenticated]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+          case 'Enter':
+            e.preventDefault();
+            if (swapForm.fromAmount && swapForm.toAmount) {
+              handleSwap();
+            }
+            break;
+          case 'r':
+            e.preventDefault();
+            loadSwapData();
+            break;
+          case 's':
+            e.preventDefault();
+            setShowSlippageSettings(!showSlippageSettings);
+            break;
+          case 'b':
+            e.preventDefault();
+            setShowBalances(!showBalances);
+            break;
+          default:
+            break;
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [swapForm.fromAmount, swapForm.toAmount, showSlippageSettings, showBalances]);
+
+  const loadSwapData = async () => {
+    setLoading(true);
+    try {
+      // Mock data loading - replace with actual API calls
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading swap data:', error);
+      setLoading(false);
+    }
+  };
+
+  const handleFromCurrencyChange = (currencyId) => {
+    const currency = currencies.find(c => c.id === currencyId);
+    if (currency) {
+      setSwapForm(prev => ({
+        ...prev,
+        fromCurrency: currencyId,
+        rate: calculateRate(currencyId, prev.toCurrency),
+        fromAmount: '',
+        toAmount: ''
+      }));
+    }
+  };
+
+  const handleToCurrencyChange = (currencyId) => {
+    const currency = currencies.find(c => c.id === currencyId);
+    if (currency) {
+      setSwapForm(prev => ({
+        ...prev,
+        toCurrency: currencyId,
+        rate: calculateRate(prev.fromCurrency, currencyId),
+        fromAmount: '',
+        toAmount: ''
+      }));
+    }
+  };
+
+  const calculateRate = (fromCurrency, toCurrency) => {
+    const fromPrice = currencies.find(c => c.id === fromCurrency)?.price || 1;
+    const toPrice = currencies.find(c => c.id === toCurrency)?.price || 1;
+    return toPrice / fromPrice;
+  };
+
+  const handleFromAmountChange = (amount) => {
+    const rate = calculateRate(swapForm.fromCurrency, swapForm.toCurrency);
+    const toAmount = (parseFloat(amount) * rate).toFixed(6);
+    
+    // Update price impact
+    updatePriceImpact(amount);
+    
+    setSwapForm(prev => ({
+      ...prev,
+      fromAmount: amount,
+      toAmount: toAmount,
+      rate: rate
+    }));
+  };
+
+  const handleToAmountChange = (amount) => {
+    const rate = calculateRate(swapForm.fromCurrency, swapForm.toCurrency);
+    const fromAmount = (parseFloat(amount) / rate).toFixed(6);
+    
+    setSwapForm(prev => ({
+      ...prev,
+      fromAmount: fromAmount,
+      toAmount: amount,
+      rate: rate
+    }));
+  };
+
+  const handleSwap = async () => {
+    // Validate inputs
+    const errors = validateSwapInputs();
+    if (errors.length > 0) {
+      showToast(errors[0], 'error');
+      return;
+    }
+
+    setLoading(true);
+    setSwapStatus('loading');
+    
+    try {
+      // Mock swap transaction
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      setSwapStatus('success');
+      
+      const swapRecord = {
+        id: Date.now(),
+        from: `${swapForm.fromAmount} ${swapForm.fromCurrency}`,
+        to: `${swapForm.toAmount} ${swapForm.toCurrency}`,
+        rate: swapForm.rate,
+        timestamp: new Date().toISOString(),
+        status: 'completed'
+      };
+      
+      setSwapHistory(prev => [swapRecord, ...prev]);
+      showToast(`Successfully swapped ${swapForm.fromAmount} ${swapForm.fromCurrency} to ${swapForm.toAmount} ${swapForm.toCurrency}`, 'success');
+      
+      // Reset form after success
+      setTimeout(() => {
+        setSwapForm(prev => ({
+          ...prev,
+          fromAmount: '',
+          toAmount: ''
+        }));
+        setSwapStatus('idle');
+      }, 2000);
+      
+    } catch (error) {
+      setSwapStatus('error');
+      showToast('Failed to process swap', 'error');
+      setTimeout(() => setSwapStatus('idle'), 2000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const swapCurrencies = () => {
+    setSwapForm(prev => ({
+      ...prev,
+      fromCurrency: prev.toCurrency,
+      toCurrency: prev.fromCurrency,
+      fromAmount: prev.toAmount,
+      toAmount: prev.fromAmount,
+      rate: 1 / prev.rate
+    }));
+  };
+
+  const formatBalance = (balance) => {
+    return new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 8
+    }).format(balance);
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 6
+    }).format(price);
+  };
+
+  const getCurrencyIcon = (currencyId) => {
+    const currency = currencies.find(c => c.id === currencyId);
+    if (currency && currency.icon) {
+      const IconComponent = currency.icon;
+      return <IconComponent size={20} style={{ color: currency.color }} />;
+    }
+    return <FiDollarSign size={20} style={{ color: theme.colors.text.secondary }} />;
+  };
+
+  const getCurrencyName = (currencyId) => {
+    return currencies.find(c => c.id === currencyId)?.name || currencyId;
+  };
+
+  const getCurrencyBalance = (currencyId) => {
+    return currencies.find(c => c.id === currencyId)?.balance || 0;
+  };
+
+  const getCurrencyChange = (currencyId) => {
+    return currencies.find(c => c.id === currencyId)?.change || 0;
+  };
+
+  const validateSwapInputs = () => {
+    const errors = [];
+    
+    if (!swapForm.fromAmount || parseFloat(swapForm.fromAmount) <= 0) {
+      errors.push('Please enter a valid amount to swap');
+    }
+    
+    if (parseFloat(swapForm.fromAmount) > getCurrencyBalance(swapForm.fromCurrency)) {
+      errors.push('Insufficient balance for this swap');
+    }
+    
+    if (swapForm.fromCurrency === swapForm.toCurrency) {
+      errors.push('Cannot swap the same currency');
+    }
+    
+    if (swapForm.priceImpact > 5) {
+      errors.push('Price impact too high (>5%). Consider reducing swap amount');
+    }
+    
+    return errors;
+  };
+
+  const calculatePriceImpact = (amount) => {
+    // Mock calculation - in real app, this would be based on liquidity
+    const impact = (parseFloat(amount) / 10000) * 100;
+    return Math.min(impact, 10); // Cap at 10%
+  };
+
+  const updatePriceImpact = (amount) => {
+    const impact = calculatePriceImpact(amount);
+    setSwapForm(prev => ({ ...prev, priceImpact: impact }));
+  };
+
+  return (
+    <div className="swap-module">
+      {/* Header Section */}
+      <div className="swap-header">
+        <button 
+          className="back-btn"
+          onClick={onBack}
+          style={{ 
+            background: 'transparent',
+            color: theme.colors.text.primary,
+            border: 'none'
+          }}
+        >
+          <FiArrowLeft />
+          Back to Overview
+        </button>
+        
+        <div className="header-content">
+         {/*  <h1 style={{ color: theme.colors.text.primary }}>Currency Swap</h1> */}
+          <p style={{ color: theme.colors.text.secondary }}>
+            Exchange between different currencies with the best rates
+          </p>
+          <div style={{ 
+            fontSize: '0.75rem', 
+            color: theme.colors.text.secondary, 
+            marginTop: '0.5rem',
+            opacity: 0.7
+          }}>
+            <span>Shortcuts: </span>
+            <span style={{ color: theme.colors.primary }}>Ctrl+Enter</span> to swap, 
+            <span style={{ color: theme.colors.primary }}> Ctrl+R</span> to refresh, 
+            <span style={{ color: theme.colors.primary }}> Ctrl+S</span> for settings
+          </div>
+        </div>
+
+        <div className="header-actions">
+          <button 
+            className="refresh-btn"
+            onClick={loadSwapData}
+            disabled={loading}
+            style={{ 
+              background: 'transparent',
+              color: theme.colors.text.primary,
+              border: 'none'
+            }}
+            title="Refresh rates"
+          >
+            <FiRefreshCw className={loading ? 'spinning' : ''} />
+          </button>
+          <button 
+            className="balance-toggle"
+            onClick={() => setShowBalances(!showBalances)}
+            style={{ 
+              background: 'transparent',
+              color: theme.colors.text.primary,
+              border: 'none'
+            }}
+            title={showBalances ? "Hide balances" : "Show balances"}
+          >
+            {showBalances ? <FiEye /> : <FiEyeOff />}
+          </button>
+          <button 
+            className="settings-btn"
+            onClick={() => setShowSlippageSettings(!showSlippageSettings)}
+            style={{ 
+              background: 'transparent',
+              color: theme.colors.text.primary,
+              border: 'none'
+            }}
+            title="Slippage settings"
+          >
+            <FiSettings />
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="swap-content-grid">
+        {/* Left Column - Swap Interface & Market Overview */}
+        <div className="swap-interface-column">
+          {/* Market Overview */}
+          <div className="market-overview-card" style={{ 
+            background: theme.colors.background.secondary,
+            border: `1px solid ${theme.colors.border}`
+          }}>
+            <div className="card-header">
+              <h3 style={{ color: theme.colors.text.primary }}>Market Overview</h3>
+              <FiActivity style={{ color: theme.colors.primary }} />
+            </div>
+            <div className="market-stats">
+              <div className="stat-row">
+                <span style={{ color: theme.colors.text.secondary, fontSize: '0.9rem' }}>24h Volume</span>
+                <span style={{ color: theme.colors.text.primary, fontSize: '0.9rem', fontWeight: '600' }}>$2.4M</span>
+              </div>
+              <div className="stat-row">
+                <span style={{ color: theme.colors.text.secondary, fontSize: '0.9rem' }}>Total Pairs</span>
+                <span style={{ color: theme.colors.text.primary, fontSize: '0.9rem', fontWeight: '600' }}>25</span>
+              </div>
+              <div className="stat-row">
+                <span style={{ color: theme.colors.text.secondary, fontSize: '0.9rem' }}>Avg. Fee</span>
+                <span style={{ color: theme.colors.text.primary, fontSize: '0.9rem', fontWeight: '600' }}>0.1%</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Swap Card */}
+          <div className="swap-card" style={{ 
+            background: theme.colors.background.secondary,
+            border: `1px solid ${theme.colors.border}`
+          }}>
+            <div className="card-header">
+              <h3 style={{ color: theme.colors.text.primary }}>Swap Currencies</h3>
+            <div className="swap-stats">
+              <div className="stat-item">
+                <span style={{ color: theme.colors.text.secondary, fontSize: '0.75rem' }}>Rate</span>
+                <span style={{ color: theme.colors.text.primary, fontSize: '0.875rem', fontWeight: '600' }}>
+                  1 {swapForm.fromCurrency} = {swapForm.rate.toFixed(6)} {swapForm.toCurrency}
+                </span>
+              </div>
+              <div className="stat-item">
+                <span style={{ color: theme.colors.text.secondary, fontSize: '0.75rem' }}>Slippage</span>
+                <button 
+                  onClick={() => setShowSlippageSettings(!showSlippageSettings)}
+                  style={{ 
+                    color: theme.colors.text.primary, 
+                    fontSize: '0.875rem', 
+                    fontWeight: '600',
+                    background: 'transparent',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textDecoration: 'underline'
+                  }}
+                >
+                  {swapForm.slippage}%
+                </button>
+              </div>
+            </div>
+            </div>
+
+            <div className="swap-container">
+              {/* From and To Currencies in Row */}
+              <div className="swap-row">
+                {/* From Currency */}
+                <div className="swap-section">
+                  <label style={{ color: theme.colors.text.primary }}>From</label>
+                  <div className="currency-selector">
+                    <div className="currency-icon">{getCurrencyIcon(swapForm.fromCurrency)}</div>
+                      <select
+                        value={swapForm.fromCurrency}
+                        onChange={(e) => handleFromCurrencyChange(e.target.value)}
+                        style={{ 
+                          color: theme.colors.text.primary
+                        }}
+                      >
+                      {currencies.map(currency => (
+                        <option key={currency.id} value={currency.id}>
+                          {currency.symbol} - {currency.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <input
+                    type="number"
+                    value={swapForm.fromAmount}
+                    onChange={(e) => handleFromAmountChange(e.target.value)}
+                    placeholder="0.00"
+                    style={{ 
+                      color: theme.colors.text.primary
+                    }}
+                  />
+                  <div className="balance-info">
+                    <span style={{ color: theme.colors.text.secondary, fontSize: '0.8rem' }}>
+                      Balance: {showBalances ? formatBalance(getCurrencyBalance(swapForm.fromCurrency)) : '••••••'} {swapForm.fromCurrency}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Swap Arrow */}
+                <div className="swap-arrow-container">
+                  <button 
+                    className="swap-arrow-btn"
+                    onClick={swapCurrencies}
+                    style={{ 
+                      background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary || theme.colors.primary})`,
+                      color: theme.colors.text.inverse || theme.colors.white,
+                      boxShadow: `0 4px 20px ${theme.colors.shadow?.primary || theme.colors.primary + '20'}`
+                    }}
+                  >
+                    <FiRotateCcw />
+                  </button>
+                </div>
+
+                {/* To Currency */}
+                <div className="swap-section">
+                  <label style={{ color: theme.colors.text.primary }}>To</label>
+                  <div className="currency-selector">
+                    <div className="currency-icon">{getCurrencyIcon(swapForm.toCurrency)}</div>
+                      <select
+                        value={swapForm.toCurrency}
+                        onChange={(e) => handleToCurrencyChange(e.target.value)}
+                        style={{ 
+                          color: theme.colors.text.primary
+                        }}
+                      >
+                      {currencies.map(currency => (
+                        <option key={currency.id} value={currency.id}>
+                          {currency.symbol} - {currency.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <input
+                    type="number"
+                    value={swapForm.toAmount}
+                    onChange={(e) => handleToAmountChange(e.target.value)}
+                    placeholder="0.00"
+                    style={{ 
+                      color: theme.colors.text.primary
+                    }}
+                  />
+                  <div className="balance-info">
+                    <span style={{ color: theme.colors.text.secondary, fontSize: '0.8rem' }}>
+                      Balance: {showBalances ? formatBalance(getCurrencyBalance(swapForm.toCurrency)) : '••••••'} {swapForm.toCurrency}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Slippage Settings */}
+            {showSlippageSettings && (
+              <div className="slippage-settings" style={{ 
+                padding: '1rem 1.5rem',
+                borderTop: `1px solid ${theme.colors.border}`,
+                background: theme.colors.background.primary
+              }}>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ color: theme.colors.text.primary, fontSize: '0.9rem', fontWeight: '600' }}>
+                    Slippage Tolerance
+                  </label>
+                  <p style={{ color: theme.colors.text.secondary, fontSize: '0.8rem', margin: '0.25rem 0' }}>
+                    Your transaction will revert if the price changes unfavorably by more than this percentage.
+                  </p>
+                </div>
+                
+                <div className="slippage-presets" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                  {slippagePresets.map(preset => (
+                    <button
+                      key={preset}
+                      onClick={() => setSwapForm(prev => ({ ...prev, slippage: preset }))}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: '8px',
+                        border: `1px solid ${swapForm.slippage === preset ? theme.colors.primary : theme.colors.border}`,
+                        background: swapForm.slippage === preset ? theme.colors.primary : 'transparent',
+                        color: swapForm.slippage === preset ? theme.colors.text.inverse : theme.colors.text.primary,
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        fontWeight: '600',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      {preset}%
+                    </button>
+                  ))}
+                </div>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <input
+                    type="number"
+                    value={swapForm.slippage}
+                    onChange={(e) => setSwapForm(prev => ({ ...prev, slippage: parseFloat(e.target.value) || 0 }))}
+                    min="0.1"
+                    max="50"
+                    step="0.1"
+                    style={{
+                      flex: 1,
+                      padding: '0.5rem',
+                      borderRadius: '8px',
+                      border: `1px solid ${theme.colors.border}`,
+                      background: theme.colors.background.secondary,
+                      color: theme.colors.text.primary,
+                      fontSize: '0.9rem'
+                    }}
+                  />
+                  <span style={{ color: theme.colors.text.secondary, fontSize: '0.9rem' }}>%</span>
+                </div>
+              </div>
+            )}
+
+            {/* Swap Preview */}
+            {swapForm.fromAmount && swapForm.toAmount && (
+              <div className="swap-preview" style={{ 
+                padding: '1rem 1.5rem',
+                borderTop: `1px solid ${theme.colors.border}`,
+                background: theme.colors.background.primary
+              }}>
+                <h4 style={{ color: theme.colors.text.primary, fontSize: '0.9rem', fontWeight: '600', marginBottom: '1rem' }}>
+                  Swap Preview
+                </h4>
+                
+                <div className="preview-details" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: theme.colors.text.secondary, fontSize: '0.8rem' }}>Price Impact</span>
+                    <span style={{ 
+                      color: swapForm.priceImpact > 5 ? theme.colors.error : 
+                             swapForm.priceImpact > 2 ? theme.colors.warning : 
+                             theme.colors.success,
+                      fontSize: '0.8rem',
+                      fontWeight: '600'
+                    }}>
+                      {swapForm.priceImpact.toFixed(2)}%
+                    </span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: theme.colors.text.secondary, fontSize: '0.8rem' }}>Gas Fee</span>
+                    <span style={{ color: theme.colors.text.primary, fontSize: '0.8rem', fontWeight: '600' }}>
+                      {swapForm.gasFee} {swapForm.fromCurrency}
+                    </span>
+                  </div>
+                  
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: theme.colors.text.secondary, fontSize: '0.8rem' }}>Minimum Received</span>
+                    <span style={{ color: theme.colors.text.primary, fontSize: '0.8rem', fontWeight: '600' }}>
+                      {(parseFloat(swapForm.toAmount) * (1 - swapForm.slippage / 100)).toFixed(6)} {swapForm.toCurrency}
+                    </span>
+                  </div>
+                  
+                  {swapForm.priceImpact > 5 && (
+                    <div style={{ 
+                      padding: '0.75rem',
+                      borderRadius: '8px',
+                      background: `${theme.colors.error}20`,
+                      border: `1px solid ${theme.colors.error}40`,
+                      color: theme.colors.error,
+                      fontSize: '0.8rem',
+                      fontWeight: '500'
+                    }}>
+                      ⚠️ High price impact detected. Consider reducing swap amount.
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Swap Button */}
+            <button 
+              className="swap-btn"
+              onClick={handleSwap}
+              disabled={loading || !swapForm.fromAmount || !swapForm.toAmount}
+              style={{ 
+                background: swapStatus === 'success' ? theme.colors.success : 
+                          swapStatus === 'error' ? theme.colors.error :
+                          loading ? theme.colors.background.secondary : 
+                          `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary || theme.colors.primary})`,
+                color: theme.colors.text.inverse || theme.colors.white,
+                border: 'none',
+                boxShadow: `0 4px 20px ${theme.colors.shadow?.primary || theme.colors.primary + '20'}`
+              }}
+            >
+              {swapStatus === 'success' ? (
+                <>
+                  <FiCheck />
+                  Swap Successful!
+                </>
+              ) : swapStatus === 'error' ? (
+                <>
+                  <FiInfo />
+                  Swap Failed
+                </>
+              ) : loading ? (
+                <>
+                  <FiRefreshCw className="spinning" />
+                  Processing Swap...
+                </>
+              ) : (
+                <>
+                  <FiRotateCcw />
+                  Swap Now
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Swap History */}
+          {swapHistory.length > 0 && (
+            <div className="swap-history-card">
+              <div className="history-header">
+                <div className="history-title">
+                  <FiClock style={{ color: theme.colors.primary }} />
+                  <h3 style={{ color: theme.colors.text.primary }}>Recent Swaps</h3>
+                </div>
+                <div className="history-count" style={{ color: theme.colors.text.secondary }}>
+                  {swapHistory.length} transactions
+                </div>
+              </div>
+              
+              <div className="history-list">
+                {swapHistory.slice(0, 5).map((swap, index) => (
+                  <div 
+                    key={swap.id}
+                    className="history-item"
+                    style={{ 
+                      background: `linear-gradient(135deg, ${theme.colors.background.secondary}20, ${theme.colors.background.primary}20)`,
+                      border: `1px solid ${theme.colors.border}40`,
+                      borderRadius: '12px'
+                    }}
+                  >
+                    <div className="history-item-header">
+                      <div className="swap-direction">
+                        <div className="currency-from">
+                          <div className="currency-icon-small">
+                            {getCurrencyIcon(swap.from.split(' ')[1])}
+                          </div>
+                          <span style={{ color: theme.colors.text.primary, fontWeight: '600' }}>
+                            {swap.from.split(' ')[0]}
+                          </span>
+                          <span style={{ color: theme.colors.text.secondary, fontSize: '0.8rem' }}>
+                            {swap.from.split(' ')[1]}
+                          </span>
+                        </div>
+                        
+                        <div className="swap-arrow">
+                          <FiRotateCcw style={{ color: theme.colors.primary }} />
+                        </div>
+                        
+                        <div className="currency-to">
+                          <div className="currency-icon-small">
+                            {getCurrencyIcon(swap.to.split(' ')[1])}
+                          </div>
+                          <span style={{ color: theme.colors.text.primary, fontWeight: '600' }}>
+                            {swap.to.split(' ')[0]}
+                          </span>
+                          <span style={{ color: theme.colors.text.secondary, fontSize: '0.8rem' }}>
+                            {swap.to.split(' ')[1]}
+                          </span>
+                        </div>
+                      </div>
+                      
+                      <div className="swap-status-badge" style={{ 
+                        background: `${theme.colors.success}20`,
+                        color: theme.colors.success,
+                        border: `1px solid ${theme.colors.success}40`
+                      }}>
+                        <FiCheck size={12} />
+                        <span>Completed</span>
+                      </div>
+                    </div>
+                    
+                    <div className="history-item-footer">
+                      <div className="swap-rate" style={{ color: theme.colors.text.secondary }}>
+                        Rate: 1 {swap.from.split(' ')[1]} = {swap.rate} {swap.to.split(' ')[1]}
+                      </div>
+                      <div className="swap-time" style={{ color: theme.colors.text.secondary }}>
+                        {new Date(swap.timestamp).toLocaleDateString()} • {new Date(swap.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Right Column - Currencies & Security */}
+        <div className="market-info-column">
+          {/* Available Currencies */}
+          <div className="currencies-card" style={{ 
+            background: theme.colors.background.secondary,
+            border: `1px solid ${theme.colors.border}`
+          }}>
+            <div className="card-header">
+              <h3 style={{ color: theme.colors.text.primary }}>Available Currencies</h3>
+              <span style={{ color: theme.colors.text.secondary }}>{currencies.length} assets</span>
+            </div>
+            <div className="currencies-list">
+              {currencies.map(currency => (
+                <div 
+                  key={currency.id}
+                  className="currency-item"
+                  style={{ 
+                    background: theme.colors.background.primary,
+                    border: `1px solid ${theme.colors.border}`
+                  }}
+                >
+                  <div className="currency-info">
+                    <div className="currency-icon">{getCurrencyIcon(currency.id)}</div>
+                    <div className="currency-details">
+                      <span style={{ color: theme.colors.text.primary, fontSize: '0.9rem', fontWeight: '600' }}>{currency.symbol}</span>
+                      <span style={{ color: theme.colors.text.secondary, fontSize: '0.8rem' }}>{currency.name}</span>
+                    </div>
+                  </div>
+                  <div className="currency-stats">
+                    <div className="currency-price" style={{ color: theme.colors.text.primary, fontSize: '0.9rem', fontWeight: '600' }}>
+                      {showBalances ? formatPrice(currency.price) : '••••••'}
+                    </div>
+                    <div 
+                      className="currency-change"
+                      style={{ 
+                        color: currency.change >= 0 ? theme.colors.success || '#10b981' : theme.colors.error || '#ef4444',
+                        fontSize: '0.8rem',
+                        fontWeight: '600'
+                      }}
+                    >
+                      {currency.change >= 0 ? '+' : ''}{currency.change}%
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Security Info */}
+          <div className="security-card" style={{ 
+            background: theme.colors.background.secondary,
+            border: `1px solid ${theme.colors.border}`
+          }}>
+            <div className="card-header">
+              <h3 style={{ color: theme.colors.text.primary }}>Security</h3>
+              <FiShield style={{ color: theme.colors.primary }} />
+            </div>
+            <div className="security-info">
+              <div className="security-item">
+                <FiShield style={{ color: theme.colors.primary }} />
+                <span style={{ color: theme.colors.text.secondary, fontSize: '0.9rem' }}>
+                  MPC-protected transactions
+                </span>
+              </div>
+              <div className="security-item">
+                <FiClock style={{ color: theme.colors.primary }} />
+                <span style={{ color: theme.colors.text.secondary, fontSize: '0.9rem' }}>
+                  {swapForm.estimatedTime} processing time
+                </span>
+              </div>
+              <div className="security-item">
+                <FiTrendingUp style={{ color: theme.colors.primary }} />
+                <span style={{ color: theme.colors.text.secondary, fontSize: '0.9rem' }}>
+                  Best rates guaranteed
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SwapModule;

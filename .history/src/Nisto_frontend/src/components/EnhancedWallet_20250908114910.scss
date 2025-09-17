@@ -1,0 +1,715 @@
+.enhanced-wallet {
+  padding: 2rem;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  .wallet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    .header-left {
+      h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      p {
+        font-size: 1rem;
+        margin: 0;
+        opacity: 0.8;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+
+      button {
+        padding: 0.75rem;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        &.spinning {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+
+  .portfolio-overview {
+    margin-bottom: 2rem;
+
+    .portfolio-card {
+      padding: 2rem;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+      .portfolio-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        h3 {
+          font-size: 1.25rem;
+          font-weight: 600;
+          margin: 0;
+        }
+
+        .portfolio-change {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-weight: 600;
+          font-size: 0.9rem;
+        }
+      }
+
+      .portfolio-value {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .portfolio-stats {
+        display: flex;
+        gap: 2rem;
+
+        .stat {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+
+          span:first-child {
+            font-size: 0.875rem;
+            opacity: 0.7;
+          }
+
+          span:last-child {
+            font-size: 1.125rem;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  .currency-section {
+    margin-bottom: 2rem;
+
+    .currency-selector {
+      label {
+        display: block;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+
+      .currency-dropdown {
+        position: relative;
+
+        .currency-select-btn {
+          width: 100%;
+          padding: 1rem 1.5rem;
+          border-radius: 16px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 1rem;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          }
+
+          .selected-currency {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            .currency-icon {
+              font-size: 1.5rem;
+            }
+
+            .currency-name {
+              font-weight: 600;
+            }
+
+            .currency-symbol {
+              opacity: 0.7;
+            }
+          }
+        }
+
+        .currency-options {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          margin-top: 0.5rem;
+          border-radius: 16px;
+          overflow: hidden;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+          z-index: 1000;
+
+          .currency-option {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+
+            &:hover {
+              background: rgba(139, 92, 246, 0.1);
+            }
+
+            &.selected {
+              background: rgba(139, 92, 246, 0.2);
+            }
+
+            .currency-icon {
+              font-size: 1.25rem;
+              margin-right: 1rem;
+            }
+
+            .currency-info {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              gap: 0.25rem;
+
+              .currency-name {
+                font-weight: 600;
+                font-size: 0.9rem;
+              }
+
+              .currency-symbol {
+                font-size: 0.8rem;
+                opacity: 0.7;
+              }
+            }
+
+            .currency-balance {
+              font-weight: 600;
+              font-size: 0.9rem;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .currency-details {
+    margin-bottom: 2rem;
+
+    .currency-card {
+      padding: 2rem;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+
+      .currency-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+
+        .currency-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+
+          .currency-icon-large {
+            font-size: 3rem;
+          }
+
+          h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0 0 0.25rem 0;
+          }
+
+          p {
+            font-size: 1rem;
+            margin: 0;
+            opacity: 0.7;
+          }
+        }
+
+        .currency-price {
+          text-align: right;
+
+          span:first-child {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+          }
+
+          .price-change {
+            font-size: 0.9rem;
+            font-weight: 600;
+          }
+        }
+      }
+
+      .currency-balance {
+        margin-bottom: 2rem;
+
+        .balance-amount {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+        }
+
+        .balance-usd {
+          font-size: 1.25rem;
+          opacity: 0.7;
+        }
+      }
+
+      .currency-actions {
+        display: flex;
+        gap: 1rem;
+
+        .action-btn {
+          flex: 1;
+          padding: 1rem 1.5rem;
+          border-radius: 16px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
+          font-weight: 600;
+          font-size: 1rem;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          }
+
+          &.send-btn {
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            color: white;
+          }
+
+          &.receive-btn, &.swap-btn {
+            &:hover {
+              background: rgba(139, 92, 246, 0.1);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .all-currencies {
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .currencies-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+
+      .currency-item {
+        padding: 1.5rem;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        &.active {
+          border-color: #8b5cf6;
+          box-shadow: 0 8px 32px rgba(139, 92, 246, 0.2);
+        }
+
+        .currency-item-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 1rem;
+
+          .currency-icon {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+          }
+
+          .currency-item-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+
+            span:first-child {
+              font-weight: 600;
+              font-size: 1rem;
+            }
+
+            span:last-child {
+              font-size: 0.8rem;
+              opacity: 0.7;
+            }
+          }
+        }
+
+        .currency-item-balance {
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+        }
+
+        .currency-item-value {
+          font-size: 1rem;
+          opacity: 0.7;
+          margin-bottom: 0.5rem;
+        }
+
+        .currency-item-change {
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  // Modal Styles
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(5px);
+
+    .modal-content {
+      width: 90%;
+      max-width: 500px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+      .modal-header {
+        padding: 1.5rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+        h3 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin: 0;
+        }
+
+        button {
+          background: none;
+          border: none;
+          font-size: 1.5rem;
+          cursor: pointer;
+          padding: 0.5rem;
+          border-radius: 8px;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+          }
+        }
+      }
+
+      .modal-body {
+        padding: 2rem;
+
+        .form-group {
+          margin-bottom: 1.5rem;
+
+          label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+          }
+
+          input, select {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+
+            &:focus {
+              outline: none;
+              box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+            }
+          }
+
+          .input-group {
+            display: flex;
+            align-items: center;
+
+            input {
+              border-radius: 12px 0 0 12px;
+              border-right: none;
+            }
+
+            .input-suffix {
+              padding: 1rem;
+              background: rgba(255, 255, 255, 0.05);
+              border-radius: 0 12px 12px 0;
+              font-weight: 600;
+            }
+          }
+        }
+
+        .deposit-address {
+          .address-container {
+            display: flex;
+            gap: 0.5rem;
+
+            input {
+              flex: 1;
+              font-family: 'Monaco', 'Menlo', monospace;
+              font-size: 0.9rem;
+            }
+
+            .copy-btn {
+              padding: 1rem;
+              border-radius: 12px;
+              border: none;
+              cursor: pointer;
+              transition: all 0.3s ease;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+
+              &:hover {
+                transform: scale(1.05);
+              }
+            }
+          }
+        }
+
+        .deposit-info {
+          margin-top: 1.5rem;
+
+          .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+        }
+
+        .swap-container {
+          .swap-from, .swap-to {
+            margin-bottom: 1rem;
+
+            label {
+              display: block;
+              font-size: 0.9rem;
+              font-weight: 600;
+              margin-bottom: 0.5rem;
+            }
+
+            .swap-input-group {
+              display: flex;
+              gap: 0.5rem;
+
+              input {
+                flex: 1;
+              }
+
+              select {
+                width: 120px;
+              }
+            }
+          }
+
+          .swap-arrow {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+            font-size: 1.5rem;
+          }
+        }
+
+        .swap-rate {
+          text-align: center;
+          font-size: 0.9rem;
+          opacity: 0.7;
+          margin-top: 1rem;
+        }
+      }
+
+      .modal-footer {
+        padding: 1.5rem 2rem;
+        display: flex;
+        gap: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+        button {
+          flex: 1;
+          padding: 1rem 1.5rem;
+          border-radius: 12px;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-weight: 600;
+          font-size: 1rem;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+          }
+
+          &.btn-primary {
+            background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+            color: white;
+          }
+
+          &.btn-secondary {
+            &:hover {
+              background: rgba(255, 255, 255, 0.1);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Animations
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .wallet-header {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+
+      .header-actions {
+        justify-content: center;
+      }
+    }
+
+    .portfolio-card {
+      padding: 1.5rem;
+
+      .portfolio-value {
+        font-size: 2rem;
+      }
+
+      .portfolio-stats {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+
+    .currency-card {
+      padding: 1.5rem;
+
+      .currency-header {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+
+        .currency-info {
+          justify-content: center;
+        }
+      }
+
+      .currency-balance .balance-amount {
+        font-size: 2rem;
+      }
+
+      .currency-actions {
+        flex-direction: column;
+
+        .action-btn {
+          width: 100%;
+        }
+      }
+    }
+
+    .currencies-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+      width: 95%;
+      margin: 1rem;
+
+      .modal-body {
+        padding: 1.5rem;
+      }
+
+      .modal-footer {
+        padding: 1rem 1.5rem;
+        flex-direction: column;
+      }
+    }
+  }
+}

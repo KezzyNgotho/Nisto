@@ -1,0 +1,306 @@
+.live-market-data {
+  padding: 2rem;
+  background: var(--background-primary);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+  .market-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+
+    h2 {
+      color: var(--text-primary);
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .market-stats {
+      display: flex;
+      gap: 1rem;
+
+      .stat {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+
+        strong {
+          color: var(--accent-color);
+          font-weight: 600;
+        }
+      }
+    }
+
+    .loading-spinner {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-secondary);
+
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--border-color);
+        border-top: 2px solid var(--accent-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+    }
+
+    .error-message {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--error-color);
+      font-size: 0.9rem;
+
+      .error-icon {
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .search-section {
+    margin-bottom: 2rem;
+
+    .search-input-wrapper {
+      position: relative;
+      max-width: 400px;
+
+      .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        background: var(--background-secondary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.2s ease;
+
+        &:focus {
+          outline: none;
+          border-color: var(--accent-color);
+          box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.1);
+        }
+
+        &::placeholder {
+          color: var(--text-tertiary);
+        }
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-tertiary);
+        font-size: 1.1rem;
+      }
+    }
+  }
+
+  .currencies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .currency-card {
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      border-color: var(--accent-color);
+    }
+
+    .currency-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      .currency-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        .currency-image {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+        }
+
+        .currency-details {
+          .currency-name {
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+          }
+
+          .currency-symbol {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+          }
+        }
+      }
+
+      .currency-price {
+        color: var(--text-primary);
+        font-size: 1.25rem;
+        font-weight: 700;
+      }
+    }
+
+    .currency-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+
+      .metric {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .metric-label {
+          color: var(--text-secondary);
+          font-size: 0.85rem;
+          font-weight: 500;
+        }
+
+        .metric-value {
+          color: var(--text-primary);
+          font-size: 0.9rem;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .currency-actions {
+      display: flex;
+      gap: 0.75rem;
+
+      .action-btn {
+        flex: 1;
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.primary {
+          background: var(--accent-color);
+          color: white;
+
+          &:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+          }
+        }
+
+        &.secondary {
+          background: var(--background-primary);
+          color: var(--text-primary);
+          border: 1px solid var(--border-color);
+
+          &:hover {
+            background: var(--background-hover);
+            border-color: var(--accent-color);
+          }
+        }
+      }
+    }
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--text-secondary);
+
+    .no-results-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    h3 {
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      margin: 0 0 0.5rem 0;
+    }
+
+    p {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .live-market-data {
+    padding: 1rem;
+
+    .market-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+
+      .market-stats {
+        align-self: stretch;
+        justify-content: space-between;
+      }
+    }
+
+    .currencies-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .currency-card {
+      padding: 1rem;
+
+      .currency-header {
+        .currency-price {
+          font-size: 1.1rem;
+        }
+      }
+
+      .currency-actions {
+        .action-btn {
+          padding: 0.6rem 0.8rem;
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+}
+
+// Dark mode adjustments
+@media (prefers-color-scheme: dark) {
+  .live-market-data {
+    .currency-card {
+      &:hover {
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+}

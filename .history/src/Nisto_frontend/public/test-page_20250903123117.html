@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NISTO Social Media Integration Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .test-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: transform 0.2s;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+        .test-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .status.success {
+            background: rgba(46, 204, 113, 0.2);
+            border: 1px solid rgba(46, 204, 113, 0.5);
+        }
+        .status.error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid rgba(231, 76, 60, 0.5);
+        }
+        .status.info {
+            background: rgba(52, 152, 219, 0.2);
+            border: 1px solid rgba(52, 152, 219, 0.5);
+        }
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .platform-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .platform-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        .demo-interface {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+        }
+        select {
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 NISTO Social Media Integration Test</h1>
+        
+        <div class="test-section">
+            <h2>🧪 System Tests</h2>
+            <button class="test-button" onclick="runQuickTest()">Run Quick Test</button>
+            <button class="test-button" onclick="runFullTest()">Run Full Test</button>
+            <button class="test-button" onclick="checkHealth()">Check System Health</button>
+            <button class="test-button" onclick="clearResults()">Clear Results</button>
+        </div>
+
+        <div class="test-section">
+            <h2>📊 Test Results</h2>
+            <div id="testResults"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🌍 Platform Status</h2>
+            <div class="platform-grid" id="platformStatus">
+                <!-- Platform status will be populated here -->
+            </div>
+        </div>
+
+        <div class="demo-interface">
+            <h2>💬 Demo Interface</h2>
+            <p>Test sending a money transfer message:</p>
+            
+            <div class="input-group">
+                <select id="platformSelect">
+                    <option value="instagram">📱 Instagram</option>
+                    <option value="whatsapp">💬 WhatsApp</option>
+                    <option value="twitter">🐦 Twitter</option>
+                    <option value="telegram">📡 Telegram</option>
+                    <option value="discord">🎮 Discord</option>
+                    <option value="slack">💼 Slack</option>
+                </select>
+                <input type="text" id="messageInput" placeholder="e.g., Send $50 to @friend" />
+                <button class="test-button" onclick="testMessage()">Send Test Message</button>
+            </div>
+            
+            <div id="messageResult"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the integration
+        let socialMediaIntegration = null;
+        let isInitialized = false;
+
+        // Initialize the integration
+        async function initializeIntegration() {
+            try {
+                const module = await import('../src/services/SocialMediaIntegration.js');
+                socialMediaIntegration = new module.default();
+                
+                // Wait for initialization
+                while (!socialMediaIntegration.isInitialized) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                isInitialized = true;
+                addResult('✅ Integration initialized successfully!', 'success');
+                updatePlatformStatus();
+                
+            } catch (error) {
+                addResult(`❌ Failed to initialize: ${error.message}`, 'error');
+            }
+        }
+
+        // Add test result
+        function addResult(message, type = 'info') {
+            const resultsDiv = document.getElementById('testResults');
+            const statusDiv = document.createElement('div');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            resultsDiv.appendChild(statusDiv);
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        // Update platform status
+        function updatePlatformStatus() {
+            if (!socialMediaIntegration) return;
+            
+            const statusDiv = document.getElementById('platformStatus');
+            const platforms = [
+                { id: 'instagram', name: 'Instagram', icon: '📱' },
+                { id: 'whatsapp', name: 'WhatsApp', icon: '💬' },
+                { id: 'twitter', name: 'Twitter', icon: '🐦' },
+                { id: 'telegram', name: 'Telegram', icon: '📡' },
+                { id: 'discord', name: 'Discord', icon: '🎮' },
+                { id: 'slack', name: 'Slack', icon: '💼' }
+            ];
+            
+            statusDiv.innerHTML = platforms.map(platform => `
+                <div class="platform-card">
+                    <div class="platform-icon">${platform.icon}</div>
+                    <h3>${platform.name}</h3>
+                    <p id="status-${platform.id}">Checking...</p>
+                </div>
+            `).join('');
+            
+            // Update individual statuses
+            platforms.forEach(platform => {
+                setTimeout(() => {
+                    const statusElement = document.getElementById(`status-${platform.id}`);
+                    if (socialMediaIntegration.isPlatformConnected(platform.id)) {
+                        statusElement.textContent = '🟢 Connected';
+                        statusElement.style.color = '#2ecc71';
+                    } else {
+                        statusElement.textContent = '🔴 Disconnected';
+                        statusElement.style.color = '#e74c3c';
+                    }
+                }, 1000 + Math.random() * 2000);
+            });
+        }
+
+        // Run quick test
+        window.runQuickTest = async function() {
+            addResult('🧪 Starting quick test...', 'info');
+            
+            if (!isInitialized) {
+                addResult('⏳ Waiting for integration to initialize...', 'info');
+                await initializeIntegration();
+            }
+            
+            try {
+                const status = socialMediaIntegration.getStatus();
+                addResult(`📊 Platform Status: ${JSON.stringify(status, null, 2)}`, 'success');
+                
+                const health = await socialMediaIntegration.getSystemHealth();
+                addResult(`🏥 System Health: ${JSON.stringify(health, null, 2)}`, 'success');
+                
+                addResult('✅ Quick test completed successfully!', 'success');
+            } catch (error) {
+                addResult(`❌ Quick test failed: ${error.message}`, 'error');
+            }
+        };
+
+        // Run full test
+        window.runFullTest = async function() {
+            addResult('🧪 Starting full test...', 'info');
+            
+            if (!isInitialized) {
+                addResult('⏳ Waiting for integration to initialize...', 'info');
+                await initializeIntegration();
+            }
+            
+            try {
+                // Test message processing
+                const testMessage = {
+                    text: 'Send $50 to @testuser',
+                    senderId: 'test_sender',
+                    platform: 'instagram'
+                };
+                
+                addResult('💬 Testing message processing...', 'info');
+                const result = await socialMediaIntegration.processMessage('instagram', testMessage);
+                addResult(`📤 Message Result: ${JSON.stringify(result, null, 2)}`, 'success');
+                
+                addResult('✅ Full test completed successfully!', 'success');
+            } catch (error) {
+                addResult(`❌ Full test failed: ${error.message}`, 'error');
+            }
+        };
+
+        // Check system health
+        window.checkHealth = async function() {
+            addResult('🏥 Checking system health...', 'info');
+            
+            if (!isInitialized) {
+                addResult('⏳ Waiting for integration to initialize...', 'info');
+                await initializeIntegration();
+            }
+            
+            try {
+                const health = await socialMediaIntegration.getSystemHealth();
+                addResult(`🏥 Health Status: ${JSON.stringify(health, null, 2)}`, 'success');
+            } catch (error) {
+                addResult(`❌ Health check failed: ${error.message}`, 'error');
+            }
+        };
+
+        // Test message
+        window.testMessage = async function() {
+            const platform = document.getElementById('platformSelect').value;
+            const message = document.getElementById('messageInput').value;
+            
+            if (!message.trim()) {
+                addResult('❌ Please enter a message to test', 'error');
+                return;
+            }
+            
+            addResult(`💬 Testing message on ${platform}: "${message}"`, 'info');
+            
+            if (!isInitialized) {
+                addResult('⏳ Waiting for integration to initialize...', 'info');
+                await initializeIntegration();
+            }
+            
+            try {
+                const testMessage = {
+                    text: message,
+                    senderId: 'test_user',
+                    platform: platform
+                };
+                
+                const result = await socialMediaIntegration.processMessage(platform, testMessage);
+                
+                const resultDiv = document.getElementById('messageResult');
+                resultDiv.innerHTML = `
+                    <div class="status success">
+                        <strong>Message Processed Successfully!</strong><br>
+                        Platform: ${platform}<br>
+                        Message: "${message}"<br>
+                        Result: ${JSON.stringify(result, null, 2)}
+                    </div>
+                `;
+                
+                addResult(`✅ Message processed successfully on ${platform}`, 'success');
+            } catch (error) {
+                const resultDiv = document.getElementById('messageResult');
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>Message Processing Failed!</strong><br>
+                        Error: ${error.message}
+                    </div>
+                `;
+                
+                addResult(`❌ Message processing failed: ${error.message}`, 'error');
+            }
+        };
+
+        // Clear results
+        window.clearResults = function() {
+            document.getElementById('testResults').innerHTML = '';
+            document.getElementById('messageResult').innerHTML = '';
+        };
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            addResult('🚀 Page loaded, initializing NISTO integration...', 'info');
+            initializeIntegration();
+        });
+    </script>
+</body>
+</html>

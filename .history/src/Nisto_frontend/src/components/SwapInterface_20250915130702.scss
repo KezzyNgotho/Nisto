@@ -1,0 +1,225 @@
+// Clean Swap Interface Styles
+.swap-interface {
+  .interface-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .interface-title {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary, #ffffff);
+      margin: 0;
+
+      .title-icon {
+        font-size: 1.4rem;
+        color: var(--primary-color, #8b5cf6);
+      }
+    }
+
+    .routing-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.25rem 0.75rem;
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      color: var(--primary-color, #8b5cf6);
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 12px;
+
+      .badge-icon {
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  // Clean card styling
+  .card {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    transition: all 0.2s ease !important;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+  }
+
+  // Clean button styling
+  .btn {
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+
+    &:hover {
+      transform: translateY(-1px) !important;
+    }
+  }
+
+  // Clean input styling
+  .input {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    color: var(--text-primary, #ffffff) !important;
+    transition: all 0.2s ease !important;
+
+    &:focus {
+      border-color: var(--primary-color, #8b5cf6) !important;
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1) !important;
+    }
+
+    &::placeholder {
+      color: var(--text-secondary, #a1a1aa) !important;
+    }
+  }
+
+  // Clean select styling
+  .select {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    color: var(--text-primary, #ffffff) !important;
+
+    &:focus {
+      border-color: var(--primary-color, #8b5cf6) !important;
+      box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.1) !important;
+    }
+  }
+
+  // Clean tabs styling
+  .tabs-list {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    padding: 0.25rem !important;
+
+    .tabs-trigger {
+      border-radius: 6px !important;
+      transition: all 0.2s ease !important;
+
+      &[data-state="active"] {
+        background: var(--primary-color, #8b5cf6) !important;
+        color: white !important;
+      }
+
+      &:hover:not([data-state="active"]) {
+        background: rgba(255, 255, 255, 0.05) !important;
+      }
+    }
+  }
+
+  // Clean alert styling
+  .alert {
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+
+    &[data-variant="destructive"] {
+      background: rgba(239, 68, 68, 0.1) !important;
+      border-color: rgba(239, 68, 68, 0.3) !important;
+      color: #ef4444 !important;
+    }
+  }
+
+  // Clean progress styling
+  .progress {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+
+    .progress-bar {
+      background: var(--primary-color, #8b5cf6) !important;
+      border-radius: 4px !important;
+    }
+  }
+
+  // Clean badge styling
+  .badge {
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    font-size: 0.8rem !important;
+    padding: 0.25rem 0.75rem !important;
+
+    &[data-variant="outline"] {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      color: var(--text-primary, #ffffff) !important;
+    }
+
+    &[data-variant="secondary"] {
+      background: rgba(139, 92, 246, 0.1) !important;
+      border: 1px solid rgba(139, 92, 246, 0.3) !important;
+      color: var(--primary-color, #8b5cf6) !important;
+    }
+  }
+
+  // Clean table styling
+  .table {
+    background: rgba(255, 255, 255, 0.02) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+
+    .table-header {
+      background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .table-row {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+      transition: all 0.2s ease !important;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.03) !important;
+      }
+
+      &:last-child {
+        border-bottom: none !important;
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    .interface-header {
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+  }
+}
+
+// Dark theme
+.swap-interface.dark {
+  .card,
+  .alert,
+  .table {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+// Light theme
+.swap-interface.light {
+  .card,
+  .alert,
+  .table {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .input,
+  .select {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    color: var(--text-primary, #1a1a1a) !important;
+  }
+}

@@ -2,6 +2,16 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
+export interface AIAnalysisResult {
+  'marketConditions' : string,
+  'confidenceLevel' : bigint,
+  'recommendedAction' : string,
+  'suggestedTokens' : Array<string>,
+  'portfolioHealth' : string,
+  'shouldSwap' : boolean,
+  'riskScore' : bigint,
+  'reason' : string,
+}
 export interface AIInsight {
   'id' : string,
   'title' : string,
@@ -36,6 +46,33 @@ export interface AIRecommendation {
   'isImplemented' : boolean,
   'category' : string,
   'priority' : string,
+}
+export interface AISwapPreferences {
+  'autoHedgingEnabled' : boolean,
+  'allocationLimit' : bigint,
+  'stablecoinPreference' : string,
+  'timeWindowMinutes' : bigint,
+  'intermediaryTokenPreference' : [] | [string],
+  'preferredSwapProvider' : [] | [string],
+  'thresholdPercentage' : bigint,
+}
+export interface AISwapRecord {
+  'id' : bigint,
+  'status' : string,
+  'userId' : string,
+  'errorMessage' : [] | [string],
+  'swapType' : string,
+  'retryCount' : bigint,
+  'swapProvider' : string,
+  'timestamp' : bigint,
+  'price' : number,
+  'fromToken' : string,
+  'intermediarySteps' : Array<string>,
+  'estimatedCompletionTime' : [] | [bigint],
+  'amount' : number,
+  'toToken' : string,
+  'gasCost' : [] | [number],
+  'reason' : string,
 }
 export interface AuditLog {
   'id' : string,
@@ -151,6 +188,18 @@ export type CryptoWalletType = { 'CAT' : null } |
   { 'SEERS' : null } |
   { 'SNEED' : null } |
   { 'SONIC' : null };
+export interface Currency {
+  'id' : string,
+  'change24h' : number,
+  'marketCap' : [] | [number],
+  'icon' : string,
+  'name' : string,
+  'color' : string,
+  'volume' : [] | [number],
+  'image' : string,
+  'price' : number,
+  'symbol' : string,
+}
 export interface DeFiPosition {
   'id' : string,
   'apy' : number,
@@ -215,6 +264,15 @@ export interface DepositTransaction {
   'phoneNumber' : string,
   'usdtAmount' : number,
 }
+export interface DocumentationSection {
+  'id' : bigint,
+  'title' : string,
+  'content' : string,
+  'sectionType' : string,
+  'lastUpdated' : bigint,
+  'version' : string,
+  'diagramUrl' : [] | [string],
+}
 export interface EmergencyContact {
   'id' : string,
   'relationship' : string,
@@ -236,6 +294,7 @@ export interface ExternalWalletConnection {
   'address' : [] | [string],
   'principalId' : [] | [string],
 }
+export interface FileReference { 'hash' : string, 'path' : string }
 export interface GameParticipant {
   'id' : string,
   'metadata' : [] | [string],
@@ -524,6 +583,14 @@ export type PluginStatus = { 'Inactive' : null } |
   { 'Suspended' : null } |
   { 'Deprecated' : null } |
   { 'Pending' : null };
+export interface PortfolioAsset {
+  'change24h' : number,
+  'value' : number,
+  'amount' : number,
+  'riskLevel' : string,
+  'percentage' : number,
+  'symbol' : string,
+}
 export interface PrivacySettings {
   'profileVisibility' : string,
   'allowFriendRequests' : boolean,
@@ -754,33 +821,35 @@ export type Result_66 = {
     }
   } |
   { 'err' : string };
-export type Result_67 = { 'ok' : SocialGame } |
+export type Result_67 = { 'ok' : Array<Currency> } |
   { 'err' : string };
-export type Result_68 = { 'ok' : VaultChatRoom } |
+export type Result_68 = { 'ok' : SocialGame } |
   { 'err' : string };
-export type Result_69 = { 'ok' : Transaction } |
+export type Result_69 = { 'ok' : VaultChatRoom } |
   { 'err' : string };
 export type Result_7 = { 'ok' : PaymentMethod } |
   { 'err' : string };
-export type Result_70 = { 'ok' : GroupVault } |
+export type Result_70 = { 'ok' : Transaction } |
   { 'err' : string };
-export type Result_71 = { 'ok' : Budget } |
+export type Result_71 = { 'ok' : GroupVault } |
   { 'err' : string };
-export type Result_72 = { 'ok' : ExternalWalletConnection } |
+export type Result_72 = { 'ok' : Budget } |
   { 'err' : string };
-export type Result_73 = {
+export type Result_73 = { 'ok' : ExternalWalletConnection } |
+  { 'err' : string };
+export type Result_74 = {
     'ok' : { 'userId' : Principal, 'instructions' : string }
   } |
   { 'err' : string };
-export type Result_74 = { 'ok' : GameReward } |
+export type Result_75 = { 'ok' : GameReward } |
   { 'err' : string };
-export type Result_75 = { 'ok' : Array<SecurityQuestion> } |
+export type Result_76 = { 'ok' : Array<SecurityQuestion> } |
   { 'err' : string };
-export type Result_76 = { 'ok' : PushSubscription } |
+export type Result_77 = { 'ok' : PushSubscription } |
   { 'err' : string };
-export type Result_77 = { 'ok' : Plugin } |
+export type Result_78 = { 'ok' : Plugin } |
   { 'err' : string };
-export type Result_78 = { 'ok' : EmergencyContact } |
+export type Result_79 = { 'ok' : EmergencyContact } |
   { 'err' : string };
 export type Result_8 = { 'ok' : NotificationPreferences } |
   { 'err' : string };
@@ -812,6 +881,15 @@ export interface SimplePayment {
   'paymentType' : string,
   'location' : [] | [string],
 }
+export interface SmartWalletPreferences {
+  'autoHedgingEnabled' : boolean,
+  'allocationLimit' : bigint,
+  'stablecoinPreference' : string,
+  'timeWindowMinutes' : bigint,
+  'intermediaryTokenPreference' : [] | [string],
+  'preferredSwapProvider' : [] | [string],
+  'thresholdPercentage' : bigint,
+}
 export interface SocialGame {
   'id' : string,
   'startTime' : bigint,
@@ -839,6 +917,42 @@ export interface StakingInfo {
   'stakingStartTime' : bigint,
   'totalRewardsEarned' : bigint,
   'stakedAmount' : bigint,
+}
+export interface SwapRecord {
+  'id' : bigint,
+  'status' : string,
+  'userId' : string,
+  'errorMessage' : [] | [string],
+  'swapType' : string,
+  'retryCount' : bigint,
+  'swapProvider' : string,
+  'timestamp' : bigint,
+  'price' : bigint,
+  'fromToken' : string,
+  'intermediarySteps' : Array<string>,
+  'estimatedCompletionTime' : [] | [bigint],
+  'amount' : bigint,
+  'toToken' : string,
+  'gasCost' : [] | [bigint],
+  'reason' : string,
+}
+export interface SwapRequest {
+  'toCurrency' : string,
+  'fromAmount' : number,
+  'fromCurrency' : string,
+  'userPrincipal' : Principal,
+  'slippage' : number,
+}
+export interface SwapResult {
+  'fromAmount' : number,
+  'priceImpact' : number,
+  'rate' : number,
+  'gasFee' : number,
+  'minimumReceived' : number,
+  'timestamp' : bigint,
+  'success' : boolean,
+  'transactionId' : [] | [string],
+  'toAmount' : number,
 }
 export interface TokenBalance {
   'balance' : bigint,
@@ -898,6 +1012,15 @@ export interface Transaction {
   'category' : string,
   'amount' : number,
   'walletId' : string,
+}
+export interface TransformationInput {
+  'context' : Uint8Array | number[],
+  'response' : http_request_result,
+}
+export interface TransformationOutput {
+  'status' : bigint,
+  'body' : Uint8Array | number[],
+  'headers' : Array<http_header>,
 }
 export interface TypingIndicator {
   'userName' : string,
@@ -1007,41 +1130,94 @@ export interface WalletPortfolio {
   'fiatWallets' : Array<Wallet>,
   'defiPositions' : Array<DeFiPosition>,
 }
+export interface http_header { 'value' : string, 'name' : string }
+export interface http_request_result {
+  'status' : bigint,
+  'body' : Uint8Array | number[],
+  'headers' : Array<http_header>,
+}
 export interface _SERVICE {
-  'addEmergencyContact' : ActorMethod<[string, string, string], Result_78>,
+  'addAISwapRecord' : ActorMethod<
+    [
+      string,
+      string,
+      string,
+      number,
+      number,
+      string,
+      string,
+      [] | [string],
+      Array<string>,
+      bigint,
+      [] | [bigint],
+      [] | [number],
+      string,
+      string,
+    ],
+    undefined
+  >,
+  'addDocumentationSection' : ActorMethod<
+    [string, string, string, [] | [string], string],
+    undefined
+  >,
+  'addEmergencyContact' : ActorMethod<[string, string, string], Result_79>,
   'addPaymentMethod' : ActorMethod<
     [string, [] | [string], [] | [string], string, boolean],
     Result_7
   >,
-  'addPlugin' : ActorMethod<[Plugin], Result_77>,
+  'addPlugin' : ActorMethod<[Plugin], Result_78>,
   'addPushSubscription' : ActorMethod<
     [string, string, string, [] | [string]],
-    Result_76
+    Result_77
   >,
   'addRecoveryMethod' : ActorMethod<[string, string, [] | [string]], Result_1>,
-  'addSecurityQuestions' : ActorMethod<[Array<[string, string]>], Result_75>,
+  'addSecurityQuestions' : ActorMethod<[Array<[string, string]>], Result_76>,
+  'addSwapRecord' : ActorMethod<
+    [
+      string,
+      string,
+      string,
+      bigint,
+      bigint,
+      string,
+      string,
+      [] | [string],
+      Array<string>,
+      bigint,
+      [] | [bigint],
+      [] | [bigint],
+      string,
+      string,
+    ],
+    undefined
+  >,
   'allowance' : ActorMethod<[UserId, UserId], bigint>,
+  'analyzePortfolioAndSwap' : ActorMethod<
+    [string, Array<PortfolioAsset>, Array<Currency>],
+    AIAnalysisResult
+  >,
   'approve' : ActorMethod<[UserId, bigint], Result_5>,
   'awardGameReward' : ActorMethod<
     [string, UserId, string, number, [] | [string], string],
-    Result_74
+    Result_75
   >,
   'balanceOf' : ActorMethod<[UserId], bigint>,
   'burn' : ActorMethod<[bigint, string], Result_5>,
   'calculateDefiRewards' : ActorMethod<[string], Result_53>,
+  'calculateExchangeRate' : ActorMethod<[string, string], number>,
   'cancelPayment' : ActorMethod<[string], Result_18>,
-  'claimGameReward' : ActorMethod<[string], Result_74>,
+  'claimGameReward' : ActorMethod<[string], Result_75>,
   'claimRewards' : ActorMethod<[], Result_23>,
   'closeDefiPosition' : ActorMethod<[string], Result_11>,
-  'completeRecovery' : ActorMethod<[string, [] | [string]], Result_73>,
+  'completeRecovery' : ActorMethod<[string, [] | [string]], Result_74>,
   'completeRecoverySetup' : ActorMethod<[], Result_4>,
   'connectExternalWallet' : ActorMethod<
     [string, [] | [string], [] | [string], Array<string>],
-    Result_72
+    Result_73
   >,
   'createBudget' : ActorMethod<
     [string, string, number, string, bigint, bigint],
-    Result_71
+    Result_72
   >,
   'createCryptoTransaction' : ActorMethod<
     [
@@ -1081,7 +1257,7 @@ export interface _SERVICE {
       boolean,
       [] | [string],
     ],
-    Result_70
+    Result_71
   >,
   'createNotification' : ActorMethod<
     [string, string, string, string, [] | [string], [] | [bigint]],
@@ -1101,29 +1277,42 @@ export interface _SERVICE {
       [] | [string],
       boolean,
     ],
-    Result_67
+    Result_68
   >,
   'createTransaction' : ActorMethod<
     [string, string, number, string, string],
-    Result_69
+    Result_70
   >,
   'createUser' : ActorMethod<[string, string, [] | [string]], Result_4>,
   'createVaultChatRoom' : ActorMethod<
     [string, string, [] | [string]],
-    Result_68
+    Result_69
   >,
   'createWallet' : ActorMethod<[string, string, string], Result_27>,
+  'deleteDocumentationSection' : ActorMethod<[bigint], undefined>,
   'deleteNotification' : ActorMethod<[string], Result_5>,
   'depositToVault' : ActorMethod<[string, number, [] | [string]], Result>,
-  'endGame' : ActorMethod<[string], Result_67>,
+  'dropFileReference' : ActorMethod<[string], undefined>,
+  'endGame' : ActorMethod<[string], Result_68>,
+  'executeSwap' : ActorMethod<[SwapRequest], SwapResult>,
+  'fetchCryptocurrencies' : ActorMethod<[], Result_67>,
   'generateAIInsights' : ActorMethod<[], Result_52>,
   'generateAIRecommendations' : ActorMethod<[], Result_51>,
   'generateDepositAddress' : ActorMethod<[string], Result_2>,
   'getAIAnalytics' : ActorMethod<[], Result_66>,
   'getAIConversationHistory' : ActorMethod<[], Result_65>,
+  'getAISwapHistory' : ActorMethod<[string], Array<AISwapRecord>>,
+  'getAIUserPreferences' : ActorMethod<[string], [] | [AISwapPreferences]>,
+  'getAllAIUserIds' : ActorMethod<[], Array<string>>,
+  'getAllCurrencies' : ActorMethod<[], Array<Currency>>,
+  'getAllDocumentationSections' : ActorMethod<[], Array<DocumentationSection>>,
+  'getAllSwapHistory' : ActorMethod<[], Array<SwapResult>>,
+  'getAllUserIds' : ActorMethod<[], Array<string>>,
   'getAvailableBills' : ActorMethod<[], Result_64>,
   'getAvailableGames' : ActorMethod<[], Result_42>,
+  'getBitcoinPrice' : ActorMethod<[], number>,
   'getBurnHistory' : ActorMethod<[bigint, bigint], Array<TokenBurn>>,
+  'getCachedAIAnalysis' : ActorMethod<[string], [] | [AIAnalysisResult]>,
   'getDashboardStats' : ActorMethod<[], Result_63>,
   'getDefiAnalytics' : ActorMethod<[], Result_62>,
   'getDefiPositionsByProductType' : ActorMethod<[string], Result_46>,
@@ -1134,9 +1323,17 @@ export interface _SERVICE {
   'getDepositAddresses' : ActorMethod<[], Result_60>,
   'getDepositHistory' : ActorMethod<[], Result_59>,
   'getDepositTransactionById' : ActorMethod<[string], Result_20>,
+  'getDocumentationByType' : ActorMethod<[string], Array<DocumentationSection>>,
+  'getDocumentationSection' : ActorMethod<
+    [bigint],
+    [] | [DocumentationSection]
+  >,
+  'getEthereumPrice' : ActorMethod<[], number>,
+  'getFileReference' : ActorMethod<[string], FileReference>,
   'getFullWalletPortfolio' : ActorMethod<[], Result_58>,
   'getGameLeaderboard' : ActorMethod<[string], Result_57>,
   'getGamesByType' : ActorMethod<[string], Result_42>,
+  'getICPNativeRate' : ActorMethod<[], number>,
   'getMintHistory' : ActorMethod<[bigint, bigint], Array<TokenMint>>,
   'getNotificationPreferences' : ActorMethod<[], Result_8>,
   'getPaybillTransactionById' : ActorMethod<[string], Result_19>,
@@ -1146,7 +1343,13 @@ export interface _SERVICE {
   'getPaymentsByProvider' : ActorMethod<[string], Result_39>,
   'getPrincipalId' : ActorMethod<[], string>,
   'getRecoveryRequestStatus' : ActorMethod<[string], [] | [RecoveryRequest]>,
+  'getSolanaPrice' : ActorMethod<[], number>,
   'getStakingInfo' : ActorMethod<[UserId], [] | [StakingInfo]>,
+  'getSwapHistory' : ActorMethod<[string], Array<SwapRecord>>,
+  'getSwapStats' : ActorMethod<
+    [],
+    { 'totalCurrencies' : bigint, 'totalSwaps' : bigint, 'totalUsers' : bigint }
+  >,
   'getSystemStats' : ActorMethod<
     [],
     {
@@ -1191,8 +1394,10 @@ export interface _SERVICE {
   'getUserNotifications' : ActorMethod<[bigint, bigint], Result_38>,
   'getUserOTPRequests' : ActorMethod<[], Result_37>,
   'getUserPaymentMethods' : ActorMethod<[], Result_36>,
+  'getUserPreferences' : ActorMethod<[string], [] | [SmartWalletPreferences]>,
   'getUserRecoveryMethods' : ActorMethod<[], Result_35>,
   'getUserSimplePaymentHistory' : ActorMethod<[], Result_34>,
+  'getUserSwapHistory' : ActorMethod<[Principal], Array<SwapResult>>,
   'getUserTransactions' : ActorMethod<[], Result_33>,
   'getUserWalletAddresses' : ActorMethod<[], Result_32>,
   'getUserWallets' : ActorMethod<[], Result_31>,
@@ -1225,7 +1430,10 @@ export interface _SERVICE {
   'joinVaultChat' : ActorMethod<[string, string], Result_5>,
   'leaveVaultChat' : ActorMethod<[string], Result_5>,
   'linkRecoveredAccount' : ActorMethod<[string, Principal], Result_4>,
+  'listFileReferences' : ActorMethod<[], Array<FileReference>>,
   'loginOrCreateUser' : ActorMethod<[], Result_4>,
+  'makeGetOutcall' : ActorMethod<[string], string>,
+  'makeHttpRequest' : ActorMethod<[string], Result_2>,
   'markAllNotificationsAsRead' : ActorMethod<[], Result_23>,
   'markMessagesAsRead' : ActorMethod<[string, Array<string>], Result_5>,
   'markNotificationAsRead' : ActorMethod<[string], Result_22>,
@@ -1252,9 +1460,16 @@ export interface _SERVICE {
     Result_16
   >,
   'regenerateWalletAddress' : ActorMethod<[string], Result_2>,
+  'registerFileReference' : ActorMethod<[string, string], undefined>,
   'removePaymentMethod' : ActorMethod<[string], Result_5>,
   'removePushSubscription' : ActorMethod<[string], Result_5>,
   'respondToVaultInvitation' : ActorMethod<[string, string], Result_5>,
+  'saveAIUserPreferences' : ActorMethod<[string, AISwapPreferences], undefined>,
+  'saveUserPreferences' : ActorMethod<
+    [string, SmartWalletPreferences],
+    undefined
+  >,
+  'searchCurrencies' : ActorMethod<[string], Array<Currency>>,
   'sendAIMessage' : ActorMethod<[string], Result_15>,
   'sendCrossCanisterNotification' : ActorMethod<[string, string], Result_2>,
   'sendCrypto' : ActorMethod<[string, string, number, [] | [string]], Result_6>,
@@ -1275,11 +1490,20 @@ export interface _SERVICE {
     Result_6
   >,
   'transferFrom' : ActorMethod<[UserId, UserId, bigint], Result_5>,
+  'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
   'unstake' : ActorMethod<[bigint], Result_5>,
+  'updateAIUserPreferences' : ActorMethod<
+    [string, AISwapPreferences],
+    undefined
+  >,
   'updateCryptoWalletBalance' : ActorMethod<[string, number], Result_12>,
   'updateDefiPosition' : ActorMethod<
     [string, number, number, number],
     Result_11
+  >,
+  'updateDocumentationSection' : ActorMethod<
+    [bigint, string, string, string, [] | [string], string],
+    undefined
   >,
   'updateGameScore' : ActorMethod<[string, number], Result_10>,
   'updateGoalProgress' : ActorMethod<[string, number], Result_9>,
@@ -1310,6 +1534,10 @@ export interface _SERVICE {
   >,
   'updateTypingStatus' : ActorMethod<[string, boolean], Result_5>,
   'updateUser' : ActorMethod<[[] | [string], [] | [string]], Result_4>,
+  'updateUserPreferences' : ActorMethod<
+    [string, SmartWalletPreferences],
+    undefined
+  >,
   'userExists' : ActorMethod<[], boolean>,
   'validateAddress' : ActorMethod<[string, string], boolean>,
   'verifyCode' : ActorMethod<[string, string, string], Result_2>,

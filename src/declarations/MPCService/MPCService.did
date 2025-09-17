@@ -1,0 +1,74 @@
+type UserId = principal;
+type TransactionId = text;
+type SocialTransfer = 
+ record {
+   amount: nat;
+   approvals: vec Approval;
+   createdAt: int;
+   currency: text;
+   from: UserId;
+   id: TransactionId;
+   message: text;
+   platform: text;
+   status: text;
+   to: UserId;
+ };
+type PartyId = text;
+type MPCWalletId = text;
+type MPCWallet = 
+ record {
+   balance: nat;
+   createdAt: int;
+   currency: text;
+   description: text;
+   id: MPCWalletId;
+   isActive: bool;
+   name: text;
+   parties: vec PartyId;
+   threshold: nat;
+   totalParties: nat;
+ };
+type MPCTransaction = 
+ record {
+   amount: nat;
+   approvals: vec Approval;
+   createdAt: int;
+   currency: text;
+   description: text;
+   executedAt: opt int;
+   from: UserId;
+   id: TransactionId;
+   status: text;
+   to: UserId;
+   walletId: MPCWalletId;
+ };
+type Approval = 
+ record {
+   approved: bool;
+   partyId: PartyId;
+   signature: opt text;
+   timestamp: int;
+ };
+service : {
+  approveMPCTransaction: (transactionId: TransactionId, approved: bool) ->
+   (bool);
+  approveSocialTransfer: (transferId: TransactionId, approved: bool) ->
+   (bool);
+  createMPCTransaction: (walletId: MPCWalletId, to: UserId, amount: nat,
+   currency: text, description: text) -> (opt TransactionId);
+  createMPCWallet: (name: text, description: text, parties: vec UserId,
+   threshold: nat) -> (MPCWalletId);
+  createSocialTransfer: (to: UserId, amount: nat, currency: text, platform:
+   text, message: text) -> (opt TransactionId);
+  getMPCStats: () ->
+   (record {
+      totalSocialTransfers: nat;
+      totalTransactions: nat;
+      totalWallets: nat;
+    }) query;
+  getMPCTransactions: (walletId: MPCWalletId) -> (vec MPCTransaction) query;
+  getMPCWallet: (walletId: MPCWalletId) -> (opt MPCWallet) query;
+  getSocialTransfers: (userId: UserId) -> (vec SocialTransfer) query;
+  getUserMPCWallets: (userId: UserId) -> (vec MPCWallet) query;
+  healthCheck: () -> (text) query;
+}

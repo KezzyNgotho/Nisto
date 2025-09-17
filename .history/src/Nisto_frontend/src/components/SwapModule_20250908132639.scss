@@ -1,0 +1,618 @@
+.swap-module {
+  padding: 0;
+  min-height: 100vh;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  .swap-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      font-size: 0.9rem;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    .header-content {
+      flex: 1;
+      text-align: center;
+
+      h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      p {
+        font-size: 1rem;
+        margin: 0;
+        opacity: 0.8;
+      }
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+
+      button {
+        padding: 0.75rem;
+        border-radius: 12px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        &.spinning {
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+
+  .swap-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 2rem;
+    padding: 0 1.5rem;
+
+    .swap-interface-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .market-info-column {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+  }
+
+  // Card Styles
+  .swap-card,
+  .swap-history-card,
+  .market-overview-card,
+  .currencies-card,
+  .security-card {
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+
+    .card-header {
+      padding: 1.5rem 1.5rem 1rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      span {
+        font-size: 0.875rem;
+        opacity: 0.7;
+      }
+    }
+  }
+
+  // Swap Card Specific Styles
+  .swap-card {
+    .swap-stats {
+      display: flex;
+      gap: 1.5rem;
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        span:first-child {
+          font-size: 0.75rem;
+          opacity: 0.7;
+        }
+
+        span:last-child {
+          font-size: 0.875rem;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .swap-container {
+      padding: 1.5rem;
+
+      .swap-row {
+        display: flex;
+        align-items: flex-end;
+        gap: 1rem;
+
+        .swap-section {
+          flex: 1;
+          margin-bottom: 0;
+        }
+
+        .swap-arrow-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0;
+          padding: 0 0.5rem;
+
+          .swap-arrow-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            backdrop-filter: blur(10px);
+
+            &:hover {
+              transform: scale(1.1) rotate(180deg);
+              box-shadow: 0 4px 15px var(--shadow-hover, rgba(0, 0, 0, 0.15));
+              filter: brightness(1.1);
+            }
+          }
+        }
+      }
+
+      .swap-section {
+        margin-bottom: 1.5rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        label {
+          display: block;
+          font-size: 0.9rem;
+          font-weight: 600;
+          margin-bottom: 0.75rem;
+          opacity: 0.8;
+        }
+
+        .currency-selector {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
+          padding: 1rem;
+          border-radius: 16px;
+          background: var(--background-secondary, rgba(255, 255, 255, 0.1));
+          border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2));
+          transition: all 0.3s ease;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+          &:hover {
+            border-color: var(--primary-color, rgba(139, 92, 246, 0.5));
+            background: var(--background-hover, rgba(255, 255, 255, 0.15));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+          }
+
+          .currency-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: var(--background-tertiary, rgba(255, 255, 255, 0.15));
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          }
+
+          select {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-primary, #ffffff);
+            transition: all 0.3s ease;
+
+            &:focus {
+              outline: none;
+              box-shadow: 0 0 0 3px var(--primary-color, rgba(139, 92, 246, 0.3));
+            }
+
+            option {
+              background: var(--background-primary, #1a1a1a);
+              color: var(--text-primary, #ffffff);
+              padding: 0.5rem;
+            }
+          }
+        }
+
+        input {
+          width: 100%;
+          padding: 1.5rem;
+          border-radius: 16px;
+          border: 1px solid var(--border-color, rgba(255, 255, 255, 0.2));
+          font-size: 1.5rem;
+          font-weight: 600;
+          text-align: right;
+          background: var(--background-secondary, rgba(255, 255, 255, 0.1));
+          color: var(--text-primary, #ffffff);
+          transition: all 0.3s ease;
+          margin-bottom: 0.5rem;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color, rgba(139, 92, 246, 0.5));
+            box-shadow: 0 0 0 3px var(--primary-color, rgba(139, 92, 246, 0.2));
+            background: var(--background-hover, rgba(255, 255, 255, 0.15));
+            transform: translateY(-1px);
+          }
+
+          &:hover {
+            border-color: var(--primary-color, rgba(139, 92, 246, 0.3));
+            background: var(--background-hover, rgba(255, 255, 255, 0.15));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+          }
+
+          &::placeholder {
+            color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+            opacity: 1;
+          }
+        }
+
+        .balance-info {
+          text-align: right;
+          font-size: 0.8rem;
+        }
+      }
+
+    }
+
+    .swap-btn {
+      width: 100%;
+      padding: 1.5rem;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin: 1.5rem;
+      backdrop-filter: blur(10px);
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 40px var(--shadow-hover, rgba(0, 0, 0, 0.15));
+        filter: brightness(1.1);
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        filter: none;
+      }
+
+      .spinning {
+        animation: spin 1s linear infinite;
+      }
+    }
+  }
+
+  // Swap History Card
+  .swap-history-card {
+    .history-list {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .history-item {
+        padding: 1rem;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .swap-info {
+          flex: 1;
+
+          .swap-amounts {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+          }
+
+          .swap-details {
+            font-size: 0.8rem;
+            opacity: 0.7;
+          }
+        }
+
+        .swap-status {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.8rem;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  // Market Overview Card
+  .market-overview-card {
+    .market-stats {
+      padding: 1.5rem;
+
+      .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        span:first-child {
+          opacity: 0.7;
+        }
+
+        span:last-child {
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  // Currencies Card
+  .currencies-card {
+    .currencies-list {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+
+      .currency-item {
+        padding: 1rem;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .currency-info {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+
+          .currency-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+          }
+
+          .currency-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+
+            span:first-child {
+              font-weight: 600;
+              font-size: 0.9rem;
+            }
+
+            span:last-child {
+              font-size: 0.8rem;
+              opacity: 0.7;
+            }
+          }
+        }
+
+        .currency-stats {
+          text-align: right;
+
+          .currency-price {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+          }
+
+          .currency-change {
+            font-size: 0.8rem;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  // Security Card
+  .security-card {
+    .security-info {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .security-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.9rem;
+
+        span {
+          opacity: 0.8;
+        }
+      }
+    }
+  }
+
+  // Animations
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  // Responsive Design
+  @media (max-width: 1200px) {
+    .swap-content-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+
+      .market-info-column {
+        order: -1;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .swap-header {
+      padding: 1rem;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+
+      .back-btn {
+        align-self: flex-start;
+      }
+
+      .header-actions {
+        justify-content: center;
+      }
+    }
+    
+    .swap-content-grid {
+      padding: 0 1rem;
+      gap: 1rem;
+    }
+
+    .swap-card {
+      .swap-container {
+        padding: 1rem;
+
+        .swap-row {
+          flex-direction: column;
+          gap: 1.5rem;
+
+          .swap-arrow-container {
+            order: 2;
+            padding: 0;
+          }
+
+          .swap-section:first-child {
+            order: 1;
+          }
+
+          .swap-section:last-child {
+            order: 3;
+          }
+        }
+
+        .currency-input-group {
+          .currency-selector {
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: stretch;
+
+            select {
+              width: 100%;
+            }
+          }
+
+          .amount-input {
+            input {
+              font-size: 1.25rem;
+              padding: 1.25rem;
+            }
+          }
+        }
+      }
+
+      .swap-btn {
+        margin: 1rem;
+        padding: 1.25rem;
+      }
+    }
+
+    .swap-history-card,
+    .market-overview-card,
+    .currencies-card,
+    .security-card {
+      .card-header {
+        padding: 1rem 1rem 0.75rem 1rem;
+      }
+    }
+
+    .swap-history-card .history-list,
+    .market-overview-card .market-stats,
+    .currencies-card .currencies-list,
+    .security-card .security-info {
+      padding: 1rem;
+    }
+  }
+}

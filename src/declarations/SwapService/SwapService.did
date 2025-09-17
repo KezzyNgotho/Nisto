@@ -1,0 +1,24 @@
+type Currency = 
+ record {
+   change24h: float64;
+   color: text;
+   icon: text;
+   id: text;
+   image: text;
+   marketCap: opt float64;
+   name: text;
+   price: float64;
+   symbol: text;
+   volume: opt float64;
+ };
+service : {
+  calculateExchangeRate: (fromCurrency: text, toCurrency: text) -> (float64);
+  getAllCurrencies: () -> (vec Currency);
+  getStats: () ->
+   (record {
+      totalCurrencies: nat;
+      totalSwaps: nat;
+      totalUsers: nat;
+    }) query;
+  searchCurrencies: (searchQuery: text) -> (vec Currency);
+}

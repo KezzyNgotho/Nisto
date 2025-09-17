@@ -1,0 +1,38 @@
+{
+  "canisters": {
+    "Nisto_backend": {
+      "main": "src/Nisto_backend/main.mo",
+      "type": "motoko"
+    },
+    "MPCService": {
+      "main": "src/Nisto_backend/MPCService.mo",
+      "type": "motoko"
+    },
+    "SwapService": {
+      "main": "src/Nisto_backend/SwapService.mo",
+      "type": "motoko"
+    },
+    "Nisto_frontend": {
+      "dependencies": [
+        "Nisto_backend"
+      ],
+      "source": [
+        "src/Nisto_frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "Nisto_frontend"
+    },
+    "internet_identity": {
+      "type": "custom",
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz"
+    }},
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
