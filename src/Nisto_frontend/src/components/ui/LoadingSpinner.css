@@ -1,0 +1,226 @@
+/* Loading Spinner Styles */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.loading-container--fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  z-index: var(--z-modal);
+}
+
+.loading-spinner {
+  display: inline-block;
+  position: relative;
+}
+
+.loading-spinner__ring {
+  display: inline-block;
+  position: relative;
+}
+
+.loading-spinner__ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  animation: loading-spinner-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: currentColor transparent transparent transparent;
+}
+
+.loading-spinner__ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+
+.loading-spinner__ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+
+.loading-spinner__ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+/* Size variants */
+.loading-spinner--sm .loading-spinner__ring {
+  width: 20px;
+  height: 20px;
+}
+
+.loading-spinner--sm .loading-spinner__ring div {
+  width: 20px;
+  height: 20px;
+  border-width: 2px;
+}
+
+.loading-spinner--md .loading-spinner__ring {
+  width: 32px;
+  height: 32px;
+}
+
+.loading-spinner--md .loading-spinner__ring div {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+
+.loading-spinner--lg .loading-spinner__ring {
+  width: 48px;
+  height: 48px;
+}
+
+.loading-spinner--lg .loading-spinner__ring div {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+}
+
+.loading-spinner--xl .loading-spinner__ring {
+  width: 64px;
+  height: 64px;
+}
+
+.loading-spinner--xl .loading-spinner__ring div {
+  width: 64px;
+  height: 64px;
+  border-width: 5px;
+}
+
+/* Color variants */
+.loading-spinner--primary {
+  color: var(--color-primary);
+}
+
+.loading-spinner--white {
+  color: var(--color-white);
+}
+
+.loading-spinner--success {
+  color: var(--color-success);
+}
+
+.loading-spinner--warning {
+  color: var(--color-warning);
+}
+
+.loading-spinner--error {
+  color: var(--color-error);
+}
+
+.loading-text {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-gray-600);
+  text-align: center;
+}
+
+.loading-container--fullscreen .loading-text {
+  color: var(--color-gray-700);
+  font-size: var(--text-base);
+}
+
+@keyframes loading-spinner-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulse animation for loading states */
+.loading-pulse {
+  animation: loading-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes loading-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Skeleton loading for content */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-gray-200) 25%, var(--color-gray-100) 50%, var(--color-gray-200) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-text:last-child {
+  margin-bottom: 0;
+}
+
+.skeleton-text--short {
+  width: 60%;
+}
+
+.skeleton-text--medium {
+  width: 80%;
+}
+
+.skeleton-text--long {
+  width: 100%;
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.skeleton-button {
+  height: 40px;
+  width: 120px;
+  border-radius: var(--radius-lg);
+}
+
+.skeleton-card {
+  height: 200px;
+  border-radius: var(--radius-xl);
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .loading-spinner--xl .loading-spinner__ring {
+    width: 48px;
+    height: 48px;
+  }
+  
+  .loading-spinner--xl .loading-spinner__ring div {
+    width: 48px;
+    height: 48px;
+    border-width: 4px;
+  }
+  
+  .loading-text {
+    font-size: var(--text-xs);
+  }
+}

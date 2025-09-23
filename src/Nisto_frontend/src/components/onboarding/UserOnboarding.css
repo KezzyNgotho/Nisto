@@ -1,0 +1,220 @@
+/* User Onboarding Styles */
+.onboarding-welcome {
+  text-align: left;
+}
+
+.welcome-features {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
+}
+
+.feature-icon {
+  font-size: var(--text-xl);
+  width: 32px;
+  text-align: center;
+}
+
+.feature-item span:last-child {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  color: var(--color-gray-700);
+}
+
+/* Security Onboarding */
+.onboarding-security {
+  text-align: left;
+}
+
+.security-tips {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.security-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
+}
+
+.tip-icon {
+  font-size: var(--text-xl);
+  width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.tip-content h4 {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-gray-900);
+  margin: 0 0 var(--space-1);
+}
+
+.tip-content p {
+  font-size: var(--text-sm);
+  color: var(--color-gray-600);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+/* Features Onboarding */
+.onboarding-features {
+  text-align: left;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-4);
+}
+
+.feature-card {
+  padding: var(--space-4);
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  transition: all var(--transition-fast);
+}
+
+.feature-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.feature-card__icon {
+  font-size: var(--text-2xl);
+  margin-bottom: var(--space-2);
+}
+
+.feature-card h4 {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-gray-900);
+  margin: 0 0 var(--space-1);
+}
+
+.feature-card p {
+  font-size: var(--text-xs);
+  color: var(--color-gray-600);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+/* Complete Onboarding */
+.onboarding-complete {
+  text-align: left;
+}
+
+.complete-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-gray-50);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-gray-200);
+  transition: all var(--transition-fast);
+}
+
+.action-item:hover {
+  background: var(--color-primary);
+  color: var(--color-white);
+  transform: translateY(-1px);
+}
+
+.action-item:hover .action-content h4,
+.action-item:hover .action-content p {
+  color: var(--color-white);
+}
+
+.action-icon {
+  font-size: var(--text-xl);
+  width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.action-content h4 {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-gray-900);
+  margin: 0 0 var(--space-1);
+}
+
+.action-content p {
+  font-size: var(--text-sm);
+  color: var(--color-gray-600);
+  margin: 0;
+  line-height: var(--leading-relaxed);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .feature-item,
+  .security-tip,
+  .action-item {
+    padding: var(--space-3);
+  }
+  
+  .feature-icon,
+  .tip-icon,
+  .action-icon {
+    width: 28px;
+    font-size: var(--text-lg);
+  }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+  .feature-item,
+  .security-tip,
+  .feature-card,
+  .action-item {
+    background: var(--color-gray-700);
+    border-color: var(--color-gray-600);
+  }
+  
+  .feature-item span:last-child,
+  .tip-content h4,
+  .feature-card h4,
+  .action-content h4 {
+    color: var(--color-gray-100);
+  }
+  
+  .tip-content p,
+  .feature-card p,
+  .action-content p {
+    color: var(--color-gray-300);
+  }
+  
+  .action-item:hover {
+    background: var(--color-primary);
+  }
+}

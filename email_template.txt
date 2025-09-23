@@ -1,0 +1,20 @@
+Subject: Your Nesto Wallet Security Code
+
+Hi there,
+
+Your verification code for Nesto Wallet is: {{code}}
+
+This code will expire in {{expires_in}} minutes.
+
+For your security:
+- Never share this code with anyone
+- Nesto Wallet team will never ask for this code
+- Only enter this code on the official Nesto Wallet website
+
+If you didn't request this code, please ignore this email or contact support.
+
+Best regards,
+Nesto Wallet Team
+
+---
+Note: This is an automated message, please do not reply to this email.
